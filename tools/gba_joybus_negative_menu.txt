@@ -1,0 +1,12 @@
+# Synthetic GC parent transcript: put the JP client in smith mode, then send
+# EVT_OPEN_MENU(-10).  Smith screen -10 aliases character-creation name entry.
+handshake
+write 0x0000010A
+write 0x00000010
+write 0x0000031B
+wait 2
+write 0x00F60F14
+state
+dump 0x03000038 0x20
+dump 0x03000138 0x04
+drain

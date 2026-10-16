@@ -43,6 +43,33 @@ whatever bytes are there. The letter pause gives control of the GBA menus
 while the GameCube isn't refreshing that data. **Hypothesis:** this is the
 GES mechanism.
 
+### Equip index 5 is a direct inventory write
+
+The unchecked first byte is stronger than a wrong category. `m_equipment`
+starts at caravan offset `+0xAC`, while `m_inventoryItems` starts at `+0xB6`:
+
+```text
+Link_SendEquipSlot(5 + inventorySlot, itemByte)
+    -> m_inventoryItems[inventorySlot] = sign_extend(itemByte)
+```
+
+Indices 5-68 cover all 64 ordinary inventory slots. The item byte covers IDs
+0-127 and -128 through -1. Inventory count is unchanged, so overwriting an
+occupied slot is the clean use.
+
+The JP radar ROP proves a route-compatible producer. Name `えkk7D8G` retains
+the wrong-craft bytes `82 A6 6B 6B`; retail gadget `0200570D` supplies `r0=5`
+and the name branches into `Smith_EquipResult`'s send tail. The untouched
+client queues `1E 05 9A 00`. GC sign-extends `9A` to item -102 and writes it
+over inventory slot 0. If that is the equipped weapon slot, the next swing
+uses the already-vetted 65,535-power fire row. Use index `5+n` for another
+known occupied slot. Values 60 and 81 similarly inject Dreamcatcher and
+Crystal Mail; Firaga +2 (534) is outside the signed-byte payload.
+
+The packet and GC alias are proven, but the full retail route still needs a
+real ordered Smith/map stream for the radar overflow. Item -102 also retains
+its inventory-sort hazard, so inject it after the last relevant sort.
+
 ## One table, two meanings (confirmed)
 
 `Game.unkCFlatData0[2]` is a table of 0x48-byte rows indexed by item ID. The

@@ -1,0 +1,21 @@
+# Synthetic GC compatibility message.  The fifth relationship name starts at
+# gSession.favorites, so its tenth byte becomes cmdSlotCount (0xE8 == -24).
+handshake
+send-message 0500050100020003000400050000000000111213141516171819E800
+wait 2
+drain
+dump 0x03002CE0 0x30
+# Exact UI sink after UP wraps cursor to cmdSlotCount-1: -25 / 0xE7.
+# Removing the slot queues LINK_CMD_SLOT {slot=E7, value=FFFF} before the
+# damaged row is redrawn.
+poke8 0x03000018 0
+poke8 0x030029A0 0
+poke8 0x03002994 0
+poke32 0x03000138 0
+quiesce
+call-thumb 0x0200AD14 0xFFFFFFE7 0xFFFFFFFF
+dump 0x03000038 0x10
+dump 0x03000138 0x04
+dump 0x04000154 0x08
+drain
+state

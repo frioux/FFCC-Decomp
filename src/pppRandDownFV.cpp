@@ -59,10 +59,12 @@ void pppRandDownFV(_pppPObject* basePtr, RandDownFVParams* in, _pppCtrlTable* ct
 
     s32 sourceOffset = in->sourceOffset;
     f32* target = (sourceOffset == -1) ? (f32*)gPppDefaultValueBuffer : (f32*)(basePtr->m_workArea + sourceOffset);
-    f32 delta = randf(in->blend[0], *valuePtr);
+    f32 x = in->blend[0];
     f32 scale = *valuePtr;
 
-    target[0] = delta + target[0];
-    target[1] += randf(in->blend[1], scale);
-    target[2] += randf(in->blend[2], scale);
+    target[0] += randf(x, scale);
+    x = in->blend[1];
+    target[1] += randf(x, scale);
+    x = in->blend[2];
+    target[2] += randf(x, scale);
 }

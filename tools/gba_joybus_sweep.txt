@@ -1,0 +1,4 @@
+# Boot a live JP client, then exercise every signed Smith screen index in each
+# phase with the common GBA button bits.  Any GBA -> GameCube words are printed.
+handshake
+sweep-smith

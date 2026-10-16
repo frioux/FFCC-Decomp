@@ -12,9 +12,10 @@ GES or wrong equip, any item can be the weapon, so any row can be the attack:
 - **Crashes, softlocks and GPU errors** come from the row's **particle**
   fields. The particle bank and number are barely checked, so a junk row can
   spawn particles from the wrong set or past the end of one.
-- Rows outside the real table can have huge power. **No stable, positive item
-  ID beats Firaga +2**: the strong ones are either negative (wiped when you
-  leave the map) or in script memory (different on every map).
+- Rows outside the real table can have huge power. Marr's Pass has a JP wrong
+  craft at gil **7601** that gives item **-102**, a stable 65,535-power fire
+  attack with particles that safely fail to spawn. A negative item survives a
+  map exit if it is the last occupied inventory slot.
 - The **Meteor Parasite core** checks its phase thresholds when hit, so one
   big enough hit may kill it before later phases. Mio-Raem and Maggie can't be
   rushed this way.
@@ -53,12 +54,14 @@ onward) reads the swung row as `SCharaItemRow`
 
 | Item | What it is | As a weapon |
 |---|---|---|
-| Firaga +2 (534) | Spell | Fire, power 120, contact hit plus a Firaga cast. The best stable option. |
+| Firaga +2 (534) | Spell | Fire, power 120, contact hit plus a Firaga cast. The best ordinary item. |
 | Ultimite, Dark Sphere | Crafting materials (kind 0x12A) | Type `0xFFFF`: no damage. |
 | Ultima / Holy magicite | Unused placeholders | No damage. Also deleted with the rest of the magicite. |
 | Ribbon | Magic +9 artifact (kind 0xB6, only counts in artifact slots) | Type 0: a weak ice hit, power 9. |
 | Force Ring | Accessory: physical resistance | Type 19: no damage. |
-| −50 (`0xFFCE`) | Monster-block row | Thunder, power 160. Two-shot a normal mob in testing. No cast. Wiped when you leave the map. |
+| −50 (`0xFFCE`) | Monster-block row | Thunder, power 160. Two-shot a normal mob in testing. No cast. Usually overwritten on map exit unless it is the final occupied slot. |
+| **−102 (`0xFF9A`)** | Monster-block row, wrong-crafted in JP Marr's Pass at gil 7601 | **Fire, power 65,535. Bank 32 is a stable null slot, so all four particles are skipped.** |
+| −566 (`0xFDCA`) | Monster-block row, wrong-crafted in JP Marr's Pass at gil 14945 | Ice, power 65,535, with the same safe bank-32 behavior. |
 
 ## What a swing reads (confirmed)
 
@@ -113,6 +116,7 @@ Tested items:
 | Item | Particles | Result |
 |---|---|---|
 | Firaga / Blizzaga / Thundaga +2 | Bank 2 (shared set), real particles | Works |
+| **−102, −566** | **Bank 32, one past the slot array** | **Works by construction: the next four bytes are permanently zero, so the data-head check fails.** |
 | −50 | Bank 2,200 (reads 0 here, so skipped) and bank 2 #15 | Works on this map |
 | −810 | Bank 0 (stage set) #0 ×4 | Crashes |
 | 7256 | Bank 0 (stage set) #0, #6, #0, #0 | Crashes on swing or map entry |
@@ -127,18 +131,21 @@ hasn't been traced.
 Scans of live JP memory (a town and two maps of the final dungeon) for rows
 that pass the kind gate, have a magic type and beat power 120:
 
-- **Stable negative rows** (monster block): many with power 65,535, such as
-  −523 (fire). All the ones found have broken particles, and negative items
-  are wiped on leaving a map.
+- **Stable negative rows** (monster block): many have power 65,535. Most have
+  broken particles, but **-102 and -566 use bank 32**, which resolves to the
+  zero field immediately after `m_pdtSlots[32]` and safely returns -1.
 - **Positive rows in script memory:** strong candidates exist on each map,
   such as 6450 (fire, 15,360). But none of them matched between maps, so the
   stats change with the map.
 - **The stable positive range** (IDs 1,206–4,173, boot-time text): only 11
   rows pass the kind gate, and none is usable.
 
-So for every boss, the ceiling is still the real table, with Firaga +2 the
-pick. An item that's only strong in one arena could still be carried
-unequipped and equipped there.
+The Marr's Pass JP heap contains two material-free, zero-price recipe rows that
+produce those safe negatives: 7601 → -102 and 14945 → -566. The first is
+the practical pick. The attack rows themselves come from fixed disc data and
+are stable across maps; the *recipe rows* are Marr heap interpretations and
+still need route/reload and regional testing. See
+[Wrong Craft: Items](wrong-craft-items.md#marrs-pass-candidates-jp-live-memory).
 
 ## Bosses and big hits (confirmed in code, untested)
 
@@ -160,10 +167,12 @@ to 0, the boss's own damage hook runs first, then the death state.
 - **Phase 2:** dies at 0.
 - **Every 50 damage** on the counter, the core retreats for 375 frames.
 
-A single hit that takes it from above the threshold to 0 should start the
-death state in phase 0 or 1, skipping the remaining phases. What the
-(undecompiled) boss script does with an early death, when its phase counter is
-lower than expected, is the open question.
+A single -102 or -566 hit has far more than enough damage to take the core from
+full HP to 0. The native death state replaces the requested phase-change state,
+and the script's generic victory check only requires the core's HP to be zero.
+Therefore both arena changes are skipped and the normal ending continues. This
+is confirmed in code but still needs an end-to-end in-game test; see
+[the boss-script trace](scripts/bosses.md#1-meteor-parasite-one-hit-to-0-hp-skips-the-arena-changes).
 
 Maggie's and Mio-Raem's endings are decided by script, so damage can't skip
 them.

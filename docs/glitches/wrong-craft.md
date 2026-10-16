@@ -70,6 +70,50 @@ checks ([mode.c](../../gba/src/cli/main/mode.c), `symbols.txt`
 | 4–10 | Artifacts … Menu | (overruns into Smith table) | (overruns past Smith table) |
 | 11 / 13 | Message screens (11 = pause) | | |
 
+### Observed submenu-glitch matrix
+
+The practical setup is more specific than directly choosing an invalid shop
+screen. Start talking to the NPC, then pause one frame after pressing A on the
+initial dialogue. The pause packet arrives while the GBA is still in field
+mode and saves the current field submenu in `gSavedScreen`. The NPC mode packet
+then changes to shop or smith and resets only `gScreen`. On unpause, menu 12
+copies the saved field index into the new mode, whose unchecked table interprets
+the same number differently.
+
+The following older observations were made with that exact setup. “Letter
+submenu” is still field screen 9; it means the pause was performed after
+entering a letter rather than from the letter list.
+
+| Submenu ID | GBA menu before pause | At crafting NPC | At merchant NPC | Notes |
+|---:|---|---|---|---|
+| 0 | Radar | Recipe menu | Merchant menu | Normal top screens. |
+| 1 | Command menu | **Craft menu** | Buy menu | Stable wrong-craft entry. |
+| 2 | Item menu | Equip menu | Sell menu | Stable cross-mode alias. |
+| 3 | Equipment menu | Empty | Empty | Calls `Screen_Idle`. |
+| 4 | Artifacts menu | Recipe-like weapon screen | Recipe menu | Merchant 4 is the real smith-top triple. |
+| 5 | Treasure menu | Crash | **Craft menu** | Merchant 5 is the real smith-forge triple. |
+| 6 | Money menu | Crash | Equip menu | Merchant 6 is the real smith-equip triple. |
+| 7 | Favorites menu | Craft-like/empty screen | Empty | Observed contents depend on stale recipe-list data. Merchant 7 is `Screen_Idle`. |
+| 8 | Family menu | Crash | Crash | Both are past their real tables. |
+| 9 | Letter list | Glitchy letter menu | Crash | Region-dependent OOB layout. |
+| 9 | Letter read submenu | Glitchy letter menu | Crash | Same saved ID, different retained letter/window state. |
+| 10 | Main menu | Specific-letter screen, crash-prone | Letter-like screen, crash-prone | Region-dependent OOB layout and retained letter state. |
+
+The stable merchant results at IDs 4-7 have a simple layout explanation:
+`gShopScreens` is immediately followed by `gSmithScreens`, so shop screen 4 is
+smith screen 0, shop 5 is smith 1, shop 6 is smith 2, and shop 7 is smith 3.
+These are genuine function calls, not data execution.
+
+The crafting-NPC results above ID 3 are different. They fetch words after
+`gSmithScreens` as code pointers. On EN/PAL the following five triples are the
+keyboard character-table pointers, followed by the real letter-state table;
+therefore smith 9 is the complete Letter List triple and smith 10 is the
+complete Letter Read triple. On JP, fourteen Japanese letter-text pointers
+occupy that space instead, so the letter functions begin partway through smith
+screen 8. The recipe/craft-looking displays at smith IDs 4 and 7 are not calls
+to the real recipe or forge functions: they execute fixed text/table data and
+can leave stale list and tile state visible before hanging or crashing.
+
 Pause and unpause arrive as "open menu" 11 and 12
 ([widget.c `Menu_OnOpen`](../../gba/src/cli/main/widget.c#L643)):
 
@@ -243,3 +287,10 @@ state machine yet.
   or a route to screen 1 that skips `CmdListScreen_Setup`.
 - **The cause of the roughly 50% junk rate.** The leading candidate is the
   artifact-sync rebuild in §3.
+
+The much more violent out-of-range smith screens are now traced separately in
+[Negative Letter Attachments](letter-reply-oob.md#why-the-pixel-vomit-smith-screens-matter).
+On JP, screens 4-8 execute Japanese text bytes as ARM instructions and write
+the smith dispatch table and VRAM, explaining the pixel-vomit behavior. Screens
+9-12 overlap real letter-state function pointers, including gift and reply
+functions.

@@ -9,13 +9,16 @@ Confirmed from the scripts unless marked otherwise.
 
 ## Debug tools and test maps
 
-- **`startmap`**, the developer start map: character-creation shortcuts
+- **`startmap`** (EN/PAL only), the developer start map: character-creation shortcuts
   (`debug_chara_making_1..5`), map jump menus (`debug_jump_dun`, `_kai`, `_num`,
   `_phs`, `_snd`, `_ssr`, `_top`, `_tst`, `_twn`, `_zon`), item test NPCs, a
   player database and party copy helpers. It loads `test.cfd`, which still has
   untranslated Japanese debug strings in the PAL build. It is reached only
   through the `default:` branch of every map's Mog-house return table (an
-  unknown `G59`), which no live path hits.
+  unknown `G59`), which no live path hits. JP's `mog_0` bytecode retains the
+  same default `loadCFlat('startmap')` call, but the JP disc omits
+  `startmap.cft`; taking that branch there should fail rather than open the
+  debug map.
 - **Debug bits in `G88`:** 1 = no map exits, 16 = no BGM loading, 32 = no map
   sound, 64 = no stream.
 - **`mail.cft`**, a letter test bench reached from startmap: a main menu (MAIL

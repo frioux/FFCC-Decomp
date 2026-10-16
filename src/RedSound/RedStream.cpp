@@ -480,10 +480,10 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 		if ((streamData->m_track != REDSOUND_STREAM_TRACK_NONE) &&
 		    RedStreamDataHasBuffer(streamData) &&
 		    RedStreamDataHasAramBuffer(streamData)) {
-			bufferValue = REDSOUND_STREAM_FILE_AUDIO_OFFSET;
 			streamFile = RedStreamFileFromHeader(streamHeader);
+			RedStreamFileGetAdpcm(streamFile, REDSOUND_STREAM_LEFT_CHANNEL)->m_data.pred_scale =
+			    RedStreamFileGetSampleByte(streamFile, bufferValue = REDSOUND_STREAM_FILE_AUDIO_OFFSET);
 			adpcmHeader = RedStreamFileGetAdpcm(streamFile, REDSOUND_STREAM_LEFT_CHANNEL);
-			adpcmHeader->m_data.pred_scale = RedStreamFileGetSampleByte(streamFile, bufferValue);
 			adpcmHeader->m_data.yn1 = adpcmHeader->m_data.yn2 = 0;
 			if (RedStreamHeaderIsStereo(&streamData->m_header)) {
 				if (RedStreamHeaderHasNoLoop(&streamData->m_header)) {

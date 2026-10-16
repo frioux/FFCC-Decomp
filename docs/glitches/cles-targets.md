@@ -157,6 +157,31 @@ the high half `0x8093`. The first halfword read from there is `0xFF00`, so the
 radius becomes **652.8**. This matches the "huge hitbox" seen when the value
 was poked to `-1` by hand.
 
+There is now a stronger route to the same write. A
+[negative letter attachment](letter-reply-oob.md) with inventory index -72
+calls `DeleteItemIdx(-72)` directly. Radar ROP can construct and send that
+reply without entering the normal gift selector: the legal JP name `kB3D G`
+queues attachment value `0xFFB80001`. Thus neither negative gift-selection
+state nor an attachable `gSession.items[-72]` value is required. The alternate
+name `えkk3D G` performs the same call while preserving the existing Any%
+wrong-craft prefix.
+
+The radar-ROP lab has now solved the **CLES index delivery** by a different
+route. The legal JP name `qB G` calls `Link_SendCmdSlot(1, -72)` and the retail
+client queues `1F 01 B8 FF`. Thus the normal GBA 0-63 candidate clamp is not a
+fundamental blocker once the radar chain is available. This does not itself
+perform the write: using that command still checks whether the pointer low
+half is food. The remaining Big Chungus gates are therefore:
+
+1. Realize the synthetic radar/ROP row with the redirected retail GC smith
+   buffer.
+2. Enter a heap state where the selected character row's pointer low half
+   resolves to kind `0x017D` or `0x0186`.
+
+The proved radar-to-letter route is preferable: it skips the second gate
+entirely. Its sole shared exploit gate is realizing the synthetic radar/ROP
+row with a redirected retail GC smith buffer.
+
 ### The 8 food-check slots (PAL)
 
 The low half `T` is one of 8 fixed values, so whether it is edible depends on 8
@@ -215,6 +240,20 @@ can only help if its first field is an item ID; `CLoadModel`'s model ID at
 
 Other versions load the rows and item table at different addresses, so their
 8 slots need their own dump.
+
+### Live JP Marr's Pass check (2026-10-09)
+
+In the running `weapon_0` session, the JP character table was `0x809627C0`
+and the item table was `0x80979FC0`. The eight pointer-low food checks read:
+
+```text
+row 0..7: CDCD, 0000, 6D72, 0000, 0000, 0000, D5D5, 0000
+```
+
+None is kind `0x017D` or `0x0186`, so CLES cannot eat the `m_romWork` low
+half for any tribe/gender in this Marr's Pass heap state. The active slot-0
+Lilty used pointer `0x80962B70`; its value `0x2B70` checked row address
+`0x80A3D740`, which held `0x6D72`.
 
 ## In-reach values that reach 381–392 on their own
 

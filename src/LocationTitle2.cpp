@@ -195,11 +195,9 @@ static const char s_locationNodeName[] = "loc";
 extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLocationTitle2Step* unkB, pppLocationTitle2Offsets* unkC)
 {
     CChara::CNode* node;
-    Vec* interpWrite;
-    int j;
-    LocationTitle2Particle* startParticle;
     Vec* interpRead;
     LocationTitle2Particle* dst;
+    int j;
     int i;
     CCharaPcs::CHandle* handle;
     Vec stepDir;
@@ -295,17 +293,15 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
             if (work->m_count > 1) {
                 startIndex = (int)work->m_count - 2;
                 inserted = 0;
-                startParticle = &particles[startIndex];
                 stepScale = 1.0f / (float)(unkB->m_stepCount + 1);
-                PSVECSubtract(&particles[startIndex + 1].m_pos, &startParticle->m_pos, &stepDir);
+                PSVECSubtract(&particles[startIndex + 1].m_pos, &particles[startIndex].m_pos, &stepDir);
                 interpRead = interp;
-                interpWrite = interpRead;
 
                 for (i = 0; i < unkB->m_stepCount; i++) {
                     float t = stepScale * (float)(i + 1);
 
                     PSVECScale(&stepDir, &scaled, t);
-                    PSVECAdd(&startParticle->m_pos, &scaled, interpWrite);
+                    PSVECAdd(&particles[startIndex].m_pos, &scaled, &interp[i]);
                     inserted++;
                     work->m_count++;
 
@@ -316,11 +312,9 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
                             break;
                         }
                     }
-
-                    interpWrite++;
                 }
 
-                pppCopyVector(particles[startIndex + 1 + inserted].m_pos, startParticle[1].m_pos);
+                pppCopyVector(particles[startIndex + 1 + inserted].m_pos, particles[startIndex + 1].m_pos);
 
                 for (j = 0; j < inserted; j++) {
                     dst = &particles[startIndex + 1 + j];

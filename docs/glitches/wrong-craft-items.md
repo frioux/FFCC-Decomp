@@ -17,6 +17,10 @@ item.
 - **Gil 1205 and up reads past the end of the table, and 32768 and up reads
   before it.** The memory on both sides was mapped live on JP (below): some of
   it is fixed, and some changes with the map.
+- **Marr's Pass has a new JP boss-weapon candidate:** gil **7601** gives a
+  Lilty item **-102**, whose attack has fire type and power 65,535. Its
+  particle bank lands on a permanent zero sentinel, so the particles safely
+  fail to spawn. Gil **4603** also gives Crystal Mail with no materials.
 
 ## Gil after the craft (confirmed)
 
@@ -127,7 +131,8 @@ Also note:
 
 - Items 256–292 (all magicite) are deleted by `SafeDeleteTempItem`
   ([gobjwork.cpp:1653](../../src/gobjwork.cpp#L1653)).
-- Negative item IDs don't survive leaving a map (below).
+- Negative item IDs survive only if the inventory sort has no later positive
+  item to move over them (below).
 
 ### Negative item IDs
 
@@ -135,7 +140,7 @@ Also note:
 0x8000–0xFFFE becomes a negative item. Its row is read from before the table,
 which for IDs −1 to about −1,276 is the stable monster block.
 
-They get wiped by the sort that runs when you leave a map,
+They can be wiped by the sort that runs when you leave a map,
 `SortBeforeReturnWorldMap` ([gobjwork.cpp:2305](../../src/gobjwork.cpp#L2305)),
 called from the end-of-stage bonus screen. It treats any item ≤ 0 as an empty
 slot:
@@ -148,11 +153,114 @@ slot:
   sort is done, for example as the last or only item.
 - Item 0 (`DUMMY-US`) is wiped the same way.
 
+This makes a negative weapon routeable: put it in the final occupied inventory
+slot, and make sure no positive item is added after it before returning to the
+world map. It can remain equipped as long as the item itself survives the
+sort.
+
 ### Side effect: the item counter
 
 Each wrong craft "deletes" slot 166 (gil), which decrements
 `m_inventoryItemCount` without removing an item. One test caravan held 9 items
 while the counter read 6.
+
+## Marr's Pass candidates (JP live memory)
+
+The live JP game was in `weapon_0` (Marr's Pass). Scanning all 65,536 signed
+gil rows for Lilty results found these clean rows:
+
+| Gil | Result | Smith price | First material | Use |
+|---|---|---:|---:|---|
+| **4603** | Crystal Mail (81) | 0 | 0 | Miasma armor |
+| **7601** | **-102 (`0xFF9A`)** | 0 | 0 | 65,535-power fire weapon |
+| 14945 | -566 (`0xFDCA`) | 0 | 0 | 65,535-power ice weapon |
+| 15584 | Firaga +2 (534) | 0 | 0 | Existing safe spell weapon |
+
+These recipe rows are not in `param.cfd`; they are interpretations of the
+loaded Marr's Pass heap. The 7601 row overlaps a `cflat_runtime.cpp` allocation
+header and the other rows lie in loaded script/texture data. They are therefore
+**confirmed for this JP Marr's Pass allocation**, not yet proven for EN/PAL or
+after every possible route into the town.
+
+The 7601 result is the strongest candidate. Item -102 reads from the fixed
+monster-data allocation immediately before the item table:
+
+| Attack field | Value |
+|---|---:|
+| Effect / kind / field 04 / base power | `FFFF FFFF FFFF FFFF` |
+| Damage type | 1 (fire) |
+| Base power | 65,535 |
+| Scale / particle bank | 10 / **32** |
+| Particle entries | 100, 30, 90, 150 (PAL: 100, 25, 75, 125) |
+| Attack frames | 67 / 0 |
+
+Because -102 is below 501, the damage handler skips the normal kind check.
+Power is loaded unsigned. Particle bank 32 is one past the 32-entry particle
+slot array, but that address is the four-byte zero field immediately following
+the array, so `pppCreate0` sees a null data pointer and returns -1. The row is
+byte-identical in JP and EN; PAL changes only the particle numbers/spec, while
+retaining the power, type and bank-32 null behavior.
+
+Negative weapons do not try to load model `0xFFF`: `changeWeapon` treats an
+item ID ≤ 0 as no visible weapon model while retaining the negative attack ID.
+The row's out-of-range sound request safely fails lookup, while sound 91 is a
+normal effect. No particle or model dereference remains on the known swing
+path.
+
+Item -566 has the same safe bank and power, but type 0 (ice), scale 25, and is
+strictly worse as a Marr setup because it needs 14,945 gil. It remains useful
+as independent confirmation that more than one fixed monster row is a stable
+nuke weapon.
+
+### No clean Marr's Pass Dreamcatcher
+
+Only two Marr rows returned Dreamcatcher for a Lilty. Neither is route-safe:
+
+- gil 5725 starts material loops of 256, 59 and 2,307 deletions;
+- gil 55097 has similarly bogus nonzero material IDs and counts.
+
+Missing materials do not cancel a craft. Each missing copy instead calls
+`DeleteItemIdx(64)`, repeatedly touching the first artifact slot, decrementing
+the item counter, and flooding the 64-entry send queue. These rows are good
+crash/queue-overflow probes, not speedrun crafts. Thus Marr can replace the
+Crystal Mail and damage parts of the Tipa setup, but it does not yet replace
+the Dreamcatcher movement weapon.
+
+### Equipping a negative result without GES
+
+There is a plausible retail path through stale smith state. On an item update,
+[`Session_OnItemChange`](../../gba/src/cli/main/session.c#L73) calls
+`Smith_SetResultSlot(idx)` only when the new item value is positive. A negative
+wrong-craft result enters the GameCube inventory but leaves
+`sSmithResultSlot` unchanged. That variable is not reset by smith-screen setup.
+
+The route is:
+
+1. Craft a positive weapon into the inventory slot that the negative item will
+   later occupy. This records that slot on the GBA.
+2. Sell or otherwise remove the positive item without restarting the GBA.
+3. Wrong-craft -102 into the newly empty slot.
+4. Use the smith's Equip prompt. Its stale slot still names the negative item,
+   and `ChgEquipPos` does not validate the item ID.
+
+The stale-slot behavior and unchecked equip are confirmed in code. The full
+sequence is still a hypothesis until performed without GES; it also needs the
+recycled recipe metadata to describe a weapon so the Equip prompt chooses slot
+0. A route can retain Dreamcatcher in a command-list slot and the negative
+item as the actual equipped weapon, switching to Dreamcatcher for a zip and
+back to Attack for the boss hit.
+
+A cleaner producer-gated alternative now exists. Radar ROP with the same
+`えkk7D8G` name queues `1E 05 9A 00`; unchecked equip index 5 aliases
+inventory slot 0 and stores signed item -102 directly. Thus an existing
+slot-0 weapon becomes the nuke weapon without this stale-smith sequence. The
+retail GBA packet and GC alias are proven; a real Smith/map overflow stream is
+still required.
+
+All four clean rows have price zero. The wrong craft first changes the low
+half of gil to `0xFFFF`, and charging zero leaves it there. Zero price also
+causes the known error-then-success reply pair, so an extra confirm can start a
+second, dangerous craft from signed row -1. Exit the prompt deliberately.
 
 ## The double craft (confirmed on JP)
 

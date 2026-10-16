@@ -887,6 +887,12 @@ int CCaravanWork::GetFoodRank(int foodIdx)
  */
 void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxResults)
 {
+	int cmpValue;
+	int letterIdx;
+	int excludeFlag;
+	int bit0;
+	int bit1;
+	int bit2;
 	int foundCount = 0;
 
 	for (int i = 0; i < maxResults; i++) {
@@ -894,11 +900,11 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 	}
 
 	CRomLetterWork* curLetter = reinterpret_cast<CRomLetterWork*>(Game.m_romLetterWorkBase);
-	for (int letterIdx = 0; letterIdx < 0x200; letterIdx++, curLetter++) {
+	for (letterIdx = 0; letterIdx < 0x200; letterIdx++, curLetter++) {
 		unsigned short condBits = curLetter->m_personalConditions;
 
 		if ((condBits & 0x7FFF) != 0) {
-			int excludeFlag = condBits & 0x8000;
+			excludeFlag = condBits & 0x8000;
 			if ((condBits & 0x0001) != 0) {
 				if (m_tribeId == 0) {
 					if (excludeFlag == 0) {
@@ -1034,7 +1040,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 		condBits = curLetter->m_linkConditions;
 		if ((condBits & 0x7FFF) != 0) {
-			int excludeFlag = condBits & 0x8000;
+			excludeFlag = condBits & 0x8000;
 			if ((condBits & 0x0001) != 0) {
 				if (m_jobType == 0) {
 					if (excludeFlag == 0) {
@@ -1179,7 +1185,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 		condBits = curLetter->m_linkValueConditions;
 		if ((condBits & 0x7FFF) != 0) {
-			int excludeFlag = condBits & 0x8000;
+			excludeFlag = condBits & 0x8000;
 			if ((condBits & 0x0001) != 0) {
 				if (Game.m_gameWork.m_linkTable[m_saveSlot][0][m_saveSlot][1] >= 0x3D) {
 					if (excludeFlag == 0) {
@@ -1313,7 +1319,6 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 	PassedLinkValueConditions:
 
-		int cmpValue;
 		int sysVal0 = static_cast<int>(Game.m_gameWork.m_scriptSysVal0);
 		int sysVal1 = Game.m_gameWork.m_timerA;
 		int sysVal2 = Game.m_gameWork.m_scriptGlobalTime;
@@ -1388,9 +1393,6 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 
 		{
 			for (int i = 0; i < 8; i++) {
-				int bit0;
-				int bit1;
-				int bit2;
 				const unsigned short evtRule = curLetter->m_eventRules[i];
 				const int sourceType = (evtRule >> 11) & 3;
 
@@ -1483,9 +1485,10 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		}
 
 		if (foundCount == maxResults) {
+			int i;
 			int minPriority = 0xFFFF;
 			int replaceIndex = 0;
-			for (int i = 0; i < maxResults; i++) {
+			for (i = 0; i < maxResults; i++) {
 				const int priority = romLetterWork[i]->m_priorityFlags & 0xF00;
 				if (priority < minPriority) {
 					minPriority = priority;
@@ -2340,7 +2343,7 @@ void CCaravanWork::GetCurrentWeaponItem(int& weaponItem, int& weaponRef)
 	if (m_weaponIdx == 0) {
 		weaponItem = 0;
 		CCaravanWork* ownerWork = reinterpret_cast<CCaravanWork*>(static_cast<CGPartyObj*>(m_ownerObj)->m_scriptHandle);
-		int equippedSlot = ownerWork->m_equipment[0];
+		int equippedSlot = (short)ownerWork->m_equipment[0];
 		weaponRef = equippedSlot >= 0 ? ownerWork->m_inventoryItems[equippedSlot] : 0;
 	} else if (m_weaponIdx != 1) {
 		weaponItem = m_weaponIdx;

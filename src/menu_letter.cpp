@@ -1270,17 +1270,21 @@ void CMenuPcs::LetterListDraw()
  */
 void CMenuPcs::LetterMessDraw()
 {
-	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
-	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-
-	CCaravanWork* const caravanWork = GetLetterCaravanWork();
-	s16 mode = m_letterMenuState->previousMode;
+	CCaravanWork* caravanWork;
+	s16 mode;
+	SingleFadeEntry* panel;
 	float x1, x0;
 	float y0, y1;
 	float u, v;
 	GXColor colors[4];
 
-	SingleFadeEntry* panel = m_singleFadeState->entries;
+	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
+	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+	caravanWork = GetLetterCaravanWork();
+	panel = m_singleFadeState->entries;
+	mode = m_letterMenuState->previousMode;
+
 	for (int i = 0; i < m_singleFadeState->count; ++i, ++panel) {
 		int tex = panel->tex;
 		if (tex < 0) {
@@ -1776,18 +1780,19 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	float x1;
 	float w;
 	float y1;
+	float innerX;
 
 	if (openRatio <= 0.0f) {
 		return;
 	}
 
-	float grow = 480.0f * openRatio;
-	float left = 288.0f - static_cast<float>(grow / 2.0);
-	float width = 64.0 + grow;
+	w = 480.0f * openRatio;
+	float left = 288.0f - static_cast<float>(w / 2.0);
+	w = 64.0 + w;
 	float top = 72.0f;
 	int leftPx = static_cast<int>(static_cast<double>(left) - 0.5);
 	int topPx = static_cast<int>(static_cast<double>(top) - 0.5);
-	int widthPx = static_cast<int>(static_cast<double>(width) - 1.0);
+	int widthPx = static_cast<int>(w - 1.0);
 	float height = 336.0f;
 	int heightPx = static_cast<int>(static_cast<double>(height) - 1.0);
 	x0 = static_cast<float>(leftPx);
@@ -1843,7 +1848,7 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 		    0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	}
 
-	float innerX = 32.0f + x0;
+	innerX = 32.0f + x0;
 	double innerW = w - 64.0;
 	float innerWf = static_cast<float>(innerW);
 	float y = y0;

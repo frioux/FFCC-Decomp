@@ -1,0 +1,6 @@
+# Download a real JP radar map through the same LINK_DATA framing as the GC.
+handshake
+send-bulk-file 1 orig/GCCJGC/files/dvd/gba/m01_1.mcd
+dump 0x0202E000 32
+dump 0x03002AE8 8
+state
