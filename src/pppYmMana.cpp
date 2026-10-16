@@ -109,7 +109,13 @@ static void CalcReflectionVector2(
     Mtx rotateMtx;
     Mtx nodeOffsetMtx;
     Mtx workMtx;
+    u8 fmt;
     u16* dl = (u16*)displayList;
+    u8 drawFmt;
+    u16 itemCount;
+    int i;
+    u16 posIndex;
+    u16 normalIndex;
     const float zero = 0.0f;
     const float denomBias = 1.0f;
     const float half = 0.5f;
@@ -142,12 +148,10 @@ static void CalcReflectionVector2(
     normalMtx[1][3] = 0.0f;
     normalMtx[2][3] = 0.0f;
 
-    u16* dlEnd = (u16*)((u8*)displayList + displayListSize);
-    while (dl < dlEnd) {
-        u8 drawFmt = *(u8*)dl;
-        u16 itemCount = *(u16*)((u8*)dl + 1);
-        int i;
-        u32 fmt = drawFmt & 7;
+    while (dl < (u16*)((u8*)displayList + displayListSize)) {
+        drawFmt = *(u8*)dl;
+        itemCount = *(u16*)((u8*)dl + 1);
+        fmt = drawFmt & 7;
 
         dl = (u16*)((u8*)dl + 3);
         if (Util.IsHasDrawFmtDL(drawFmt) == 0) {
@@ -155,8 +159,11 @@ static void CalcReflectionVector2(
         }
 
         for (i = 0; i < itemCount; i++) {
-            u16 posIndex = dl[0];
-            u16 normalIndex = dl[1];
+            float tx;
+            float ty;
+
+            posIndex = dl[0];
+            normalIndex = dl[1];
             dl += 4;
             if (fmt == 2) {
                 dl++;
@@ -192,8 +199,10 @@ static void CalcReflectionVector2(
             uv.y *= half;
             uv.x += half;
             uv.y += half;
-            uv.x = uv.x - scale * (warp * (uv.x - half));
-            uv.y = uv.y - scale * (warp * (uv.y - half));
+            tx = warp * (uv.x - half);
+            ty = warp * (uv.y - half);
+            uv.x = uv.x - scale * tx;
+            uv.y = uv.y - scale * ty;
             Util.ConvF2IVector2d(texCoordA[posIndex], uv, 12);
 
             uv.x = -reflectionVec[posIndex].x / (denomBias - reflectionVec[posIndex].z);
@@ -202,8 +211,10 @@ static void CalcReflectionVector2(
             uv.y *= half;
             uv.x += half;
             uv.y += half;
-            uv.x = uv.x - scale * (warp * (uv.x - half));
-            uv.y = uv.y - scale * (warp * (uv.y - half));
+            tx = warp * (uv.x - half);
+            ty = warp * (uv.y - half);
+            uv.x = uv.x - scale * tx;
+            uv.y = uv.y - scale * ty;
             Util.ConvF2IVector2d(texCoordB[posIndex], uv, 12);
         }
     }
@@ -519,8 +530,6 @@ static int RenderWaterMesh(VYmMana* mana)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma push
-#pragma opt_common_subs off
 static int UpdateWaterMesh(VYmMana* mana)
 {
     float* waterHeightA;
@@ -529,7 +538,12 @@ static int UpdateWaterMesh(VYmMana* mana)
     Vec origin;
     float currentScale;
     float neighborScale;
+    s32 col;
+    s32 row;
+    int index;
+    s32 stride;
 
+    stride = 0x11;
     waterHeightA = mana->m_waterHeightA;
     positions = mana->m_positions;
     waterHeightB = mana->m_waterHeightB;
@@ -537,15 +551,14 @@ static int UpdateWaterMesh(VYmMana* mana)
         return 0;
     }
 
-    for (int row = 1; row < 0x10; row++) {
+    for (row = 1; row < 0x10; row++) {
         currentScale = 0.0f;
         neighborScale = 0.5f;
-        for (int col = 1; col < 0x10; col++) {
-            int index = row * 0x11 + col;
-            float* center = &waterHeightA[index];
-            waterHeightB[index] = currentScale * center[0] +
-                                  neighborScale * (waterHeightA[index - 0x11] + waterHeightA[index + 0x11] +
-                                                   center[-1] + center[1]) -
+        for (col = 1; col < 0x10; col++) {
+            index = row * stride + col;
+            waterHeightB[index] = currentScale * waterHeightA[index] +
+                                  neighborScale * (waterHeightA[index - stride] + waterHeightA[index + stride] +
+                                                   waterHeightA[index - 1] + waterHeightA[index + 1]) -
                                   waterHeightB[index];
         }
     }
@@ -567,7 +580,6 @@ static int UpdateWaterMesh(VYmMana* mana)
                               mana->m_waterMtx, mana->m_colors, mana->m_texCoord1);
     return 1;
 }
-#pragma pop
 
 /*
  * --INFO--
