@@ -115,10 +115,15 @@ static inline void wrap_particle_rotation_triplet_s32(s32* rotation)
     }
 }
 
-static inline signed char random_signed_byte_span(u8 span)
+static inline float get_rand()
 {
-    Math.RandF();
-    return (signed char)((s32)((float)((u8)span * 2) * Math.RandF() - (float)((u8)span / 2)));
+    return Math.RandF();
+}
+
+static inline signed char get_noise(u8 span)
+{
+    get_rand();
+    return (signed char)((float)(span * 2) * get_rand() - (float)(span >> 1));
 }
 
 /*
@@ -1064,10 +1069,10 @@ static void birth(
     }
 
     {
-        particleData->m_colorOffset[0] = random_signed_byte_span(params->m_colorOffsetRange[0]);
-        particleData->m_colorOffset[1] = random_signed_byte_span(params->m_colorOffsetRange[1]);
-        particleData->m_colorOffset[2] = random_signed_byte_span(params->m_colorOffsetRange[2]);
-        particleData->m_colorOffset[3] = random_signed_byte_span(params->m_colorOffsetRange[3]);
+        particleData->m_colorOffset[0] = get_noise(params->m_colorOffsetRange[0]);
+        particleData->m_colorOffset[1] = get_noise(params->m_colorOffsetRange[1]);
+        particleData->m_colorOffset[2] = get_noise(params->m_colorOffsetRange[2]);
+        particleData->m_colorOffset[3] = get_noise(params->m_colorOffsetRange[3]);
     }
 
     if (params->m_fadeOutFrames != 0) {
