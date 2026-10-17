@@ -2589,14 +2589,14 @@ unsigned int CMenuPcs::CmdClose1()
  * JP Address: TODO
  * JP Size: TODO
  */
-unsigned int CMenuPcs::CmdOpen2()
+inline unsigned int CMenuPcs::CmdOpen2()
 {
 	int done;
 	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
 
-	m_cmdState->transitionTimer = static_cast<s16>(m_cmdState->transitionTimer + 1);
+	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
-	s32 selected = static_cast<s32>(m_cmdState->selected[0]);
+	s32 selected = static_cast<s32>(GetCmdStateView(this)->selected[0]);
 	s32 prev;
 	for (prev = selected - 1; prev > 2; prev--) {
 		if (caravanWork->m_commandListExtra[prev] >= 0) {
@@ -2614,20 +2614,24 @@ unsigned int CMenuPcs::CmdOpen2()
 
 	CmdListEntry* fadeEntry;
 	s32 i;
-	for (i = 0; i < static_cast<s32>(m_cmdList->count); i++, fadeEntry++) {
+	for (i = 0; i < static_cast<s32>(GetCmdListStorage(this)->count); i++, fadeEntry++) {
 		if ((i < prev) || (i > next)) {
-			fadeEntry = &m_cmdList->entries[i];
+			fadeEntry = &GetCmdListStorage(this)->entries[i];
 			fadeEntry->alpha = static_cast<float>(
-			    -((0.1 * static_cast<double>(static_cast<s32>(m_cmdState->transitionTimer))) - 1.0));
+			    -((0.1 * static_cast<double>(static_cast<s32>(GetCmdStateView(this)->transitionTimer))) - 1.0));
 			if (static_cast<double>(fadeEntry->alpha) < 0.5) {
 				fadeEntry->alpha = 0.5f;
 			}
 		}
 	}
 
-	done = (static_cast<double>(static_cast<s32>(m_cmdState->transitionTimer)) >= 5.0) ? 1 : 0;
+	if (static_cast<double>(static_cast<s32>(GetCmdStateView(this)->transitionTimer)) >= 5.0) {
+		done = 1;
+	} else {
+		done = 0;
+	}
 	if (done != 0) {
-		m_cmdState->selected[m_cmdState->mode] = static_cast<s16>(prev);
+		GetCmdStateSelections(GetCmdStateView(this))[GetCmdStateView(this)->mode] = static_cast<s16>(prev);
 	}
 	return done;
 }
