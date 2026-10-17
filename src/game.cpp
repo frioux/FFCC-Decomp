@@ -503,7 +503,7 @@ void CGame::clearWork()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::clearWorkMap()
+inline void CGame::clearWorkMap()
 {
     if (MapPcs.GetCharLightHolderSize() != 0) {
         _GXColor color;
@@ -531,7 +531,7 @@ void CGame::clearWorkMap()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGame::clearWorkScript()
+inline void CGame::clearWorkScript()
 {
     int i;
 
