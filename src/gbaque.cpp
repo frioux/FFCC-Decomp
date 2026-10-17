@@ -337,7 +337,6 @@ void GbaQueue::LoadAll()
 	char prevMenuStageMode;
 	char spModeBits;
 	char spModeChangeBits;
-	int cflatFlag;
 
 	for (i = 0; i < 4; i++) {
 		OSWaitSemaphore(&accessSemaphores[i]);
@@ -368,27 +367,7 @@ void GbaQueue::LoadAll()
 		OSSignalSemaphore(&accessSemaphores[i]);
 	}
 
-	cflatFlag = CFlat.IsInitFinished();
-
-	LoadPlayerStat();
-	LoadEnemyStat();
-	LoadMapItemStat();
-
-	if ((m_scrInitEnd == 0) && (cflatFlag != 0)) {
-		SetRadarType();
-	}
-	if (cflatFlag == 0) {
-		memset(m_hitInfo, 0xFF, sizeof(m_hitInfo));
-		m_chgHitFlags = 0;
-	}
-
-	for (i = 0; i < 4; i++) {
-		OSWaitSemaphore(&accessSemaphores[i]);
-	}
-	m_scrInitEnd = cflatFlag;
-	for (i = 0; i < 4; i++) {
-		OSSignalSemaphore(&accessSemaphores[i]);
-	}
+	LoadAllStat();
 
 	LoadMapObj();
 
@@ -1175,9 +1154,28 @@ void GbaQueue::GetMBasePos(int channel, short* outX, short* outY)
  */
 inline void GbaQueue::LoadAllStat()
 {
+	int i;
+	int cflatFlag = CFlat.IsInitFinished();
+
 	LoadPlayerStat();
 	LoadEnemyStat();
 	LoadMapItemStat();
+
+	if ((m_scrInitEnd == 0) && (cflatFlag != 0)) {
+		SetRadarType();
+	}
+	if (cflatFlag == 0) {
+		memset(m_hitInfo, 0xFF, sizeof(m_hitInfo));
+		m_chgHitFlags = 0;
+	}
+
+	for (i = 0; i < 4; i++) {
+		OSWaitSemaphore(&accessSemaphores[i]);
+	}
+	m_scrInitEnd = cflatFlag;
+	for (i = 0; i < 4; i++) {
+		OSSignalSemaphore(&accessSemaphores[i]);
+	}
 }
 
 /*
