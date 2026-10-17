@@ -598,7 +598,7 @@ inline void GbaQueue::SetSellData(int channel, unsigned int value)
 		Game.m_scriptFoodBase[channel]->m_inventoryItems[static_cast<int>(bytes[2])];
 	Game.m_scriptFoodBase[channel]->DeleteItemIdx(bytes[2], 1);
 	const unsigned short baseGil =
-		reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemId].m_price;
+		reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable)[itemId].m_price;
 	float shopRate = static_cast<float>(static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
 	shopRate *= 0.25f;
 	int gil = static_cast<int>(shopRate * static_cast<float>(baseGil));
@@ -631,7 +631,7 @@ inline void GbaQueue::SetBuyData(int channel, unsigned int value)
 		}
 	}
 	const unsigned short baseGil =
-		reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[shopItem].m_price;
+		reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable)[shopItem].m_price;
 	const float shopRate = static_cast<float>(static_cast<double>(Game.m_scriptFoodBase[channel]->m_shopParam) / 100.0);
 	const int gil = static_cast<int>(shopRate * static_cast<float>(baseGil));
 	Game.m_scriptFoodBase[channel]->AddGil(-(gil * quantity));
@@ -898,7 +898,7 @@ void GbaQueue::SetSmithData(int channel, unsigned int value)
 
 	caravanWork->DeleteItemIdx(itemSlot, 1);
 
-	itemRow = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[baseItem];
+	itemRow = &reinterpret_cast<SItemFlatRow*>(Game.m_itemTable)[baseItem];
 	smithItem = itemRow->m_smithResults[recipeIndex];
 
 	for (i = 0; i < 3; i++) {
@@ -1421,7 +1421,7 @@ void GbaQueue::LoadEnemyStat()
 			if (Game.m_monObjects[i] == 0 || Game.m_monObjects == 0) {
 				localEnemyData[i].m_baseDataIndex = 0;
 			} else {
-				const CRomWork* enemyData = &reinterpret_cast<const CRomWork*>(Game.unkCFlatData0[1])[
+				const CRomWork* enemyData = &Game.m_enemyRomTable[
 				    Game.m_monWorkRefs[i]->m_baseDataIndex];
 				const unsigned int enemyKind = enemyData->m_data[CRomWork::EnemyKindOffset];
 
@@ -1493,7 +1493,7 @@ void GbaQueue::LoadMapItemStat()
 				if ((dropItemCode & 0xC000) == 0x4000) {
 					localMapItems[numMapItems].m_kind = 4;
 				} else {
-					const SItemFlatRow* itemRow = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2]);
+					const SItemFlatRow* itemRow = reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable);
 					itemRow += dropItemCode;
 					const int bossStageLimit = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex] + 2;
 					const int itemStage = itemRow->m_stage;
@@ -3188,7 +3188,7 @@ int GbaQueue::GetCmdData(int channel, unsigned char* outData)
 			const int iconMask = localPlayerData.m_appearance & 3;
 			const int icon = MenuPcs.GetItemIcon(itemId);
 			if (icon == iconMask) {
-				SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemId];
+				SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.m_itemTable)[itemId];
 
 				cmdData[0] = __lhbrx(&itemBase->m_equipFlags, 0);
 				cmdData[1] = __lhbrx(&itemBase->m_value, 0);
@@ -3251,7 +3251,7 @@ int GbaQueue::GetEquipData(int channel, unsigned char* outData)
 	outData += indexBytes - 1;
 	for (i = 0; i < equipCount; i++) {
 		int itemId = localPlayerData.m_items[equipIndices[i]];
-		SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemId];
+		SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.m_itemTable)[itemId];
 
 		equipData[0] = __lhbrx(&itemBase->m_equipFlags, 0);
 		equipData[1] = __lhbrx(&itemBase->m_value, 0);
@@ -3412,7 +3412,7 @@ int GbaQueue::MakeBuyData(int channel, char* outData)
 
 	for (i = 0; i < itemCount; i++) {
 		work = Game.m_scriptFoodBase[channel]->m_shopList[i];
-		price = static_cast<unsigned short>(reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[work].m_price);
+		price = static_cast<unsigned short>(reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable)[work].m_price);
 		work = static_cast<int>(price * userRate);
 		if (work < 1) {
 			work = 1;
@@ -3501,7 +3501,7 @@ int GbaQueue::MakeSellData(int channel, char* outData)
 		if ((work < 1) || (work > 0x9E)) {
 			memset(sellInfo, 0, sizeof(sellInfo));
 		} else {
-			SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[work];
+			SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.m_itemTable)[work];
 			sellInfo[0] = __lhbrx(&itemBase->m_equipFlags, 0);
 			sellInfo[1] = __lhbrx(&itemBase->m_value, 0);
 			sellInfo[2] = __lhbrx(&itemBase->m_attribute, 0);
@@ -3517,7 +3517,7 @@ int GbaQueue::MakeSellData(int channel, char* outData)
 	for (i = 0; i < 0x40; i++) {
 		work = Game.m_scriptFoodBase[channel]->m_inventoryItems[i];
 		if (work > 0) {
-			price = static_cast<unsigned short>(reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[work].m_price);
+			price = static_cast<unsigned short>(reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable)[work].m_price);
 			work = static_cast<int>(price * userRate);
 			if (work < 1) {
 				work = 1;
@@ -3618,7 +3618,7 @@ int GbaQueue::MakeSmithData(int channel, char* outData)
 		const int itemId = (*foodBasePtr)->m_inventoryItems[i];
 		if (itemId >= 401) {
 			unsigned int itemBuf[0xE];
-			SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemId];
+			SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.m_itemTable)[itemId];
 
 			memset(itemBuf, 0, sizeof(itemBuf));
 
@@ -3636,7 +3636,7 @@ int GbaQueue::MakeSmithData(int channel, char* outData)
 			}
 
 			for (k = 0; k < 4; k++) {
-				SItemFlatRow* itemTable = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+				SItemFlatRow* itemTable = reinterpret_cast<SItemFlatRow*>(Game.m_itemTable);
 				SItemFlatRow* recipeRow = &itemTable[itemId];
 				itemData[8 + k] =
 				    __lhbrx(&recipeRow->m_smithResults[k], 0);
@@ -4243,7 +4243,7 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 			localScouterInfo[i].m_baseDataIndex = m_enemies[i].m_baseDataIndex;
 			if (localScouterInfo[i].m_baseDataIndex != 0) {
 				CMonWork* enemyWork = Game.m_monWorkRefs[i];
-				const CRomWork* enemyData = &reinterpret_cast<const CRomWork*>(Game.unkCFlatData0[1])[m_enemies[i].m_baseDataIndex];
+				const CRomWork* enemyData = &Game.m_enemyRomTable[m_enemies[i].m_baseDataIndex];
 
 				work = enemyWork->m_maxHp;
 				localScouterInfo[i].m_maxHp = __lhbrx(&work, 0);

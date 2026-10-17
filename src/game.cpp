@@ -487,9 +487,9 @@ void CGame::clearWork()
         m_cFlatDataArr[i].Destroy();
     }
 
-    unkCFlatData0[0] = 0;
-    unkCFlatData0[1] = 0;
-    unkCFlatData0[2] = 0;
+    m_charaRomTable = 0;
+    m_enemyRomTable = 0;
+    m_itemTable = 0;
     clearWorkScript();
     clearWorkMap();
 }
@@ -768,12 +768,12 @@ void CGame::loadCfd()
         }
     }
 
-    unkCFlatData0[0] = (unsigned int)m_cFlatDataArr[0].GetData(0);
-    FFCC_ASSERT(unkCFlatData0[0]);
-    unkCFlatData0[1] = (unsigned int)m_cFlatDataArr[0].GetData(1);
-    FFCC_ASSERT(unkCFlatData0[1]);
-    unkCFlatData0[2] = (unsigned int)m_cFlatDataArr[0].GetData(2);
-    FFCC_ASSERT(unkCFlatData0[2]);
+    m_charaRomTable = (CRomWork*)m_cFlatDataArr[0].GetData(0);
+    FFCC_ASSERT(m_charaRomTable);
+    m_enemyRomTable = (CRomWork*)m_cFlatDataArr[0].GetData(1);
+    FFCC_ASSERT(m_enemyRomTable);
+    m_itemTable = (unsigned int)m_cFlatDataArr[0].GetData(2);
+    FFCC_ASSERT(m_itemTable);
     m_romLetterWork = (CRomLetterWork*)m_cFlatDataArr[2].GetData(0);
     FFCC_ASSERT(m_romLetterWork);
     unk_flat3_field_8_0xc7dc = (unsigned int)m_cFlatDataArr[3].GetData(0);

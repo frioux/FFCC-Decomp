@@ -2113,7 +2113,7 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
                 }
             }
 
-            const SItemFlatRow* itemData = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2]);
+            const SItemFlatRow* itemData = reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable);
             int totalHpBonus = 0;
 
             for (int i = 0; i < 4; i++)

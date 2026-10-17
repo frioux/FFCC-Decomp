@@ -67,7 +67,7 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
             CMes::drawTagString(font, msg, 1, 0, 0);
             y = static_cast<int>(static_cast<float>(y) + 25.0f);
         }
-        const SItemFlatRow* item = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2]) + msgNo;
+        const SItemFlatRow* item = reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable) + msgNo;
         u16 flags = item->m_equipFlags;
         if (flags & 0x100) {
             strcpy(scratch, "\x8D\x55\x8C\x82\x97\xCD");
@@ -138,7 +138,7 @@ void CMenuPcs::DrawHelpMessage(int msgNo, CFont* font, int posX, int posY, _GXCo
                         currentItem = caravanWork->m_inventoryItems[equipmentSlot];
                         if (ChkEquipActive(static_cast<int>(m_artiState->selections[sel]) +
                                            static_cast<int>(m_artiState->scrollOffset))) {
-                            const SItemFlatRow* current = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2]) + currentItem;
+                            const SItemFlatRow* current = reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable) + currentItem;
                             unsigned int currentValue;
                             if (currentItem == -1) {
                                 currentValue = 0;

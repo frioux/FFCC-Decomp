@@ -823,12 +823,12 @@ void CGObject::InitWork(int index)
     switch (ownerType) {
     case 0: {
         m_scriptHandle->Init(
-            index, &reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0])[index], 0);
+            index, &Game.m_charaRomTable[index], 0);
         break;
     }
     case 1: {
         m_scriptHandle->Init(
-            index, &reinterpret_cast<CRomWork*>(Game.unkCFlatData0[1])[index], 0);
+            index, &Game.m_enemyRomTable[index], 0);
         break;
     }
     }

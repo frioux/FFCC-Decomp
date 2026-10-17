@@ -417,7 +417,7 @@ void CMenuPcs::createBonus()
 				m_wm.m_handles[i] = itemHandle;
 				m_wm.m_handles[i]->Add();
 				unsigned short itemModelCode =
-				    reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemId].m_model;
+				    reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable)[itemId].m_model;
 				int modelNo = itemModelCode & 0x0FFF;
 				m_wm.m_handles[i]->LoadModel(3, modelNo, (itemModelCode >> 12) & 0xF, 0, -1, 0, 0);
 				m_wm.m_handles[i]->m_flags = 0x300543;
