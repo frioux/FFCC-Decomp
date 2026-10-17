@@ -1432,7 +1432,7 @@ chara_fur.cpp:
 	extab       start:0x80008D14 end:0x80008D84
 	extabindex  start:0x8000F868 end:0x8000F910
 	.text       start:0x800DF618 end:0x800E46DC
-	.rodata     start:0x801DB648 end:0x801DB740
+	.rodata     start:0x801DB648 end:0x801DB73A
 	.bss        start:0x802FF3A8 end:0x802FF404
 	.sbss       start:0x8032EDE8 end:0x8032EE14
 	.sdata2     start:0x803310D8 end:0x80331170
@@ -2557,7 +2557,7 @@ Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
 	extab       start:0x8000A26C end:0x8000A2E0
 	extabindex  start:0x8001180C end:0x80011860
 	.text       start:0x801B06B8 end:0x801B1AF0
-	.rodata     start:0x801E6EB0 end:0x801E6F48
+	.rodata     start:0x801E6EB0 end:0x801E6F42
 	.data       start:0x8021D070 end:0x8021D158
 	.bss        start:0x8032B400 end:0x8032B40C
 	.sdata      start:0x8032EBF8 end:0x8032EC08
