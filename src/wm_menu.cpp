@@ -442,7 +442,7 @@ void CMenuPcs::WmInit()
 	s_MaxAnimWait = 0.0f;
 	m_wmThpActive = 0;
 	m_textureLocIndex = 0;
-	memset(bytes + 4, 0, 0x1C);
+	memset(&m_wmArea, 0, 0x1C);
 	bytes[0xD] = 0;
 	bytes[0x10] = 0;
 	bytes[0x12] = 0;
@@ -4573,34 +4573,34 @@ void CMenuPcs::SetWorldParam(int code, int value)
 	case 0: {
 		bytes[5] = bytes[4];
 		bytes[4] = static_cast<unsigned char>(value);
-		bytes[0xA] |= WMDATA_CHG_AREA;
+		m_wmChgFlags |= WMDATA_CHG_AREA;
 		break;
 	}
 	case 1:
 		bytes[6] = static_cast<unsigned char>(value);
 		break;
 	case 2:
-		*reinterpret_cast<unsigned short*>(bytes + 0x1A) = static_cast<unsigned short>(value) & 0x3FF;
+		m_wmIconFlags = static_cast<unsigned short>(value) & 0x3FF;
 		break;
 	case 3:
 		bytes[7] = static_cast<unsigned char>(value);
 		break;
 	case 4:
-		bytes[8] = static_cast<unsigned char>(value);
+		m_wmBubbleType = static_cast<unsigned char>(value);
 		break;
 	case 5:
-		*reinterpret_cast<unsigned short*>(bytes + 0x1C) = static_cast<unsigned short>(value);
+		m_wmBubbleX = static_cast<unsigned short>(value);
 		break;
 	case 6:
-		*reinterpret_cast<unsigned short*>(bytes + 0x1E) = static_cast<unsigned short>(value);
+		m_wmBubbleY = static_cast<unsigned short>(value);
 		break;
 	case 7:
-		bytes[9] = static_cast<unsigned char>(value);
+		m_wmBubbleVisible = static_cast<unsigned char>(value);
 		break;
 	case 8: {
-		bytes[0xB] = bytes[0xC];
-		bytes[0xC] = static_cast<unsigned char>(value);
-		bytes[0xA] |= WMDATA_CHG_YEAR;
+		m_wmPrevYear = m_wmYear;
+		m_wmYear = static_cast<unsigned char>(value);
+		m_wmChgFlags |= WMDATA_CHG_YEAR;
 		break;
 	}
 	case 9:
@@ -4616,7 +4616,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		bytes[0x11] = value ? 1 : 0;
 		break;
 	case 12:
-		bytes[0xE] = static_cast<unsigned char>(value);
+		m_wmNextAnim = static_cast<unsigned char>(value);
 		break;
 	case 13:
 		m_pageMarkFlags = static_cast<unsigned char>(value) & 3;
@@ -4713,31 +4713,31 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 
 	switch (code) {
 	case 0:
-		result = *reinterpret_cast<signed char*>(bytes + 4);
+		result = m_wmArea;
 		break;
 	case 1:
 		result = *reinterpret_cast<signed char*>(bytes + 6);
 		break;
 	case 2:
-		result = static_cast<unsigned int>(*reinterpret_cast<short*>(bytes + 0x1A));
+		result = static_cast<unsigned int>(m_wmIconFlags);
 		break;
 	case 3:
 		result = *reinterpret_cast<signed char*>(bytes + 7);
 		break;
 	case 4:
-		result = *reinterpret_cast<signed char*>(bytes + 8);
+		result = m_wmBubbleType;
 		break;
 	case 5:
-		result = static_cast<unsigned int>(*reinterpret_cast<short*>(bytes + 0x1C));
+		result = static_cast<unsigned int>(m_wmBubbleX);
 		break;
 	case 6:
-		result = static_cast<unsigned int>(*reinterpret_cast<short*>(bytes + 0x1E));
+		result = static_cast<unsigned int>(m_wmBubbleY);
 		break;
 	case 7:
-		result = *reinterpret_cast<signed char*>(bytes + 9);
+		result = m_wmBubbleVisible;
 		break;
 	case 8:
-		result = *reinterpret_cast<signed char*>(bytes + 0xC);
+		result = m_wmYear;
 		break;
 	case 9:
 		result = *reinterpret_cast<signed char*>(bytes + 0xD);
@@ -4749,7 +4749,7 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		result = bytes[0x11] ? 1 : 0;
 		break;
 	case 12:
-		result = *reinterpret_cast<signed char*>(bytes + 0xE);
+		result = m_wmNextAnim;
 		break;
 	case 13:
 		result = static_cast<unsigned int>(static_cast<signed char>(m_pageMarkFlags));
