@@ -490,6 +490,7 @@ allocDone:
 	return allocation;
 }
 
+#ifdef VERSION_GCCP01
 /*
  * --INFO--
  * PAL Address: 80056d20
@@ -533,6 +534,7 @@ void* pppMemAllocNoReport(unsigned long allocSize, CMemory::CStage* stage, char*
 allocDone:
 	return allocation;
 }
+#endif
 
 /*
  * --INFO--
