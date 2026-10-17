@@ -30,13 +30,13 @@ static inline SItemFlatRow* GetItemDataPtr(int itemIdx)
 
 static inline float GetStatusMultiplier(int offset)
 {
-	return ((float)(*(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset)) * 0.01f) +
+	return ((float)(*(unsigned short*)((unsigned char*)Game.m_battleParams + offset)) * 0.01f) +
 		   0.0000001f;
 }
 
 static inline float GetStatusMultiplier(int offset, int index)
 {
-	return ((float)((unsigned short*)(Game.unk_flat3_field_8_0xc7dc + offset))[index] * 0.01f) +
+	return ((float)((unsigned short*)((unsigned char*)Game.m_battleParams + offset))[index] * 0.01f) +
 		   0.0000001f;
 }
 }
@@ -1769,13 +1769,13 @@ void CCaravanWork::CalcStatus()
 		if (tempStatBuffId >= 0x185) {
 			goto TempStatDone;
 		}
-		m_strength += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6A);
+		m_strength += Game.m_battleParams[0x35];
 		goto TempStatDone;
 	TempStatDef:
-		m_defense += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6C);
+		m_defense += Game.m_battleParams[0x36];
 		goto TempStatDone;
 	TempStatMag:
-		m_magic += *(unsigned short*)(Game.unk_flat3_field_8_0xc7dc + 0x6E);
+		m_magic += Game.m_battleParams[0x37];
 	TempStatDone:;
 		m_tempStatBuffTimer--;
 	}

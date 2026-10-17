@@ -449,7 +449,7 @@ void CGMonObj::setAttackAfter(int attackKind)
 	}
 
 	if (0 < stageRank) {
-		delay -= reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x58)[stageRank];
+		delay -= Game.m_battleParams[0x2C + stageRank];
 		delay &= ~((int)delay >> 31);
 	}
 
