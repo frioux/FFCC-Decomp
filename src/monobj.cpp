@@ -2781,7 +2781,7 @@ int CGMonObj::aiSeq(int seqId, int priority, int currentState, int nextState, in
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::statWatch()
+inline void CGMonObj::statWatch()
 {
 	if (m_stateFrame == 0) {
 		reqAnim(-1, 0, 0);
