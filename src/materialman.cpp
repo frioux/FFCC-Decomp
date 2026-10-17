@@ -55,7 +55,7 @@ static inline void ReleaseRefNonNull(CRef* object)
     object->Release();
 }
 
-static inline int HighestSetBit(unsigned int value)
+static inline int getHsb(unsigned int value)
 {
     for (int bit = 31; bit >= 0; bit--) {
         if ((value & (1u << bit)) != 0) {
@@ -3534,7 +3534,7 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
                             } else if (format == 1) {
                                 material->SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x400));
                             }
-                            if (static_cast<int>(material->m_textureData.m_textures[i]->m_isAlphaLut) != 0) {
+                            if (material->m_textureData.m_textures[i]->IsAlphaDxt()) {
                                 material->SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x800));
                             }
                         }
@@ -3547,14 +3547,14 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
                     (material->GetNumTexture() >= 2) &&
                     (material->m_textureData.m_textures[0] != 0) &&
                     (material->m_textureData.m_textures[1] != 0)) {
-                    material->m_texShiftU = static_cast<char>(HighestSetBit(
+                    material->m_texShiftU = static_cast<char>(getHsb(
                         material->m_textureData.m_textures[0]->GetWidth() /
                         material->m_textureData.m_textures[1]->GetWidth()));
                     if (static_cast<unsigned char>(material->m_texShiftU) == 0xFF) {
                         material->m_texShiftU = 0;
                     }
 
-                    material->m_texShiftV = static_cast<char>(HighestSetBit(
+                    material->m_texShiftV = static_cast<char>(getHsb(
                         material->m_textureData.m_textures[0]->GetHeight() /
                         material->m_textureData.m_textures[1]->GetHeight()));
                     if (static_cast<unsigned char>(material->m_texShiftV) == 0xFF) {
