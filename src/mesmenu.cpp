@@ -303,9 +303,9 @@ void CMesMenu::onCalc()
 
             int wait = m_mes.GetWait();
             if (wait == 3) {
-                int altCursor = m_mes.mRubyOffset;
-                int cursorMax = m_mes.mRubyLine;
-                int cursor = m_mes.mRubyHeight;
+                int cursor = m_mes.GetIdxSelect();
+                int cursorMax = m_mes.GetNumSelect();
+                int altCursor = m_mes.GetDefaultSelect();
                 if ((repeatMask & 8) != 0) {
                     cursor--;
                     if (cursor < 0) {
