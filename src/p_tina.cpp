@@ -130,16 +130,6 @@ char g_MsgFlashy[0x36] =
     "\x81\x9A\x81\x99\x0A";
 int g_MaxDataSize;
 int g_MaxHeapSize;
-extern "C" {
-const char* sDebugSpinnerTextPtr;
-signed char sDebugSpinnerTextPtrInit;
-int s_debugSpinnerFrameCounter;
-signed char s_debugSpinnerFrameCounterInit;
-unsigned char g_IsCheckDrawDone;
-signed char s_debugSpinnerFrameCounterPad0;
-signed char s_debugSpinnerFrameCounterPad1;
-signed char s_debugSpinnerFrameCounterPad2;
-}
 
 static const int kPppFieldParticleNoAutoCreate = -0x1000;
 
@@ -997,18 +987,11 @@ void CPartPcs::drawAfterViewer()
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
 
-	if (sDebugSpinnerTextPtrInit == 0) {
-		sDebugSpinnerTextPtr = "|/-\\";
-		sDebugSpinnerTextPtrInit = 1;
-	}
-	if (s_debugSpinnerFrameCounterInit == 0) {
-		s_debugSpinnerFrameCounter = 0;
-		s_debugSpinnerFrameCounterInit = 1;
-	}
+	static char* pFan = "|/-\\";
+	static int alive = 0;
 
-	s_debugSpinnerFrameCounter++;
-	Graphic.Printf(
-		"Tina [%c]", sDebugSpinnerTextPtr[(s_debugSpinnerFrameCounter >> 4) % 4]);
+	alive++;
+	Graphic.Printf("Tina [%c]", pFan[(alive >> 4) % 4]);
 
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();
@@ -1025,6 +1008,8 @@ void CPartPcs::drawAfterViewer()
 		(double)((float)gPppHeapUseRateWords[0] / 100.0f),
 		(double)((float)gPppHeapUseRateWords[1] / 100.0f));
 }
+
+unsigned char g_IsCheckDrawDone;
 
 /*
  * --INFO--
