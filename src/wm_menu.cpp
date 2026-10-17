@@ -1458,7 +1458,6 @@ inline void CMenuPcs::CalcMainMenu()
  */
 void CMenuPcs::CalcMCardMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	int playOpenSe = false;
 	unsigned int buttonsDown = Pad.GetButtonDown(0);
@@ -2043,7 +2042,6 @@ void CMenuPcs::InitSaveLoadMenu()
  */
 void CMenuPcs::CalcLoadMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	int playOpenSe = 0;
 	m_textureLocIndex = 0;
 
@@ -2905,7 +2903,6 @@ void CMenuPcs::CalcGoOutSelCharInit()
  */
 void CMenuPcs::SetMenuCharaAnim(int charaIndex, int animIndex)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmCharaAnimState* const menuCharaAnims = m_wmCharaAnimState;
 
 	menuCharaAnims[charaIndex].m_nextAnimIndex = animIndex;
@@ -3017,7 +3014,6 @@ void CMenuPcs::drawWorld()
  */
 void CMenuPcs::DrawMainMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	short state = m_wmWorldState->m_mainState;
 	float frameAlpha;
@@ -3180,7 +3176,6 @@ void CMenuPcs::DrawDiaryMenu()
  */
 void CMenuPcs::DrawMCardMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	float cursorX;
 	float cursorY;
@@ -3553,7 +3548,6 @@ void CMenuPcs::DrawMCardMenu()
  */
 void CMenuPcs::DrawCMakeMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	short state = m_wmWorldState->m_mainState;
 	float frameAlpha;
@@ -3843,7 +3837,6 @@ void CMenuPcs::DrawMoveMenu()
  */
 void CMenuPcs::DrawLoadMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	McCtrl& mcCtrl = *GetMcCtrl();
 	if ((signed char)m_wmWorldState->m_worldReady == 0) {
 		return;
@@ -6724,7 +6717,6 @@ int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
 void CMenuPcs::CalcCharaSelect()
 {
 	int i;
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 
 	unsigned short padRepeat[4];
 	unsigned short padTrig[4];
@@ -7963,7 +7955,6 @@ inline void CMenuPcs::SetMakeChara(int channel)
  */
 void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	WmCharaModelInfo* modelData = &m_wm.m_charaModelData[slot];
 	int modelNo;
 	int charaKind;
@@ -8065,7 +8056,6 @@ void CMenuPcs::CalcMainMenuSub()
 #endif
 	int i;
 	int n;
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	const unsigned short btn = Pad.GetButtonDown(0);
 
 	if (((m_wmWorldState->m_mainState > 0) && (m_wmWorldState->m_mainState < 4)) || m_wmWorldState->m_cardChannel == 1) {
@@ -8528,7 +8518,6 @@ inline int CMenuPcs::ChkMcDataCnt()
 void CMenuPcs::DrawMCList()
 {
 	int digitIdx;
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	static const int s_TimeWTbl[] = {17, 10, 16, 16, 19, 17, 16, 16, 16, 15, 8};
 	static const unsigned char s_LocTex[][4] = {
 		{1, 1, 0, 0},
