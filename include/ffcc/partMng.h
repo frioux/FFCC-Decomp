@@ -181,19 +181,7 @@ struct _PARTICLE_COLOR
     float m_colorFrameDeltas[4]; // 0x10
 };
 
-struct _PARTICLE_DATA
-{
-    Mtx m_matrix;          // 0x0 - 0x30
-    Vec m_velocity;        // 0x30 - 0x3c
-    Vec m_directionTail;   // 0x3c - 0x48
-    float m_colorDeltaAdd[4]; // 0x48 - 0x58
-    float m_sizeStart;     // 0x58 - 0x5c
-    float m_sizeEnd;       // 0x5c - 0x60
-    float m_sizeVal;       // 0x60 - 0x64
-    int m_lifeTime;        // 0x64 - 0x68
-    int m_age;             // 0x68 - 0x6c
-    char m_padding[0x140 - 0x6c]; // Pad to 0x140 bytes total
-};
+struct _PARTICLE_DATA;
 struct _pppPDataVal;
 struct _pppCtrlTable;
 

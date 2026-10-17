@@ -7,6 +7,38 @@
 #include "ffcc/pppShape.h"
 #include <string.h>
 
+struct _PARTICLE_DATA
+{
+	Vec m_position;            // 0x00
+	u8 _pad0C[0x04];
+	Vec m_direction;           // 0x10
+	u16 m_frameTimer;          // 0x1c
+	u16 m_shapeFrame;          // 0x1e
+	u16 m_drawFrame;           // 0x20
+	u16 m_life;                // 0x22
+	s8 m_colorOffset[4];       // 0x24
+	float m_angle;             // 0x28
+	float m_angleVelocity;     // 0x2c
+	float m_angleRandom;       // 0x30
+	float m_sizeX;             // 0x34
+	float m_sizeY;             // 0x38
+	float m_sizeVelocityX;     // 0x3c
+	float m_sizeVelocityY;     // 0x40
+	float m_sizeRandomX;       // 0x44
+	float m_sizeRandomY;       // 0x48
+	float m_velocity;          // 0x4c
+	float m_acceleration;      // 0x50
+	float m_alphaFade;         // 0x54
+	u8 m_age;                  // 0x58
+	u8 m_fadeInFrames;         // 0x59
+	u8 m_fadeOutFrames;        // 0x5a
+	u8 _pad5B[0x05];
+}; // Size 0x60
+
+STATIC_ASSERT(sizeof(_PARTICLE_DATA) == 0x60);
+STATIC_ASSERT(offsetof(_PARTICLE_DATA, m_life) == 0x22);
+STATIC_ASSERT(offsetof(_PARTICLE_DATA, m_alphaFade) == 0x54);
+
 static void birth(_pppPObject*, VRyjMegaBirth*, PRyjMegaBirth*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
 static void calc(VRyjMegaBirth*, PRyjMegaBirth*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
 static void calc_particle(_pppPObject*, VRyjMegaBirth*, PRyjMegaBirth*, VColor*);
@@ -29,26 +61,6 @@ static inline RyjMegaBirthDataOffsets* GetRyjMegaBirthDataOffsets(_pppCtrlTable*
 	return reinterpret_cast<RyjMegaBirthDataOffsets*>(ctrlTable->m_serializedDataOffsets);
 }
 
-static inline float* f32_at(void* base, s32 off)
-{
-	return (float*)((u8*)base + off);
-}
-
-static inline s16* s16_at(void* base, s32 off)
-{
-	return (s16*)((u8*)base + off);
-}
-
-static inline u16* u16_at(void* base, s32 off)
-{
-	return (u16*)((u8*)base + off);
-}
-
-static inline u8* u8_at(void* base, s32 off)
-{
-	return (u8*)base + off;
-}
-
 static inline unsigned char clamp_u8(float value)
 {
 	int ivalue = (int)value;
@@ -66,18 +78,18 @@ static inline signed char random_signed_byte_span(u8 span)
 	return (signed char)((s32)((float)((u8)span * 2) * Math.RandF() - (float)((u8)span / 2)));
 }
 
-static inline void apply_signed_randomization_2(u8* particle, s32 offset, u8 flags)
+static inline void apply_signed_randomization_2(float* x, float* y, u8 flags)
 {
 	if (((flags & 1) != 0) && ((flags & 2) != 0)) {
 		if (0.5 < (double)Math.RandF()) {
-			*f32_at(particle, offset) *= -1.0f;
+			*x *= -1.0f;
 		}
 		if (0.5 < (double)Math.RandF()) {
-			*f32_at(particle, offset + 4) *= -1.0f;
+			*y *= -1.0f;
 		}
 	} else if ((flags & 2) != 0) {
-		*f32_at(particle, offset) *= -1.0f;
-		*f32_at(particle, offset + 4) *= -1.0f;
+		*x *= -1.0f;
+		*y *= -1.0f;
 	}
 }
 
@@ -180,11 +192,11 @@ static inline void set_matrix(
 	Mtx scale;
 
 	pppUnitMatrix(local);
-	local.value[0][3] = *f32_at(particle, 0x0);
-	local.value[1][3] = *f32_at(particle, 0x4);
-	local.value[2][3] = *f32_at(particle, 0x8);
+	local.value[0][3] = particle->m_position.x;
+	local.value[1][3] = particle->m_position.y;
+	local.value[2][3] = particle->m_position.z;
 
-	PSMTXScale(scale, particle->m_sizeStart, particle->m_sizeEnd, particle->m_sizeVal);
+	PSMTXScale(scale, particle->m_sizeX, particle->m_sizeY, particle->m_sizeX);
 	PSMTXConcat(local.value, scale, local.value);
 
 	if (particleWorldMat != NULL) {
@@ -205,7 +217,6 @@ static inline void set_matrix(
 void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTable* ctrlTable)
 {
 	PRyjMegaBirth* params = (PRyjMegaBirth*)stepData;
-	u8* payload = (u8*)params;
 	RyjMegaBirthDataOffsets* offsets = GetRyjMegaBirthDataOffsets(ctrlTable);
 	VRyjMegaBirth* work = (VRyjMegaBirth*)(obj->m_workArea + offsets->m_workOffset);
 	tagOAN3_SHAPE* drawShape;
@@ -269,7 +280,7 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTabl
 	int baseAlpha = baseColor->m_color.rgba[3];
 
 	for (int i = 0; i < numParticles; i++) {
-		if (*u16_at(particle, 0x22) != 0) {
+		if (particle->m_life != 0) {
 			Mtx rotMatrix;
 			pppFMATRIX viewMatrix;
 			Mtx drawMatrix;
@@ -284,12 +295,12 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTabl
 			int alpha;
 
 			PSMTXIdentity(drawMatrix);
-			drawMatrix[0][0] = ((float*)particle)[13] * ppvMng->m_scale.x;
-			drawMatrix[1][1] = ((float*)particle)[14] * ppvMng->m_scale.y;
+			drawMatrix[0][0] = particle->m_sizeX * ppvMng->m_scale.x;
+			drawMatrix[1][1] = particle->m_sizeY * ppvMng->m_scale.y;
 			drawMatrix[2][2] = drawMatrix[0][0];
 
-			if (*f32_at(particle, 0x28) != 0.0f) {
-				PSMTXRotRad(rotMatrix, 'Z', 0.017453292f * *f32_at(particle, 0x28));
+			if (particle->m_angle != 0.0f) {
+				PSMTXRotRad(rotMatrix, 'Z', 0.017453292f * particle->m_angle);
 				PSMTXConcat(drawMatrix, rotMatrix, drawMatrix);
 			}
 
@@ -297,7 +308,7 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTabl
 				drawPos.x = drawMatrix[0][3];
 				drawPos.y = drawMatrix[1][3];
 				drawPos.z = drawMatrix[2][3];
-				PSVECAdd(&drawPos, (Vec*)particle, &drawPos);
+				PSVECAdd(&drawPos, &particle->m_position, &drawPos);
 				drawMatrix[0][3] = drawPos.x;
 				drawMatrix[1][3] = drawPos.y;
 				drawMatrix[2][3] = drawPos.z;
@@ -347,14 +358,14 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTabl
 
 			GXLoadPosMtxImm(drawMatrix, 0);
 
-			u16 frame = *u16_at(particle, 0x20);
+			u16 frame = particle->m_drawFrame;
 			pppShapeAnimData* shapeAnim = reinterpret_cast<pppShapeAnimData*>(animData);
 			drawShape = (tagOAN3_SHAPE*)((u8*)shapeAnim + shapeAnim->m_frames[frame].m_shapeOffset);
 
-			red = baseRed + (int)*(s8*)((u8*)particle + 0x24);
-			green = baseGreen + (int)*(s8*)((u8*)particle + 0x25);
-			blue = baseBlue + (int)*(s8*)((u8*)particle + 0x26);
-			alpha = (int)((float)baseAlpha + (float)(int)*(s8*)((u8*)particle + 0x27) - *f32_at(particle, 0x54));
+			red = baseRed + (int)particle->m_colorOffset[0];
+			green = baseGreen + (int)particle->m_colorOffset[1];
+			blue = baseBlue + (int)particle->m_colorOffset[2];
+			alpha = (int)((float)baseAlpha + (float)(int)particle->m_colorOffset[3] - particle->m_alphaFade);
 
 			if (colorData != NULL) {
 				red += (int)colorData->m_color[0];
@@ -399,7 +410,7 @@ void pppRyjDrawMegaBirth(_pppPObject* obj, PRyjMegaBirth* stepData, _pppCtrlTabl
 		if (colorData != NULL) {
 			colorData = colorData + 1;
 		}
-		particle = (_PARTICLE_DATA*)((u8*)particle + 0x60);
+		particle++;
 	}
 }
 
@@ -543,36 +554,36 @@ static void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBir
 
 		for (i = 0; i < maxParticles; i = i + 1)
 		{
-			if (*(u16*)((u8*)particle + 0x22) != 0)
+			if (particle->m_life != 0)
 			{
 				calc(work, param, particle, color, colorData);
 
-				frame = *(u16*)((u8*)particle + 0x1E);
+				frame = particle->m_shapeFrame;
 				shapeAnim =
 					static_cast<pppShapeAnimData*>(ppvEnv->m_shapeTablePtr[param->m_shapeIndex]->m_animData);
-				*(u16*)((u8*)particle + 0x20) = frame;
+				particle->m_drawFrame = frame;
 				frameData = &shapeAnim->m_frames[frame];
 
-				*(u16*)((u8*)particle + 0x1C) = *(u16*)((u8*)particle + 0x1C) + param->m_frameStep;
-				frame = *(u16*)((u8*)particle + 0x1C);
+				particle->m_frameTimer = particle->m_frameTimer + param->m_frameStep;
+				frame = particle->m_frameTimer;
 				duration = frameData->m_duration;
 
 				if ((s32)frame >= (s32)duration)
 				{
-					*(u16*)((u8*)particle + 0x1C) = frame - duration;
-					*(u16*)((u8*)particle + 0x1E) = *(u16*)((u8*)particle + 0x1E) + 1;
+					particle->m_frameTimer = frame - duration;
+					particle->m_shapeFrame = particle->m_shapeFrame + 1;
 
-					if ((s32)*(u16*)((u8*)particle + 0x1E) >= (s32)shapeAnim->m_frameCount)
+					if ((s32)particle->m_shapeFrame >= (s32)shapeAnim->m_frameCount)
 					{
 						if ((frameData->m_flags & 0x80) != 0)
 						{
-							*(u16*)((u8*)particle + 0x1E) = 0;
-							*(u16*)((u8*)particle + 0x1C) = 0;
+							particle->m_shapeFrame = 0;
+							particle->m_frameTimer = 0;
 						}
 						else
 						{
-							*(u16*)((u8*)particle + 0x1C) = 0;
-							*(u16*)((u8*)particle + 0x1E) = *(u16*)((u8*)particle + 0x1E) - 1;
+							particle->m_frameTimer = 0;
+							particle->m_shapeFrame = particle->m_shapeFrame - 1;
 						}
 					}
 				}
@@ -594,7 +605,7 @@ static void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBir
 				colorData = colorData + 1;
 			}
 
-			particle = (_PARTICLE_DATA*)((u8*)particle + 0x60);
+			particle++;
 		}
 
 		if (emitCount > 0)
@@ -619,14 +630,10 @@ static void calc(
 	_PARTICLE_COLOR* colorData)
 {
 	int alpha;
-	u8* paramPayload;
-	u8* particlePayload;
 	u32 frameCount;
 	Vec step;
 
 	alpha = vColor->m_color.rgba[3];
-	paramPayload = (u8*)param;
-	particlePayload = (u8*)particle;
 
 	if (colorData != NULL)
 	{
@@ -634,10 +641,10 @@ static void calc(
 		colorData->m_color[1] = colorData->m_color[1] + colorData->m_colorFrameDeltas[1];
 		colorData->m_color[2] = colorData->m_color[2] + colorData->m_colorFrameDeltas[2];
 		colorData->m_color[3] = colorData->m_color[3] + colorData->m_colorFrameDeltas[3];
-		colorData->m_colorFrameDeltas[0] = colorData->m_colorFrameDeltas[0] + *f32_at(paramPayload, 0x3C);
-		colorData->m_colorFrameDeltas[1] = colorData->m_colorFrameDeltas[1] + *f32_at(paramPayload, 0x40);
-		colorData->m_colorFrameDeltas[2] = colorData->m_colorFrameDeltas[2] + *f32_at(paramPayload, 0x44);
-		colorData->m_colorFrameDeltas[3] = colorData->m_colorFrameDeltas[3] + *f32_at(paramPayload, 0x48);
+		colorData->m_colorFrameDeltas[0] = colorData->m_colorFrameDeltas[0] + param->m_colorDeltaAdds[0];
+		colorData->m_colorFrameDeltas[1] = colorData->m_colorFrameDeltas[1] + param->m_colorDeltaAdds[1];
+		colorData->m_colorFrameDeltas[2] = colorData->m_colorFrameDeltas[2] + param->m_colorDeltaAdds[2];
+		colorData->m_colorFrameDeltas[3] = colorData->m_colorFrameDeltas[3] + param->m_colorDeltaAdds[3];
 		alpha = (int)vColor->m_color.rgba[3] + (int)colorData->m_color[3];
 		if (alpha > 0xFF)
 		{
@@ -645,96 +652,90 @@ static void calc(
 		}
 	}
 
-	*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) + *f32_at(particlePayload, 0x2C);
-	if ((paramPayload[0xEB] & 0x10) != 0)
+	particle->m_angle = particle->m_angle + particle->m_angleVelocity;
+	if ((param->m_angleFlags & 0x10) != 0)
 	{
-		*f32_at(particlePayload, 0x2C) =
-			*f32_at(particlePayload, 0x2C) + (*f32_at(paramPayload, 0x98) + *f32_at(particlePayload, 0x30));
+		particle->m_angleVelocity =
+			particle->m_angleVelocity + (param->m_angleAcceleration + particle->m_angleRandom);
 	}
 	else
 	{
-		*f32_at(particlePayload, 0x2C) = *f32_at(particlePayload, 0x2C) + *f32_at(paramPayload, 0x98);
+		particle->m_angleVelocity = particle->m_angleVelocity + param->m_angleAcceleration;
 	}
 
+	while (180.0f <= particle->m_angle)
 	{
-		volatile float* angle = f32_at(particlePayload, 0x28);
-		while (180.0f <= *angle)
-		{
-			*angle -= 360.0f;
-		}
+		particle->m_angle -= 360.0f;
 	}
+	while (particle->m_angle < -180.0f)
 	{
-		volatile float* angle = f32_at(particlePayload, 0x28);
-		while (*angle < -180.0f)
-		{
-			*angle += 360.0f;
-		}
+		particle->m_angle += 360.0f;
 	}
 
-	*f32_at(particlePayload, 0x34) = *f32_at(particlePayload, 0x34) + *f32_at(particlePayload, 0x3C);
-	*f32_at(particlePayload, 0x38) = *f32_at(particlePayload, 0x38) + *f32_at(particlePayload, 0x40);
-	if ((paramPayload[0xEA] & 0x10) != 0)
+	particle->m_sizeX = particle->m_sizeX + particle->m_sizeVelocityX;
+	particle->m_sizeY = particle->m_sizeY + particle->m_sizeVelocityY;
+	if ((param->m_sizeFlags & 0x10) != 0)
 	{
-		*f32_at(particlePayload, 0x3C) =
-			*f32_at(particlePayload, 0x3C) + (*f32_at(paramPayload, 0x70) + *f32_at(particlePayload, 0x44));
-		*f32_at(particlePayload, 0x40) =
-			*f32_at(particlePayload, 0x40) + (*f32_at(paramPayload, 0x74) + *f32_at(particlePayload, 0x48));
+		particle->m_sizeVelocityX =
+			particle->m_sizeVelocityX + (param->m_sizeAccelerationX + particle->m_sizeRandomX);
+		particle->m_sizeVelocityY =
+			particle->m_sizeVelocityY + (param->m_sizeAccelerationY + particle->m_sizeRandomY);
 	}
 	else
 	{
-		*f32_at(particlePayload, 0x3C) = *f32_at(particlePayload, 0x3C) + *f32_at(paramPayload, 0x70);
-		*f32_at(particlePayload, 0x40) = *f32_at(particlePayload, 0x40) + *f32_at(paramPayload, 0x74);
+		particle->m_sizeVelocityX = particle->m_sizeVelocityX + param->m_sizeAccelerationX;
+		particle->m_sizeVelocityY = particle->m_sizeVelocityY + param->m_sizeAccelerationY;
 	}
 
-	*f32_at(particlePayload, 0x4C) = *f32_at(particlePayload, 0x4C) + *f32_at(paramPayload, 0xC4);
-	if (paramPayload[0xEE] == 0)
+	particle->m_velocity = particle->m_velocity + param->m_velocityStep;
+	if (param->m_clampMode == 0)
 	{
-		if ((0.0f < *f32_at(paramPayload, 0xC0)) &&
-		    (*f32_at(paramPayload, 0xC4) < 0.0f))
+		if ((0.0f < param->m_velocity) &&
+		    (param->m_velocityStep < 0.0f))
 		{
-			if (*f32_at(particlePayload, 0x4C) < 0.0f)
+			if (particle->m_velocity < 0.0f)
 			{
-				*f32_at(particlePayload, 0x4C) = 0.0f;
+				particle->m_velocity = 0.0f;
 			}
 		}
 		else
 		{
 			float zero = 0.0f;
-			if ((*f32_at(paramPayload, 0xC0) < zero) &&
-			    (zero < *f32_at(paramPayload, 0xC4)) &&
-			    (zero < *f32_at(particlePayload, 0x4C)))
+			if ((param->m_velocity < zero) &&
+			    (zero < param->m_velocityStep) &&
+			    (zero < particle->m_velocity))
 			{
-				*f32_at(particlePayload, 0x4C) = zero;
+				particle->m_velocity = zero;
 			}
 		}
 	}
 
-	*f32_at(particlePayload, 0x50) = *f32_at(particlePayload, 0x50) + *f32_at(paramPayload, 0xD0);
-	PSVECScale((Vec*)(particlePayload + 0x10), &step, *f32_at(particlePayload, 0x4C));
-	PSVECAdd(&step, (Vec*)particlePayload, (Vec*)particlePayload);
-	PSVECScale(&work->m_accelerationAxis, &step, *f32_at(particlePayload, 0x50));
-	PSVECAdd((Vec*)particlePayload, &step, (Vec*)particlePayload);
+	particle->m_acceleration = particle->m_acceleration + param->m_accelerationStep;
+	PSVECScale(&particle->m_direction, &step, particle->m_velocity);
+	PSVECAdd(&step, &particle->m_position, &particle->m_position);
+	PSVECScale(&work->m_accelerationAxis, &step, particle->m_acceleration);
+	PSVECAdd(&particle->m_position, &step, &particle->m_position);
 
-	if (*u16_at(paramPayload, 0x26) != 0)
+	if (param->m_life != 0)
 	{
-		*u16_at(particlePayload, 0x22) = *u16_at(particlePayload, 0x22) - 1;
+		particle->m_life = particle->m_life - 1;
 	}
 
-	*u8_at(particlePayload, 0x58) = *u8_at(particlePayload, 0x58) + 1;
-	frameCount = *u8_at(particlePayload, 0x59);
-	if ((frameCount != 0) && ((u32)*u8_at(particlePayload, 0x58) <= frameCount))
+	particle->m_age = particle->m_age + 1;
+	frameCount = particle->m_fadeInFrames;
+	if ((frameCount != 0) && ((u32)particle->m_age <= frameCount))
 	{
-		*f32_at(particlePayload, 0x54) = *f32_at(particlePayload, 0x54) - (float)alpha / (float)frameCount;
+		particle->m_alphaFade = particle->m_alphaFade - (float)alpha / (float)frameCount;
 	}
 
-	frameCount = *u8_at(particlePayload, 0x5A);
-	if ((frameCount != 0) && ((int)*u16_at(particlePayload, 0x22) <= (int)frameCount))
+	frameCount = particle->m_fadeOutFrames;
+	if ((frameCount != 0) && ((int)particle->m_life <= (int)frameCount))
 	{
 		float fadeAlpha = (float)alpha;
-		float fadeFrameCount = (float)(unsigned int)paramPayload[0x29];
-		float particleAlpha = *f32_at(particlePayload, 0x54);
+		float fadeFrameCount = (float)(unsigned int)param->m_fadeOutFrames;
+		float particleAlpha = particle->m_alphaFade;
 
-		*f32_at(particlePayload, 0x54) = particleAlpha + fadeAlpha / fadeFrameCount;
+		particle->m_alphaFade = particleAlpha + fadeAlpha / fadeFrameCount;
 	}
 }
 
@@ -752,25 +753,21 @@ static void birth(
     _pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* param, VColor* color, _PARTICLE_DATA* particle,
     _PARTICLE_WMAT* worldMat, _PARTICLE_COLOR* colorData)
 {
-	u8* payload;
-	u8* particlePayload;
 	u16 life;
 	float vx;
 	float vy;
 	float vz;
 
-	payload = (u8*)param;
 	float spread = (float)param->m_spread;
 	float spreadRange = 2.0f * spread;
 
-	memset(particle, 0, 0x60);
+	memset(particle, 0, sizeof(_PARTICLE_DATA));
 	if (worldMat != NULL) {
 		memset(worldMat, 0, sizeof(_PARTICLE_WMAT));
 	}
 	if (colorData != NULL) {
 		memset(colorData, 0, sizeof(_PARTICLE_COLOR));
 	}
-	particlePayload = (u8*)particle;
 
 	switch (param->m_spawnMode) {
 	case 0:
@@ -800,11 +797,11 @@ static void birth(
 		}
 
 		pppGetRotMatrixXYZ(rot, &angles);
-		PSMTXMultVecSR(rot.value, (Vec*)&baseDir, reinterpret_cast<Vec*>(particle->m_matrix[1]));
-		reinterpret_cast<Vec*>(particle->m_matrix[1])->x *= param->m_directionScale.x;
-		reinterpret_cast<Vec*>(particle->m_matrix[1])->y *= param->m_directionScale.y;
-		reinterpret_cast<Vec*>(particle->m_matrix[1])->z *= param->m_directionScale.z;
-		PSVECNormalize(reinterpret_cast<Vec*>(particle->m_matrix[1]), reinterpret_cast<Vec*>(particle->m_matrix[1]));
+		PSMTXMultVecSR(rot.value, (Vec*)&baseDir, &particle->m_direction);
+		particle->m_direction.x *= param->m_directionScale.x;
+		particle->m_direction.y *= param->m_directionScale.y;
+		particle->m_direction.z *= param->m_directionScale.z;
+		PSVECNormalize(&particle->m_direction, &particle->m_direction);
 		break;
 	}
 	}
@@ -857,7 +854,7 @@ static void birth(
 			}
 			}
 
-			PSVECScale(reinterpret_cast<Vec*>(particle->m_matrix[1]), reinterpret_cast<Vec*>(particle->m_matrix[0]), scale);
+			PSVECScale(&particle->m_direction, &particle->m_position, scale);
 		}
 		break;
 	}
@@ -877,46 +874,46 @@ static void birth(
 		float rand4;
 		switch (param->m_randomMode) {
 		default:
-			particle->m_matrix[0][0] = param->m_directionSpeed * Math.RandF();
-			particle->m_matrix[0][0] -= speedRandHalf;
-			particle->m_matrix[0][1] = param->m_directionSpeed * Math.RandF();
-			particle->m_matrix[0][1] -= speedRandHalf;
-			particle->m_matrix[0][2] = param->m_directionSpeed * Math.RandF();
-			particle->m_matrix[0][2] -= speedRandHalf;
+			particle->m_position.x = param->m_directionSpeed * Math.RandF();
+			particle->m_position.x -= speedRandHalf;
+			particle->m_position.y = param->m_directionSpeed * Math.RandF();
+			particle->m_position.y -= speedRandHalf;
+			particle->m_position.z = param->m_directionSpeed * Math.RandF();
+			particle->m_position.z -= speedRandHalf;
 			break;
 		case 1:
 			Math.RandF();
-			particle->m_matrix[0][0] = param->m_directionSpeed * Math.RandF();
-			particle->m_matrix[0][0] -= speedRandHalf;
-			particle->m_matrix[0][1] = param->m_directionSpeed * Math.RandF();
-			particle->m_matrix[0][1] -= speedRandHalf;
-			particle->m_matrix[0][2] = param->m_directionSpeed * Math.RandF();
-			particle->m_matrix[0][2] -= speedRandHalf;
+			particle->m_position.x = param->m_directionSpeed * Math.RandF();
+			particle->m_position.x -= speedRandHalf;
+			particle->m_position.y = param->m_directionSpeed * Math.RandF();
+			particle->m_position.y -= speedRandHalf;
+			particle->m_position.z = param->m_directionSpeed * Math.RandF();
+			particle->m_position.z -= speedRandHalf;
 			break;
 		case 2:
-			particle->m_matrix[0][0] = param->m_directionSpeed * Math.RandF() * Math.RandF();
-			particle->m_matrix[0][0] -= speedRandHalf;
-			particle->m_matrix[0][1] = param->m_directionSpeed * Math.RandF() * Math.RandF();
-			particle->m_matrix[0][1] -= speedRandHalf;
-			particle->m_matrix[0][2] = param->m_directionSpeed * Math.RandF() * Math.RandF();
-			particle->m_matrix[0][2] -= speedRandHalf;
+			particle->m_position.x = param->m_directionSpeed * Math.RandF() * Math.RandF();
+			particle->m_position.x -= speedRandHalf;
+			particle->m_position.y = param->m_directionSpeed * Math.RandF() * Math.RandF();
+			particle->m_position.y -= speedRandHalf;
+			particle->m_position.z = param->m_directionSpeed * Math.RandF() * Math.RandF();
+			particle->m_position.z -= speedRandHalf;
 			break;
 		case 3:
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
 			rand2 = param->m_directionSpeed * rand2;
-			particle->m_matrix[0][0] = param->m_directionSpeed - 0.7f * (rand2 * rand1);
-			particle->m_matrix[0][0] -= speedRandHalf;
+			particle->m_position.x = param->m_directionSpeed - 0.7f * (rand2 * rand1);
+			particle->m_position.x -= speedRandHalf;
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
 			rand2 = param->m_directionSpeed * rand2;
-			particle->m_matrix[0][1] = param->m_directionSpeed - 0.7f * (rand2 * rand1);
-			particle->m_matrix[0][1] -= speedRandHalf;
+			particle->m_position.y = param->m_directionSpeed - 0.7f * (rand2 * rand1);
+			particle->m_position.y -= speedRandHalf;
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
 			rand2 = param->m_directionSpeed * rand2;
-			particle->m_matrix[0][2] = param->m_directionSpeed - 0.7f * (rand2 * rand1);
-			particle->m_matrix[0][2] -= speedRandHalf;
+			particle->m_position.z = param->m_directionSpeed - 0.7f * (rand2 * rand1);
+			particle->m_position.z -= speedRandHalf;
 			break;
 		case 4:
 			rand1 = Math.RandF();
@@ -924,49 +921,49 @@ static void birth(
 			rand3 = Math.RandF();
 			rand4 = Math.RandF();
 			rand2 = param->m_directionSpeed * rand2;
-			particle->m_matrix[0][0] = rand4 * (rand3 * (rand2 * rand1));
-			particle->m_matrix[0][0] -= speedRandHalf;
+			particle->m_position.x = rand4 * (rand3 * (rand2 * rand1));
+			particle->m_position.x -= speedRandHalf;
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
 			rand3 = Math.RandF();
 			rand4 = Math.RandF();
 			rand2 = param->m_directionSpeed * rand2;
-			particle->m_matrix[0][1] = rand4 * (rand3 * (rand2 * rand1));
-			particle->m_matrix[0][1] -= speedRandHalf;
+			particle->m_position.y = rand4 * (rand3 * (rand2 * rand1));
+			particle->m_position.y -= speedRandHalf;
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
 			rand3 = Math.RandF();
 			rand4 = Math.RandF();
 			rand2 = param->m_directionSpeed * rand2;
-			particle->m_matrix[0][2] = rand4 * (rand3 * (rand2 * rand1));
-			particle->m_matrix[0][2] -= speedRandHalf;
+			particle->m_position.z = rand4 * (rand3 * (rand2 * rand1));
+			particle->m_position.z -= speedRandHalf;
 			break;
 		case 5:
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
 			rand3 = Math.RandF();
 			rand2 = param->m_directionSpeed * rand2;
-			particle->m_matrix[0][0] = param->m_directionSpeed - 0.5f * (rand3 * (rand2 * rand1));
-			particle->m_matrix[0][0] -= speedRandHalf;
+			particle->m_position.x = param->m_directionSpeed - 0.5f * (rand3 * (rand2 * rand1));
+			particle->m_position.x -= speedRandHalf;
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
 			rand3 = Math.RandF();
 			rand2 = param->m_directionSpeed * rand2;
-			particle->m_matrix[0][1] = param->m_directionSpeed - 0.5f * (rand3 * (rand2 * rand1));
-			particle->m_matrix[0][1] -= speedRandHalf;
+			particle->m_position.y = param->m_directionSpeed - 0.5f * (rand3 * (rand2 * rand1));
+			particle->m_position.y -= speedRandHalf;
 			rand1 = Math.RandF();
 			rand2 = Math.RandF();
 			rand3 = Math.RandF();
 			rand2 = param->m_directionSpeed * rand2;
-			particle->m_matrix[0][2] = param->m_directionSpeed - 0.5f * (rand3 * (rand2 * rand1));
-			particle->m_matrix[0][2] -= speedRandHalf;
+			particle->m_position.z = param->m_directionSpeed - 0.5f * (rand3 * (rand2 * rand1));
+			particle->m_position.z -= speedRandHalf;
 			break;
 		}
 		}
 
-		particle->m_matrix[0][0] *= param->m_directionScale.x;
-		particle->m_matrix[0][1] *= param->m_directionScale.y;
-		particle->m_matrix[0][2] *= param->m_directionScale.z;
+		particle->m_position.x *= param->m_directionScale.x;
+		particle->m_position.y *= param->m_directionScale.y;
+		particle->m_position.z *= param->m_directionScale.z;
 		break;
 	}
 
@@ -1058,12 +1055,12 @@ static void birth(
 				}
 				path_store:
 
-				particle->m_matrix[0][0] = vx * param->m_directionScale.x;
-				particle->m_matrix[0][1] = vy * param->m_directionScale.y;
-				particle->m_matrix[0][2] = vz * param->m_directionScale.z;
+				particle->m_position.x = vx * param->m_directionScale.x;
+				particle->m_position.y = vy * param->m_directionScale.y;
+				particle->m_position.z = vz * param->m_directionScale.z;
 
 				if ((param->m_spawnMode == 8) || (param->m_spawnMode == 9)) {
-					PSVECNormalize(reinterpret_cast<Vec*>(particle->m_matrix[0]), reinterpret_cast<Vec*>(particle->m_matrix[1]));
+					PSVECNormalize(&particle->m_position, &particle->m_direction);
 				}
 			}
 		}
@@ -1074,98 +1071,98 @@ static void birth(
 
 
 
-	*u8_at(particlePayload, 0x24) = random_signed_byte_span(payload[0x4C]);
-	*u8_at(particlePayload, 0x25) = random_signed_byte_span(payload[0x4D]);
-	*u8_at(particlePayload, 0x26) = random_signed_byte_span(payload[0x4E]);
-	*u8_at(particlePayload, 0x27) = random_signed_byte_span(payload[0x4F]);
+	particle->m_colorOffset[0] = random_signed_byte_span(param->m_colorOffsetRange[0]);
+	particle->m_colorOffset[1] = random_signed_byte_span(param->m_colorOffsetRange[1]);
+	particle->m_colorOffset[2] = random_signed_byte_span(param->m_colorOffsetRange[2]);
+	particle->m_colorOffset[3] = random_signed_byte_span(param->m_colorOffsetRange[3]);
 
-	if (payload[0x28] != 0) {
-		*f32_at(particlePayload, 0x54) = (float)color->m_color.rgba[3];
-		*u8_at(particlePayload, 0x59) = payload[0x28];
+	if (param->m_fadeInFrames != 0) {
+		particle->m_alphaFade = (float)color->m_color.rgba[3];
+		particle->m_fadeInFrames = param->m_fadeInFrames;
 	}
-	if (payload[0x29] != 0) {
-		*u8_at(particlePayload, 0x5A) = payload[0x29];
+	if (param->m_fadeOutFrames != 0) {
+		particle->m_fadeOutFrames = param->m_fadeOutFrames;
 	}
 
-	*f32_at(particlePayload, 0x28) = *f32_at(payload, 0x90);
-	*f32_at(particlePayload, 0x2C) = *f32_at(payload, 0x94);
+	particle->m_angle = param->m_angleStart;
+	particle->m_angleVelocity = param->m_angleVelocity;
 
-	if (payload[0xEB] != 0) {
-		*f32_at(particlePayload, 0x30) = *f32_at(payload, 0x9C) * Math.RandF();
-		u8 tailFlags = payload[0xEB];
+	if (param->m_angleFlags != 0) {
+		particle->m_angleRandom = param->m_angleRandom * Math.RandF();
+		u8 tailFlags = param->m_angleFlags;
 		if (((tailFlags & 1) != 0) && ((tailFlags & 2) != 0)) {
 			if (0.5 < (double)Math.RandF()) {
-				*f32_at(particlePayload, 0x30) *= -1.0f;
+				particle->m_angleRandom *= -1.0f;
 			}
 		} else if ((tailFlags & 2) != 0) {
-			*f32_at(particlePayload, 0x30) *= -1.0f;
+			particle->m_angleRandom *= -1.0f;
 		}
 	}
-	if ((payload[0xEB] & 4) != 0) {
-		*f32_at(particlePayload, 0x28) = *f32_at(particlePayload, 0x28) + *f32_at(particlePayload, 0x30);
+	if ((param->m_angleFlags & 4) != 0) {
+		particle->m_angle = particle->m_angle + particle->m_angleRandom;
 	}
-	if ((payload[0xEB] & 8) != 0) {
-		*f32_at(particlePayload, 0x2C) = *f32_at(particlePayload, 0x2C) + *f32_at(particlePayload, 0x30);
+	if ((param->m_angleFlags & 8) != 0) {
+		particle->m_angleVelocity = particle->m_angleVelocity + particle->m_angleRandom;
 	}
-	while (180.0f <= *f32_at(particlePayload, 0x28)) {
-		*f32_at(particlePayload, 0x28) -= 360.0f;
+	while (180.0f <= particle->m_angle) {
+		particle->m_angle -= 360.0f;
 	}
-	while (*f32_at(particlePayload, 0x28) < -180.0f) {
-		*f32_at(particlePayload, 0x28) += 360.0f;
+	while (particle->m_angle < -180.0f) {
+		particle->m_angle += 360.0f;
 	}
 
-	*f32_at(particlePayload, 0x34) = *f32_at(payload, 0x50);
-	*f32_at(particlePayload, 0x38) = *f32_at(payload, 0x54);
-	*f32_at(particlePayload, 0x3C) = *f32_at(payload, 0x60);
-	*f32_at(particlePayload, 0x40) = *f32_at(payload, 0x64);
+	particle->m_sizeX = param->m_sizeX;
+	particle->m_sizeY = param->m_sizeY;
+	particle->m_sizeVelocityX = param->m_sizeVelocityX;
+	particle->m_sizeVelocityY = param->m_sizeVelocityY;
 
-	if (payload[0xEA] != 0) {
-		if ((payload[0xEA] & 0x20) != 0) {
-			float randomRotation = *f32_at(payload, 0x80) * Math.RandF();
-			*f32_at(particlePayload, 0x48) = randomRotation;
-			*f32_at(particlePayload, 0x44) = randomRotation;
-			u8 rotFlags = payload[0xEA];
+	if (param->m_sizeFlags != 0) {
+		if ((param->m_sizeFlags & 0x20) != 0) {
+			float randomRotation = param->m_sizeRandomX * Math.RandF();
+			particle->m_sizeRandomY = randomRotation;
+			particle->m_sizeRandomX = randomRotation;
+			u8 rotFlags = param->m_sizeFlags;
 			if (((rotFlags & 1) != 0) && ((rotFlags & 2) != 0)) {
 				if (0.5 < (double)Math.RandF()) {
-					*f32_at(particlePayload, 0x44) *= -1.0f;
-					*f32_at(particlePayload, 0x48) *= -1.0f;
+					particle->m_sizeRandomX *= -1.0f;
+					particle->m_sizeRandomY *= -1.0f;
 				}
 			} else if ((rotFlags & 2) != 0) {
-				*f32_at(particlePayload, 0x44) *= -1.0f;
-				*f32_at(particlePayload, 0x48) *= -1.0f;
+				particle->m_sizeRandomX *= -1.0f;
+				particle->m_sizeRandomY *= -1.0f;
 			}
 		} else {
-			*f32_at(particlePayload, 0x44) = *f32_at(payload, 0x80) * Math.RandF();
-			*f32_at(particlePayload, 0x48) = *f32_at(payload, 0x84) * Math.RandF();
-			apply_signed_randomization_2(particlePayload, 0x44, payload[0xEA]);
+			particle->m_sizeRandomX = param->m_sizeRandomX * Math.RandF();
+			particle->m_sizeRandomY = param->m_sizeRandomY * Math.RandF();
+			apply_signed_randomization_2(&particle->m_sizeRandomX, &particle->m_sizeRandomY, param->m_sizeFlags);
 		}
 	}
-	if ((payload[0xEA] & 4) != 0) {
-		*f32_at(particlePayload, 0x34) = *f32_at(particlePayload, 0x34) + *f32_at(particlePayload, 0x44);
-		*f32_at(particlePayload, 0x38) = *f32_at(particlePayload, 0x38) + *f32_at(particlePayload, 0x48);
+	if ((param->m_sizeFlags & 4) != 0) {
+		particle->m_sizeX = particle->m_sizeX + particle->m_sizeRandomX;
+		particle->m_sizeY = particle->m_sizeY + particle->m_sizeRandomY;
 	}
-	if ((payload[0xEA] & 8) != 0) {
-		*f32_at(particlePayload, 0x3C) = *f32_at(particlePayload, 0x3C) + *f32_at(particlePayload, 0x44);
-		*f32_at(particlePayload, 0x40) = *f32_at(particlePayload, 0x40) + *f32_at(particlePayload, 0x48);
+	if ((param->m_sizeFlags & 8) != 0) {
+		particle->m_sizeVelocityX = particle->m_sizeVelocityX + particle->m_sizeRandomX;
+		particle->m_sizeVelocityY = particle->m_sizeVelocityY + particle->m_sizeRandomY;
 	}
 
-	*f32_at(particlePayload, 0x4C) = param->m_velocity;
-	*f32_at(particlePayload, 0x50) = param->m_acceleration;
+	particle->m_velocity = param->m_velocity;
+	particle->m_acceleration = param->m_acceleration;
 	if (0.0f != param->m_velocityRandom) {
 		float rand1 = Math.RandF();
-		*f32_at(particlePayload, 0x4C) +=
+		particle->m_velocity +=
 			(2.0f * param->m_velocityRandom) * rand1 - param->m_velocityRandom;
 	}
 
-	life = *(u16*)(payload + 0x26);
+	life = param->m_life;
 	if (life == 0) {
-		*(u16*)(particlePayload + 0x22) = 0xFFFF;
+		particle->m_life = 0xFFFF;
 	} else {
-		*(s16*)(particlePayload + 0x22) = life;
+		particle->m_life = life;
 	}
-	*(u8*)(particlePayload + 0x58) = 0;
+	particle->m_age = 0;
 
-	switch (payload[0xEC]) {
+	switch (param->m_matrixMode) {
 	case 1:
 		PSMTXCopy(work->m_worldMatrix, worldMat->value);
 		break;
@@ -1177,9 +1174,9 @@ static void birth(
 	}
 
 	if (colorData != NULL) {
-		colorData->m_colorFrameDeltas[0] = *(float*)(payload + 0x2C);
-		colorData->m_colorFrameDeltas[1] = *(float*)(payload + 0x30);
-		colorData->m_colorFrameDeltas[2] = *(float*)(payload + 0x34);
-		colorData->m_colorFrameDeltas[3] = *(float*)(payload + 0x38);
+		colorData->m_colorFrameDeltas[0] = param->m_colorFrameDeltas[0];
+		colorData->m_colorFrameDeltas[1] = param->m_colorFrameDeltas[1];
+		colorData->m_colorFrameDeltas[2] = param->m_colorFrameDeltas[2];
+		colorData->m_colorFrameDeltas[3] = param->m_colorFrameDeltas[3];
 	}
 }

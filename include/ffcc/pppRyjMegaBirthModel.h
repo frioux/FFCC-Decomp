@@ -22,16 +22,31 @@ struct PRyjMegaBirthModel
     u8 m_fadeInFrames;            // 0x29
     u8 m_spawnMode;               // 0x2A
     u8 m_spread;                  // 0x2B
-    u8 m_colorRandom[4];          // 0x2C
-    u8 _pad30[0x0C];
+    float m_colorFrameDeltas[4];  // 0x2C
     float m_colorDeltaAdds[4];    // 0x3C
-    u8 _pad4C[0x70];
-    float m_colorFrameDeltas[4];  // 0xBC
-    u8 _padCC[0x0C];
-    float m_texScrollUStepDelta;  // 0xD8
-    float m_texScrollVStart;      // 0xDC
-    float m_texScrollUStep;       // 0xE0
-    float m_texScrollVStep;       // 0xE4
+    u8 m_colorOffsetRange[4];     // 0x4C
+    s32 m_rotation[3];            // 0x50
+    u8 _pad5C[0x04];
+    s32 m_rotationVelocity[3];    // 0x60
+    u8 _pad6C[0x04];
+    s32 m_rotationAcceleration[3]; // 0x70
+    u8 _pad7C[0x04];
+    s32 m_rotationRandom[3];      // 0x80
+    u8 _pad8C[0x04];
+    Vec m_scale;                  // 0x90
+    u8 _pad9C[0x04];
+    Vec m_scaleVelocity;          // 0xA0
+    u8 _padAC[0x04];
+    Vec m_scaleAcceleration;      // 0xB0
+    u8 _padBC[0x04];
+    Vec m_scaleRandom;            // 0xC0
+    u8 _padCC[0x04];
+    float m_texScrollU;           // 0xD0
+    float m_texScrollUStep;       // 0xD4
+    float m_texScrollUAcceleration; // 0xD8
+    float m_texScrollV;           // 0xDC
+    float m_texScrollVStep;       // 0xE0
+    float m_texScrollVAcceleration; // 0xE4
     Vec m_baseDirection;          // 0xE8
     u8 _padF4[0x04];
     Vec m_accelerationAxis;       // 0xF8
@@ -46,8 +61,8 @@ struct PRyjMegaBirthModel
     u8 _pad12C[0x04];
     u8 m_speedMode;               // 0x130
     u8 m_enableParticleColor;     // 0x131
-    u8 m_rotationRandomFlags;     // 0x132
-    u8 m_scaleRandomFlags;        // 0x133
+    u8 m_scaleRandomFlags;        // 0x132
+    u8 m_rotationRandomFlags;     // 0x133
     u8 m_texScaleRandomMode;      // 0x134
     u8 m_matrixMode;              // 0x135
     u8 m_enableWorldMatrix;       // 0x136
