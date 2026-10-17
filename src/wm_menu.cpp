@@ -3783,7 +3783,7 @@ void CMenuPcs::DrawMoveMenu()
 		{
 			m_effectWork[5].m_object.m_currentAlpha = m_wm.m_handles[5]->m_model->m_lightAlpha;
 			m_wm.m_handles[5]->Draw(5);
-			pppFVECTOR4 color;
+			pppFVECTOR4 color ATTRIBUTE_ALIGN(8);
 			const short partColorIndex = m_crystalPart;
 			PartPcs.GetParColIdx(partColorIndex, color);
 			color.w = m_wm.m_handles[5]->m_model->m_lightAlpha;
