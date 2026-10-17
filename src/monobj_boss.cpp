@@ -13,8 +13,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
-static const char sCrystalItemNodeName[] = "c_item";
-static const char sMeteoParasiteScriptName[] = "meteo_3";
 extern char SoundBuffer[];
 extern "C" Vec gGoblinKingTeleportPoints[] = {
     {-1.5f, -5.989999771118164f, -44.279998779296875f},
@@ -535,7 +533,7 @@ void CGMonObj::initFinishedFuncLastBoss()
 	initFinishedFuncDefault();
 	reinterpret_cast<LastBossWork*>(m_boss)->m_boss = this;
 
-	int nodeIndex = m_charaModelHandle->m_model->SearchNode(const_cast<char*>(sCrystalItemNodeName));
+	int nodeIndex = m_charaModelHandle->m_model->SearchNode("c_item");
 	CChara::CModel* model = m_charaModelHandle->m_model;
 	reinterpret_cast<LastBossWork*>(m_boss)->m_node = model->m_nodes + nodeIndex;
 }
@@ -1161,7 +1159,7 @@ void CGMonObj::initFinishedFuncMeteoParasiteC()
 	initFinishedFuncDefault();
 	*reinterpret_cast<CGMonObj**>(CGMonObj::m_boss + 0x74) = this;
 
-	if (strcmp(Game.m_currentScriptName, sMeteoParasiteScriptName) == 0) {
+	if (strcmp(Game.m_currentScriptName, "meteo_3") == 0) {
 		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->bits.m_meteo3 = 1;
 		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_index = 3;
 		*reinterpret_cast<u16*>(reinterpret_cast<u8*>(m_scriptHandle) + 0x1C) = 1;
