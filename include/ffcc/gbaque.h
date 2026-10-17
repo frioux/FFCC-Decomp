@@ -148,7 +148,9 @@ public:
     int GetMoney(int);
     void ClrScrInitEnd();
     void InitCmakeInfo(int, int);
+#ifndef VERSION_GCCJGC
     void ClrCmakeInfo(int);
+#endif
     void ChkCMakeName(int, unsigned int);
     void ChkCMakeCharaType(int, unsigned int);
     void ChkCMakeJob(int, unsigned int);
@@ -195,7 +197,9 @@ public:
     int GetRadarType(int);
     void ClrRadarTypeFlg();
     unsigned int GetRadarMode(int);
+#ifndef VERSION_GCCJGC
     void SetRadarMode(int, int);
+#endif
     unsigned int GetChgRadarMode(int);
     void ClrChgRadarMode(int);
     int GetScouterInfo(int, unsigned char*);

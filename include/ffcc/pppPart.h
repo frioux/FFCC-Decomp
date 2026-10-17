@@ -74,7 +74,9 @@ float pppVectorLength(Vec vec);
 void pppCreateHeap(_pppEnvSt* pppEnvSt, unsigned long heapSize);
 void pppDestroyHeap(_pppEnvSt* pppEnvSt);
 void* pppMemAlloc(unsigned long, CMemory::CStage*, char*, int);
+#ifdef VERSION_GCCP01
 void* pppMemAllocNoReport(unsigned long, CMemory::CStage*, char*, int);
+#endif
 void pppMemFree(void* allocation);
 void pppHeapCheckLeak(CMemory::CStage* stage);
 unsigned long pppHeapUseRate(CMemory::CStage* stage);

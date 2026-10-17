@@ -1157,7 +1157,7 @@ void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned lon
  * JP Address: TODO
  * JP Size: TODO
  */
-static int loadPdtPtx(char* path, void* pdtData, int pdtCount, void* ptxData, int ptxCount, int useData)
+static inline int loadPdtPtx(char* path, void* pdtData, int pdtCount, void* ptxData, int ptxCount, int useData)
 {
     int pdtSlotIndex = PartMng.pppGetFreeDataMng();
     if (pdtSlotIndex == -1) {

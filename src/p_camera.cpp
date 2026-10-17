@@ -1778,7 +1778,7 @@ void CCameraPcs::SetOffsetZBuff(float offset)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCameraPcs::addWorldMap()
+inline void CCameraPcs::addWorldMap()
 {
     Mtx worldMapMtx;
     Mtx tempMtx;

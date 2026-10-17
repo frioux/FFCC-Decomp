@@ -2781,7 +2781,7 @@ int CGMonObj::aiSeq(int seqId, int priority, int currentState, int nextState, in
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::statWatch()
+inline void CGMonObj::statWatch()
 {
 	if (m_stateFrame == 0) {
 		reqAnim(-1, 0, 0);
@@ -2804,7 +2804,7 @@ void CGMonObj::statWatch()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::statAround()
+inline void CGMonObj::statAround()
 {
 	switch (m_subState) {
 	case 0:

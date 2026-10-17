@@ -2023,10 +2023,10 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     }
     for (i = 0; i < lineCount; i++) {
 #ifdef VERSION_GCCJGC
-        if (useDynamic != 0) {
-            text = s_DynamicMessStr + i * 0x80;
-        } else {
+        if (!useDynamic) {
             text = GetMenuStr(s_singleMenuStaticMessages[messageNo].textIds[i]);
+        } else {
+            text = s_DynamicMessStr + i * 0x80;
         }
 #else
         if (useDynamic == 0) {
@@ -2124,10 +2124,10 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
     for (i = 0; i < lineCount; i++) {
         const char* text;
 #ifdef VERSION_GCCJGC
-        if (useDynamic != 0) {
-            text = s_DynamicMessStr + i * 0x80;
-        } else {
+        if (!useDynamic) {
             text = GetMenuStr(s_singleMenuStaticMessages[messageNo].textIds[i]);
+        } else {
+            text = s_DynamicMessStr + i * 0x80;
         }
 #else
         if (useDynamic == 0) {

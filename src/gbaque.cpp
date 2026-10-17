@@ -2713,6 +2713,7 @@ void GbaQueue::InitCmakeInfo(int channel, int value)
 	Joybus.SetMType(channel, 1);
 }
 
+#ifndef VERSION_GCCJGC
 /*
  * --INFO--
  * PAL Address: 0x800cc9dc
@@ -2730,6 +2731,7 @@ void GbaQueue::ClrCmakeInfo(int channel)
 	}
 	ReleaseSem(channel);
 }
+#endif
 
 /*
  * --INFO--
@@ -4159,6 +4161,7 @@ unsigned int GbaQueue::GetRadarMode(int channel)
 	return (radarMode & (1 << channel)) ? 1 : 0;
 }
 
+#ifndef VERSION_GCCJGC
 /*
  * --INFO--
  * PAL Address: 0x800C9CCC
@@ -4181,6 +4184,7 @@ void GbaQueue::SetRadarMode(int channel, int mode)
 	}
 	OSSignalSemaphore(accessSemaphores + channel);
 }
+#endif
 
 /*
  * --INFO--
