@@ -1952,8 +1952,8 @@ void CMenuPcs::DrawSingWin(short mode)
     MenuPcs.SetTexture(SingMenuTex(0x40));
     double innerH = static_cast<double>(h) - 64.0;
     float innerY = 32.0f + y0;
-    float xx = x0;
     float innerHf = static_cast<float>(innerH);
+    float xx = x0;
     for (i = 0; i < 2; i++) {
         uvFlag = 0;
         if (i != 0) {
