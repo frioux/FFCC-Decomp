@@ -169,26 +169,12 @@ static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 	}
 }
 
-static bool isMenuPcsCommandBusy()
+static inline bool isMenuPcsCommandBusy()
 {
 	return MenuPcs.m_mode != 0;
 }
 
-static unsigned short getItemKindFromCfd(int itemId)
-{
-	if (itemId <= 0 || Game.m_itemTable == 0) {
-		return 0;
-	}
-
-	return *reinterpret_cast<unsigned short*>(Game.m_itemTable + itemId * 0x48);
-}
-
-static bool isBossArtifactStage()
-{
-	return Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F;
-}
-
-static bool isFrameInterval(int frame, int interval)
+static inline bool isFrameInterval(int frame, int interval)
 {
 	return frame % interval == 0;
 }
@@ -275,7 +261,7 @@ extern "C" void sendCombiToScript__10CGCharaObjFP10CGCharaObjii(CGCharaObj* self
  * Address:	TODO
  * Size:	TODO
  */
-int CATEGOLY2TYPE(int value)
+inline int CATEGOLY2TYPE(int value)
 {
 	switch (value) {
 	case 0:
@@ -2741,7 +2727,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statCarry()
+inline void CGPartyObj::statCarry()
 {
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
@@ -3104,7 +3090,7 @@ canUse:
  * Address:	TODO
  * Size:	TODO
  */
-int CGPartyObj::canPlayerGoMenu()
+inline int CGPartyObj::canPlayerGoMenu()
 {
 	if ((m_weaponNodeFlagBits.m_prg != 0) &&
 	    ((m_weaponNodeFlagAll.m_bits1.m_shield != 0) ||
