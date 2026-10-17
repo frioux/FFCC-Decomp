@@ -200,8 +200,8 @@ static inline bool isGhostPartyTargetMode(CGPartyObj* self)
 
 #define PARTY_CARRY_ANIM(self, heldAnim, plainAnim) \
 	(PARTY_GHOST_TARGET_MODE(self) ? PARTY_GHOST_CARRY_ANIM \
-	                              : (CFlatItemCarryMode() == 1 ? PARTY_ANIM_ROW(self).heldAnim \
-	                                                           : PARTY_ANIM_ROW(self).plainAnim))
+	                               : (static_cast<int>(CFlat.m_centerState) == 1 ? PARTY_ANIM_ROW(self).heldAnim \
+	                                                                             : PARTY_ANIM_ROW(self).plainAnim))
 
 inline void CMapPcs::CalcHitPosition(Vec* hitPosition)
 {
