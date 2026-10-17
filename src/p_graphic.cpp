@@ -92,14 +92,6 @@ static const char s_graphic_order_debug_fmt[] = "%s(%d) %.3f%%";
 static const char s_graphic_move_debug_fmt[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
 static const char s_graphic_pad_input_fmt[] = "%c%c%c%c%c%c%c%c%c%c";
 static const char s_p_graphic_cpp[] = "p_graphic.cpp";
-static const char* s_scenegraph_step_labels[] = {
-    s_scenegraph_step_none,
-    s_scenegraph_step_x8,
-    s_scenegraph_step_x0,
-    s_scenegraph_step_x1_8,
-    s_scenegraph_step_x1_4,
-    s_scenegraph_step_x1_2,
-};
 
 STATIC_ASSERT(offsetof(CGraphicPcs, m_screenFade) == 0x04);
 STATIC_ASSERT(sizeof(CGraphicPcs::ScreenFadeSlot) == 0x2C);
@@ -299,6 +291,14 @@ void CGraphicPcs::drawFlip()
  */
 void CGraphicPcs::drawEnd()
 {
+	static const char* pTable[] = {
+		s_scenegraph_step_none,
+		s_scenegraph_step_x8,
+		s_scenegraph_step_x0,
+		s_scenegraph_step_x1_8,
+		s_scenegraph_step_x1_4,
+		s_scenegraph_step_x1_2,
+	};
 	char debugPadString[256];
 	char debugInputString[256];
 
@@ -314,7 +314,7 @@ void CGraphicPcs::drawEnd()
 		Graphic.InitDebugString();
 
 		if (System.m_scenegraphStepMode != 0) {
-			Graphic.DrawDebugStringDirect(0x10, 0x10, const_cast<char*>(s_scenegraph_step_labels[System.m_scenegraphStepMode]), 0xC);
+			Graphic.DrawDebugStringDirect(0x10, 0x10, const_cast<char*>(pTable[System.m_scenegraphStepMode]), 0xC);
 		}
 
 		if (Pad.GetPortEmulation() != -1) {
