@@ -1488,19 +1488,19 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 m_vtxDescMode = 0xFF;
             }
             IncTexMapIdCur();
-            *reinterpret_cast<int*>(&m_pad0CC) = m_texMapIdCur;
+            m_manaParaboloidTexMapId = m_texMapIdCur;
             IncTexCoordIdCur();
-            *reinterpret_cast<int*>(&m_pad0D4) = m_texCoordIdCur;
-            GXSetTexCoordGen2(static_cast<GXTexCoordID>(*reinterpret_cast<int*>(&m_pad0D4)), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
+            m_manaParaboloidTexCoordId = m_texCoordIdCur;
+            GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_manaParaboloidTexCoordId), GX_TG_MTX2x4, GX_TG_TEX0, 0x3C, GX_FALSE, 0x7D);
             if (m_manaParaboloidTexObj0 != 0) {
-                GXLoadTexObj(m_manaParaboloidTexObj0, static_cast<GXTexMapID>(*reinterpret_cast<int*>(&m_pad0CC)));
+                GXLoadTexObj(m_manaParaboloidTexObj0, static_cast<GXTexMapID>(m_manaParaboloidTexMapId));
             }
             GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_NONE);
             GXSetTevDirect(static_cast<GXTevStageID>(m_numTevStage));
             _GXSetTevOrder(
                 static_cast<_GXTevStageID>(m_numTevStage),
-                static_cast<_GXTexCoordID>(*reinterpret_cast<int*>(&m_pad0D4)),
-                static_cast<_GXTexMapID>(*reinterpret_cast<int*>(&m_pad0CC)), GX_COLOR0A0);
+                static_cast<_GXTexCoordID>(m_manaParaboloidTexCoordId),
+                static_cast<_GXTexMapID>(m_manaParaboloidTexMapId), GX_COLOR0A0);
             if (m_manaParaboloidTexObj0 != 0) {
                 _GXSetTevColorIn(
                     static_cast<_GXTevStageID>(m_numTevStage), GX_CC_TEXC, GX_CC_TEXC, GX_CC_CPREV, GX_CC_ZERO);
