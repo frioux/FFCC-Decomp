@@ -426,8 +426,6 @@ static const int kWmCharaSelectBytes = sizeof(WmCharaSelectEntry) * kWmCharaSele
  */
 void CMenuPcs::WmInit()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-
 	m_wm.m_worldObjData = 0;
 	m_wm.m_bubbleData = 0;
 	m_wm.m_frameData = 0;
@@ -443,12 +441,12 @@ void CMenuPcs::WmInit()
 	m_wmThpActive = 0;
 	m_textureLocIndex = 0;
 	memset(&m_wmArea, 0, 0x1C);
-	bytes[0xD] = 0;
-	bytes[0x10] = 0;
-	bytes[0x12] = 0;
-	bytes[0x13] = 0;
-	bytes[0xD] = 1;
-	bytes[0x16] = 0;
+	m_wmMenuRequest = 0;
+	m_wmMoveMenuActive = 0;
+	m_wmMoveStart = 0;
+	m_wmMoveExit = 0;
+	m_wmMenuRequest = 1;
+	m_wmResetRequest = 0;
 	s_McSavePos[0] = 0xFF;
 	s_McSavePos[1] = 0xFF;
 	s_McOdekakeLoadPos[0] = 0xFF;
@@ -540,7 +538,6 @@ void CMenuPcs::loadData()
 #else
 	const int kInitialAnimWait = 300;
 #endif
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	m_menuResultCode = 0;
 	GbaQue.SetControllerMode(1);
 
@@ -836,10 +833,10 @@ void CMenuPcs::loadData()
 	loadFont(0, fontPath, 1, -1);
 #endif
 
-	bytes[0xD] = 0;
-	bytes[0x10] = 0;
-	bytes[0x12] = 0;
-	bytes[0x13] = 0;
+	m_wmMenuRequest = 0;
+	m_wmMoveMenuActive = 0;
+	m_wmMoveStart = 0;
+	m_wmMoveExit = 0;
 	m_wmWorldState->m_changeRequest = 0;
 	m_wmWorldState->m_nextMenuMode = 0;
 	m_wmWorldState->m_delay = 0;
@@ -1189,8 +1186,6 @@ void CMenuPcs::destroyWorld()
  */
 void CMenuPcs::CalcDiaryMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-
 #ifdef VERSION_GCCP01
 	static bool s_wmMenuLastMountState = false;
 
@@ -1205,15 +1200,12 @@ void CMenuPcs::CalcDiaryMenu()
 #endif
 
 	WMChgMenu();
-	if (static_cast<char>(bytes[0xD]) == 0) {
-		int menuIndex = 4;
-		unsigned char* menuPtr = bytes + 0x10;
+	if (static_cast<char>(m_wmMenuRequest) == 0) {
+		int i = 4;
 		do {
-			CMenu* const menu = *reinterpret_cast<CMenu**>(menuPtr + 0x10C);
-			menu->Calc();
-			menuIndex++;
-			menuPtr += 4;
-		} while (menuIndex < 6);
+			m_battleMesMenus[i]->Calc();
+			i++;
+		} while (i < 6);
 		return;
 	}
 
@@ -1263,14 +1255,11 @@ void CMenuPcs::CalcDiaryMenu()
 		break;
 	}
 
-	int menuIndex = 4;
-	unsigned char* menuPtr = bytes + 0x10;
+	int i = 4;
 	do {
-		CMenu* const menu = *reinterpret_cast<CMenu**>(menuPtr + 0x10C);
-		menu->Calc();
-		menuIndex++;
-		menuPtr += 4;
-	} while (menuIndex < 6);
+		m_battleMesMenus[i]->Calc();
+		i++;
+	} while (i < 6);
 }
 
 /*
@@ -1981,8 +1970,7 @@ inline void CMenuPcs::CalcCMakeMenu()
  */
 inline void CMenuPcs::CalcMoveMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	if (((m_wmWorldState->m_mainState != 0) || bytes[0x12] != 0) &&
+	if (((m_wmWorldState->m_mainState != 0) || m_wmMoveStart != 0) &&
 	    m_wmWorldState->m_mainState <= 3) {
 		if (Game.m_gameWork.m_chaliceElement != m_crystalElem) {
 			SetCrystalCageAttr();
@@ -2933,15 +2921,9 @@ unsigned int CMenuPcs::IsMenuCharaAnimIdle(int charaIndex)
  */
 void CMenuPcs::drawWorld()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-
-	if (static_cast<signed char>(bytes[0xD]) == 0) {
-		int i = 4;
-		unsigned char* menuSlot = bytes + 0x10;
-		for (; i < 6; i++) {
-			CMenu* const menu = *reinterpret_cast<CMenu**>(menuSlot + 0x10C);
-			menu->Draw();
-			menuSlot += 4;
+	if (m_wmMenuRequest == 0) {
+		for (int i = 4; i < 6; i++) {
+			m_battleMesMenus[i]->Draw();
 		}
 	} else {
 		const short menuMode = m_wmWorldState->m_menuMode;
@@ -2991,13 +2973,8 @@ void CMenuPcs::drawWorld()
 			break;
 		}
 
-		unsigned char* menuSlot;
-		int i = 4;
-		menuSlot = bytes + 0x10;
-		for (; i < 6; i++) {
-			CMenu* const menu = *reinterpret_cast<CMenu**>(menuSlot + 0x10C);
-			menu->Draw();
-			menuSlot += 4;
+		for (int i = 4; i < 6; i++) {
+			m_battleMesMenus[i]->Draw();
 		}
 		DrawInit();
 	}
@@ -3751,11 +3728,9 @@ void CMenuPcs::DrawCMakeMenu()
  */
 void CMenuPcs::DrawMoveMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-
 	{
 		short state = m_wmWorldState->m_mainState;
-		if ((state == 0) && bytes[0x12] == 0) {
+		if ((state == 0) && m_wmMoveStart == 0) {
 			return;
 		}
 		if (state > 3) {
@@ -3768,7 +3743,7 @@ void CMenuPcs::DrawMoveMenu()
 	float moveAlpha;
 	if (state == 1) {
 		moveAlpha = static_cast<float>(static_cast<double>(m_wmWorldState->m_frameCounter) / 10.0);
-	} else if (state == 2 && bytes[0x13] != 0) {
+	} else if (state == 2 && m_wmMoveExit != 0) {
 		moveAlpha = static_cast<float>(DOUBLE_80331420 - static_cast<double>(m_wmWorldState->m_frameCounter) / 10.0);
 	} else {
 		moveAlpha = FLOAT_803313e8;
@@ -3800,12 +3775,12 @@ void CMenuPcs::DrawMoveMenu()
 		RestoreProjection();
 	}
 
-	if (m_wmWorldState->m_mainState != 2 || bytes[0x13] != 0) {
+	if (m_wmWorldState->m_mainState != 2 || m_wmMoveExit != 0) {
 		m_wmWorldState->m_frameCounter++;
 	}
 
 	if (m_wmWorldState->m_mainState == 0 ||
-	    (m_wmWorldState->m_mainState == 2 && bytes[0x13] != 0)) {
+	    (m_wmWorldState->m_mainState == 2 && m_wmMoveExit != 0)) {
 		if (static_cast<double>(m_wmWorldState->m_posX) <= DOUBLE_803314F0) {
 			m_wmWorldState->m_mainState++;
 			m_wm.m_frameData->m_titleFrame = 0;
@@ -4244,7 +4219,6 @@ void CMenuPcs::DrawLoadMenu()
  */
 void CMenuPcs::DrawTitleMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	int state = m_wmWorldState->m_mainState;
 
 		if (state == 0 && static_cast<signed char>(m_wmWorldState->m_worldReady) != 0) {
@@ -4511,7 +4485,7 @@ void CMenuPcs::DrawTitleMenu()
 				const int channel = m_wmWorldState->m_cardChannel;
 				m_wmWorldState->m_changeRequest = 1;
 				CallWorldParam(7, channel, 0);
-				bytes[0x0D] = 0;
+				m_wmMenuRequest = 0;
 			} else {
 				s_fade_mode = 0;
 			}
@@ -4560,23 +4534,21 @@ void CMenuPcs::DrawTitleMenu()
  */
 void CMenuPcs::SetWorldParam(int code, int value)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-
 	switch (code) {
 	case 0: {
-		bytes[5] = bytes[4];
-		bytes[4] = static_cast<unsigned char>(value);
+		m_wmPrevArea = m_wmArea;
+		m_wmArea = static_cast<unsigned char>(value);
 		m_wmChgFlags |= WMDATA_CHG_AREA;
 		break;
 	}
 	case 1:
-		bytes[6] = static_cast<unsigned char>(value);
+		m_wmIconVariant = static_cast<unsigned char>(value);
 		break;
 	case 2:
 		m_wmIconFlags = static_cast<unsigned short>(value) & 0x3FF;
 		break;
 	case 3:
-		bytes[7] = static_cast<unsigned char>(value);
+		m_wmPlaceNo = static_cast<unsigned char>(value);
 		break;
 	case 4:
 		m_wmBubbleType = static_cast<unsigned char>(value);
@@ -4597,16 +4569,16 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		break;
 	}
 	case 9:
-		if (static_cast<int>(static_cast<signed char>(bytes[0xD])) != value) {
-			bytes[0xD] = static_cast<unsigned char>(value);
+		if (static_cast<int>(m_wmMenuRequest) != value) {
+			m_wmMenuRequest = static_cast<unsigned char>(value);
 		}
 		m_wmWorldState->m_changeRequest = 2;
 		break;
 	case 10:
-		bytes[0x10] = value ? 1 : 0;
+		m_wmMoveMenuActive = value ? 1 : 0;
 		break;
 	case 11:
-		bytes[0x11] = value ? 1 : 0;
+		m_wmDiaryFlag = value ? 1 : 0;
 		break;
 	case 12:
 		m_wmNextAnim = static_cast<unsigned char>(value);
@@ -4615,25 +4587,25 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		m_pageMarkFlags = static_cast<unsigned char>(value) & 3;
 		break;
 	case 14:
-		bytes[0x12] = value ? 1 : 0;
+		m_wmMoveStart = value ? 1 : 0;
 		break;
 	case 15:
-		bytes[0x13] = value ? 1 : 0;
+		m_wmMoveExit = value ? 1 : 0;
 		break;
 	case 16:
-		bytes[0x17] = static_cast<unsigned char>(value);
+		m_mcSlot = static_cast<unsigned char>(value);
 		break;
 	case 0x12: {
 		McCtrl* mc = GetMcCtrl();
 		mc->Init();
-		mc->SetSlot(static_cast<signed char>(bytes[0x17]));
+		mc->SetSlot(m_mcSlot);
 		m_mcRequest = 0x12;
 		break;
 	}
 	case 0x13: {
 		McCtrl* mc = GetMcCtrl();
 		mc->Init();
-		mc->SetSlot(static_cast<signed char>(bytes[0x17]));
+		mc->SetSlot(m_mcSlot);
 		m_mcRequest = 0x13;
 		break;
 	}
@@ -4642,9 +4614,9 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		m_mcRequestLocked = 1;
 		break;
 	case 0x16:
-		bytes[0x15] = 1;
+		m_wmModeChangeFlag = 1;
 		changeMode(static_cast<MENUMODE>(2));
-		bytes[0x15] = 1;
+		m_wmModeChangeFlag = 1;
 		break;
 	case 0x17: {
 		const char disabled = value == 0;
@@ -4659,7 +4631,7 @@ void CMenuPcs::SetWorldParam(int code, int value)
 		loadData();
 		break;
 	case 0x19:
-		bytes[0x16] = 1;
+		m_wmResetRequest = 1;
 		break;
 #ifndef VERSION_GCCJGC
 	case 0x1a: {
@@ -4701,7 +4673,6 @@ void CMenuPcs::SetWorldParam(int code, int value)
  */
 unsigned int CMenuPcs::GetWorldParam(int code)
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned int result = 0;
 
 	switch (code) {
@@ -4709,13 +4680,13 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		result = m_wmArea;
 		break;
 	case 1:
-		result = *reinterpret_cast<signed char*>(bytes + 6);
+		result = m_wmIconVariant;
 		break;
 	case 2:
 		result = static_cast<unsigned int>(m_wmIconFlags);
 		break;
 	case 3:
-		result = *reinterpret_cast<signed char*>(bytes + 7);
+		result = m_wmPlaceNo;
 		break;
 	case 4:
 		result = m_wmBubbleType;
@@ -4733,13 +4704,13 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		result = m_wmYear;
 		break;
 	case 9:
-		result = *reinterpret_cast<signed char*>(bytes + 0xD);
+		result = m_wmMenuRequest;
 		break;
 	case 10:
-		result = bytes[0x10] ? 1 : 0;
+		result = m_wmMoveMenuActive ? 1 : 0;
 		break;
 	case 11:
-		result = bytes[0x11] ? 1 : 0;
+		result = m_wmDiaryFlag ? 1 : 0;
 		break;
 	case 12:
 		result = m_wmNextAnim;
@@ -4748,13 +4719,13 @@ unsigned int CMenuPcs::GetWorldParam(int code)
 		result = static_cast<unsigned int>(static_cast<signed char>(m_pageMarkFlags));
 		break;
 	case 14:
-		result = bytes[0x12] ? 1 : 0;
+		result = m_wmMoveStart ? 1 : 0;
 		break;
 	case 15:
-		result = bytes[0x13] ? 1 : 0;
+		result = m_wmMoveExit ? 1 : 0;
 		break;
 	case 16:
-		result = *reinterpret_cast<signed char*>(bytes + 0x17);
+		result = m_mcSlot;
 		break;
 	case 0x11: {
 		int connectStatus;
@@ -5006,8 +4977,6 @@ inline void CMenuPcs::DrawObj(int kind)
  */
 void CMenuPcs::CalcPitcher()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-
 	short state = m_wmWorldState->m_mainState;
 	if (state == 0 || state > 2) {
 		return;
@@ -5051,7 +5020,7 @@ void CMenuPcs::CalcPitcher()
 	float blendStep = static_cast<float>(DOUBLE_803314E8 * static_cast<double>(step));
 	if (m_wmWorldState->m_mainState == 1 && step < 10) {
 		m_wm.m_handles[5]->m_model->m_lightAlpha = blendStep;
-	} else if (m_wmWorldState->m_mainState == 2 && bytes[0x13] != 0) {
+	} else if (m_wmWorldState->m_mainState == 2 && m_wmMoveExit != 0) {
 		m_wm.m_handles[5]->m_model->m_lightAlpha =
 			static_cast<float>(DOUBLE_80331420 - static_cast<double>(blendStep));
 	} else {
@@ -5715,7 +5684,6 @@ inline void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFo
 void CMenuPcs::CalcWMFrame()
 {
 	int i;
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	short mainState = m_wmWorldState->m_mainState;
 	if (mainState == 0) {
 		return;
@@ -5724,7 +5692,7 @@ void CMenuPcs::CalcWMFrame()
 		return;
 	}
 
-	if (mainState == 2 && bytes[0x13] != 0) {
+	if (mainState == 2 && m_wmMoveExit != 0) {
 		m_wm.m_frameData->m_titleFrame--;
 		if (m_wm.m_frameData->m_titleFrame < 0) {
 			m_wm.m_frameData->m_titleFrame = 0;
@@ -5762,7 +5730,7 @@ void CMenuPcs::CalcWMFrame()
 	    (10 - wmFrame->m_titleFrame) * 2 + 0x68;
 
 	if (((m_wmChgFlags & WMDATA_CHG_YEAR) != 0 ||
-	     (m_wmWorldState->m_mainState == 2 && bytes[0x13] != 0))
+	     (m_wmWorldState->m_mainState == 2 && m_wmMoveExit != 0))
 	    && m_wm.m_frameData->m_yearFrame >= 10) {
 		m_wm.m_frameData->m_yearFrame = 0;
 		m_wmChgFlags &= ~WMDATA_CHG_YEAR;
@@ -5831,7 +5799,7 @@ void CMenuPcs::CalcWMFrame()
 	}
 
 	if ((m_wmChgFlags & WMDATA_CHG_YEAR) != 0 ||
-	    (m_wmWorldState->m_mainState == 2 && bytes[0x13] != 0)) {
+	    (m_wmWorldState->m_mainState == 2 && m_wmMoveExit != 0)) {
 		for (i = 0; i < digitCount; i++) {
 			if (i != 0 && digitCount != 2) {
 				break;
@@ -7517,8 +7485,6 @@ inline void CMenuPcs::WMSubMenuInit()
  */
 void CMenuPcs::WMChgMenu()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-
 	if (m_wmWorldState->m_changeRequest == 0) {
 		return;
 	}
@@ -7529,7 +7495,7 @@ void CMenuPcs::WMChgMenu()
 	short changeRequest = m_wmWorldState->m_changeRequest;
 
 	if (changeRequest == 2) {
-		char requestKind = bytes[0xD];
+		char requestKind = m_wmMenuRequest;
 		if (requestKind == 1) {
 			m_wmWorldState->m_menuMode = 0;
 		} else if (requestKind == 2) {
@@ -7580,7 +7546,7 @@ void CMenuPcs::WMChgMenu()
 		if (changeRequest == 1) {
 			m_wmWorldState->m_menuMode = 0;
 #ifndef VERSION_GCCJGC
-			bytes[0xD] = 0;
+			m_wmMenuRequest = 0;
 #endif
 			m_wmWorldState->m_cardChannel = 0;
 			CallWorldParam(1, 1, 0);
@@ -7593,14 +7559,14 @@ void CMenuPcs::WMChgMenu()
 		m_wmWorldState->m_menuMode = 0;
 	} else if (changeRequest == 1) {
 		if (m_wmWorldState->m_menuMode >= 8) {
-			bytes[0xD] = 0;
+			m_wmMenuRequest = 0;
 		} else {
 			m_wmWorldState->m_menuMode++;
 		}
 	} else if (changeRequest == -1) {
 		short curMode = m_wmWorldState->m_menuMode;
 		if (curMode <= 0) {
-			bytes[0xD] = 0;
+			m_wmMenuRequest = 0;
 		} else if (curMode == 3) {
 			m_wmWorldState->m_menuMode = 0;
 			m_wmWorldState->m_cardChannel = 0;
@@ -7708,9 +7674,9 @@ void CMenuPcs::WMChgMenu()
 			for (int i = 0; i < kWmMenuControllerCount; i++) {
 				Game.m_gameWork.m_wmBackupParams[i] = m_wmWorldState->m_backupParams[i];
 			}
-			bytes[0x10] = 1;
-			bytes[0x12] = 0;
-			bytes[0x13] = 0;
+			m_wmMoveMenuActive = 1;
+			m_wmMoveStart = 0;
+			m_wmMoveExit = 0;
 		} else {
 			InitCharaSelectInfo();
 		}
@@ -7718,21 +7684,21 @@ void CMenuPcs::WMChgMenu()
 	}
 	case 1:
 		memset(m_wmWorldParams, 0, 0x10);
-		bytes[0x11] = 0;
+		m_wmDiaryFlag = 0;
 		break;
 	case 3: {
 		if (m_wmWorldState->m_menuMode == 4) {
 			SetParty();
 
-			bytes[0x10] = 1;
-			bytes[0x12] = 0;
-			bytes[0x13] = 0;
+			m_wmMoveMenuActive = 1;
+			m_wmMoveStart = 0;
+			m_wmMoveExit = 0;
 		}
 		break;
 	}
 	case 4: {
 		Sound.PlaySe(0x31, 0x40, 0x7F, 0);
-		bytes[0x10] = 0;
+		m_wmMoveMenuActive = 0;
 		InitCharaSelectInfo();
 		break;
 	}
@@ -7742,9 +7708,9 @@ void CMenuPcs::WMChgMenu()
 
 	if (m_wmWorldState->m_changeRequest == 2
 	    && m_wmWorldState->m_menuMode == 4) {
-		bytes[0x10] = 1;
-		bytes[0x12] = 0;
-		bytes[0x13] = 0;
+		m_wmMoveMenuActive = 1;
+		m_wmMoveStart = 0;
+		m_wmMoveExit = 0;
 	}
 
 	m_wmWorldState->m_changeRequest = 0;

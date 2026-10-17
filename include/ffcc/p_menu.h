@@ -909,12 +909,17 @@ public:
     signed char m_wmChgFlags;        // 0x0A
     signed char m_wmPrevYear;        // 0x0B
     signed char m_wmYear;            // 0x0C
-    unsigned char m_pad0D;
+    signed char m_wmMenuRequest;     // 0x0D
     signed char m_wmNextAnim;        // 0x0E
     unsigned char m_pageMarkFlags;
-    unsigned char m_pad10[0x14 - 0x10];
+    unsigned char m_wmMoveMenuActive; // 0x10
+    unsigned char m_wmDiaryFlag;     // 0x11
+    unsigned char m_wmMoveStart;     // 0x12
+    unsigned char m_wmMoveExit;      // 0x13
     unsigned char m_mcRequestLocked;
-    unsigned char m_pad15[0x18 - 0x15];
+    unsigned char m_wmModeChangeFlag; // 0x15
+    unsigned char m_wmResetRequest;  // 0x16
+    signed char m_mcSlot;            // 0x17
     signed char m_mcRequest;
     unsigned char m_pad19;
     short m_wmIconFlags;             // 0x1A
