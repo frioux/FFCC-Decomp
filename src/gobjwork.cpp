@@ -100,7 +100,7 @@ void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGObjWork::CalcStatus()
+inline void CGObjWork::CalcStatus()
 {
 	if (m_statusTimers[6] != 0) {
 		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(0x38));
@@ -1688,7 +1688,7 @@ void CCaravanWork::ClampStatus(short& cmdSlots, unsigned short& hpMax)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCaravanWork::CalcArtifactStatus(int includeTemp, int, int& hp, int& cmdSlots, int& strength, int& magic, int& defense)
+inline void CCaravanWork::CalcArtifactStatus(int includeTemp, int, int& hp, int& cmdSlots, int& strength, int& magic, int& defense)
 {
 	hp = 0;
 	cmdSlots = 0;
