@@ -215,24 +215,24 @@ static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
 	if (carryType == 0) {
 		if (CFlatItemCarryMode() == 1) {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			anim = rows[work->m_genderFlag +
 			            work->m_tribeId * 2].m_carryAnim2;
 		} else {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			anim = rows[work->m_genderFlag +
 			            work->m_tribeId * 2].m_carryAnim0;
 		}
 	} else {
 		if (CFlatItemCarryMode() == 1) {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			anim = rows[work->m_genderFlag +
 			            work->m_tribeId * 2].m_carryAnim3;
 		} else {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			anim = rows[work->m_genderFlag +
 			            work->m_tribeId * 2].m_carryAnim1;
 		}
@@ -379,21 +379,21 @@ void CGPartyObj::onChangeStat(int state)
 		int attackSel = party.attackSel;
 		m_attackAnimId = (attackSel == 0) ? 5 : ((attackSel == 1) ? 7 : 8);
 		{
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			m_castFrameStart =
 			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
 			         reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
 			        .m_attacks[attackSel].m_attackStartFrame;
 		}
 		{
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			m_castFrameEnd =
 			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
 			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
 			        .m_attacks[attackSel].m_attackEndFrame;
 		}
 		{
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			m_castFrameCurrent =
 			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
 			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
@@ -436,14 +436,14 @@ void CGPartyObj::onChangeStat(int state)
 		System.Printf("\x83`\x83\x83\x81[\x83W\x83^\x83" "C\x83v=%d\n", itemLow);
 		m_unk558 = itemHigh + 0x2A;
 		{
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			m_castFrameStart =
 			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
 			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
 			        .m_chargeAttacks[itemLow].m_phases[0].m_attackStartFrame;
 		}
 		{
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			m_castFrameEnd =
 			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
 			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
@@ -1876,7 +1876,7 @@ void CGPartyObj::statCharge()
 			putParticleFromItem(m_itemId, 3, m_particleSlots[0], static_cast<Vec*>(0));
 		}
 
-		SPartyAnimRow* animRows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+		SPartyAnimRow* animRows = Game.m_partyAnimTable;
 		SCfdItemRow* rowRows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
 		SChargeRec* table = &animRows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
 		                            reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
@@ -2069,7 +2069,7 @@ void CGPartyObj::onStatAttack(int chargeType)
 	}
 
 	const int chain = party.unk6CC;
-	SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+	SPartyAnimRow* rows = Game.m_partyAnimTable;
 	SAtkRec* attackEntry = &rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
 	                           reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
 	                       .m_attacks[chain];

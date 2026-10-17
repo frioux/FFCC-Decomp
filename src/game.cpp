@@ -783,8 +783,8 @@ void CGame::loadCfd()
     FFCC_ASSERT((m_cFlatDataArr[3].m_data[1].m_size % sizeof(CCombi2)) == 0);
     m_combiCount = m_cFlatDataArr[3].m_data[1].m_size / sizeof(CCombi2);
     FFCC_ASSERT(m_combiCount);
-    unk_flat3_field_30_0xc7e0 = (unsigned int)m_cFlatDataArr[3].GetData(2);
-    FFCC_ASSERT(unk_flat3_field_30_0xc7e0);
+    m_partyAnimTable = (SPartyAnimRow*)m_cFlatDataArr[3].GetData(2);
+    FFCC_ASSERT(m_partyAnimTable);
     m_bossArtifactBase = reinterpret_cast<CBossArtifactStage*>(m_cFlatDataArr[3].GetData(3));
     FFCC_ASSERT(m_bossArtifactBase);
 }
