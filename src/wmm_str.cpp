@@ -2,9 +2,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/game.h"
 
-#ifdef VERSION_GCCJGC
-#include "src/wmm_str_status_jp.inc"
-#else
+#ifndef VERSION_GCCJGC
 
 #ifdef VERSION_GCCE01
 #include "src/wmm_str_data_us.inc"

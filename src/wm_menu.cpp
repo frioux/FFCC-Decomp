@@ -256,6 +256,10 @@ static CMenuPcs::FCV s_MenuObjZRot = {4, s_MenuObjZRotSpl};
 static CMenuPcs::FCV s_MenuObjYTrs = {5, s_MenuObjYTrsSpl};
 static CMenuPcs::FCV s_MenuObjScl = {7, s_MenuObjSclSpl};
 
+#ifdef VERSION_GCCJGC
+#include "src/wmm_str_status_jp.inc"
+#endif
+
 static float s_MaxAnimWait;
 static unsigned char s_LoadCancelFlg;
 static char s_McSavePos[2];
