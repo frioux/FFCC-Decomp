@@ -811,7 +811,7 @@ void CGCharaObj::resetIgnoreHit()
  */
 void CGCharaObj::damageDelete()
 {
-	Sound.StopSe3DGroup(m_particleId);
+	seDamageDelete();
 	deletePSlotBit(0x3B);
 }
 
@@ -2254,7 +2254,7 @@ checkParticle:
 			seNo = (seSpec == 0xFFFF) ? 0 : ((seSpec & 0xFF) + ((seSpec >> 8) * 1000));
 			if (seNo != 0) {
 				int seHandle = playSe3D(seNo, 0x32, 0x96, 0, pos);
-				Sound.SetSe3DGroup(seHandle, m_particleId);
+				addSe(seHandle);
 			}
 	}
 	} else {
@@ -2483,7 +2483,7 @@ checkParticle:
 				useArgPos = 0;
 			}
 			int seHandle = playSe3D(seNo, 0x32, 0x96, 0, (useArgPos != 0) ? pos : 0);
-			Sound.SetSe3DGroup(seHandle, m_particleId);
+			addSe(seHandle);
 		}
 
 		if (!emittedCustom) {
@@ -2780,6 +2780,34 @@ void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 		float glyphOffset = (float)(unsigned short)font->m_glyphHeight * font->scaleY;
 		posY = posY - glyphOffset;
 	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: UNUSED
+ * EN Size: TODO
+ * JP Address: UNUSED
+ * JP Size: TODO
+ */
+inline void CGCharaObj::addSe(int seHandle)
+{
+	Sound.SetSe3DGroup(seHandle, m_particleId);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 48b
+ * EN Address: UNUSED
+ * EN Size: TODO
+ * JP Address: UNUSED
+ * JP Size: TODO
+ */
+inline void CGCharaObj::seDamageDelete()
+{
+	Sound.StopSe3DGroup(m_particleId);
 }
 
 /*
