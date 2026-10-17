@@ -972,7 +972,7 @@ void CMenuPcs::CmdDraw()
 				text = GetMenuStr(displayIdx + 0x0B);
 			} else if (!(displayIdx >= itemCount)) {
 				const s16 slot = letterBuf[displayIdx - 1];
-				const s16 skillId = caravan->m_inventoryItems[slot];
+				const int skillId = caravan->m_inventoryItems[slot];
 				text = Game.GetShortItemName(skillId);
 
 				s32 selDisp = m_cmdState->selected[1] + m_cmdState->scrollTop;
@@ -1147,8 +1147,8 @@ void CMenuPcs::CmdDraw()
 	}
 
 	CFont* helpFont = GetFont22();
-	int helpAlpha = static_cast<int>(
-	    255.0f * m_cmdList->entries[m_cmdList->count].alpha);
+	entry = &m_cmdList->entries[m_cmdList->count];
+	int helpAlpha = static_cast<int>(255.0f * entry->alpha);
 	if (!hasItemHelp) {
 		helpId = -1;
 	}
