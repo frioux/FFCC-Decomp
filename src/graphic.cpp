@@ -601,10 +601,7 @@ void CGraphic::Thread()
                 CSystem::COrder* order = System.GetOrder(drawSyncPart >> 8);
                 char drawSyncByte = drawSyncPart & 0xFF;
                 int orderIndex = (order != nullptr) ? order->m_insertIndex : -1;
-                const char* orderName = "---";
-                if (order != nullptr) {
-                    orderName = order->m_debugName;
-                }
+                const char* orderName = (order != nullptr) ? order->m_debugName : "---";
                 System.Printf(debugFmtBase + kGraphicCppDrawDoneFmt, m_drawDoneFile, m_drawDoneLine, orderName, orderIndex,
                               drawSyncByte);
             }
