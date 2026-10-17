@@ -544,7 +544,7 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
 
     owner = (CGObject*)mngSt->m_owner;
     if ((s32)Game.m_currentSceneId == 7) {
-        nodeNameBase = PartMng.m_editNodeNameBuffer + mngSt->m_nodeIndex * 0x60;
+        nodeNameBase = &PartMng.m_editFieldParticles[mngSt->m_nodeIndex];
     } else {
         nodeNameBase = (u8*)(*(u32*)mngSt->m_pppResSet) + mngSt->m_nodeIndex * 0x60 + 0x20;
     }

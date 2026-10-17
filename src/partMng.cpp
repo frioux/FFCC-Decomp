@@ -89,7 +89,7 @@ STATIC_ASSERT(offsetof(CPartMng, m_soundFarDistance) == 0x23588);
 STATIC_ASSERT(offsetof(CPartMng, m_editParticleCount) == 0x4);
 STATIC_ASSERT(offsetof(CPartMng, m_editCursorEnabled) == 0xC);
 STATIC_ASSERT(offsetof(CPartMng, m_editDrawMode) == 0x174);
-STATIC_ASSERT(offsetof(CPartMng, m_editReceiveCursor) == 0x1CC);
+STATIC_ASSERT(offsetof(CPartMng, m_editFieldParticleCursor) == 0x1CC);
 STATIC_ASSERT(offsetof(CPartMng, m_editShapeGroups) == 0x7FC);
 STATIC_ASSERT(offsetof(CPartMng, m_cursorRequest) == 0x10);
 STATIC_ASSERT(offsetof(CPartMng, m_editorCursorPosition) == 0x18);
@@ -311,7 +311,7 @@ void CPartMng::Create()
         m_pdtSlots[i].m_pppDataHead = 0;
     }
 
-    m_editNodeNameBuffer = 0;
+    m_editFieldParticles = 0;
     m_editModelSlots = 0;
     m_editShapeSlots = 0;
     m_editShapeGroups = 0;
@@ -1018,7 +1018,7 @@ void CPartMng::SetFp()
 {
     int i;
     for (i = 0; i < m_editParticleCount; i++) {
-        _pppFieldParticleData* fp = &reinterpret_cast<_pppFieldParticleData*>(m_editNodeNameBuffer)[i];
+        _pppFieldParticleData* fp = &m_editFieldParticles[i];
         m_pppMng[i].m_pppResSet = m_unk23518;
 
 #ifdef VERSION_GCCP01
@@ -1110,7 +1110,7 @@ inline void CPartMng::fpIDon(unsigned short selectedId)
     _pppMngSt* mng;
 
     mng = m_pppMng;
-    fp = reinterpret_cast<_pppFieldParticleData*>(m_editNodeNameBuffer);
+    fp = m_editFieldParticles;
     for (i = m_editParticleCount; i != 0; i--) {
         if (fp->m_fieldId == selectedId) {
             mng->m_baseTime = 0;
@@ -1136,7 +1136,7 @@ inline void CPartMng::fpIDoff(unsigned short selectedId)
     _pppMngSt* mng;
 
     mng = m_pppMng;
-    fp = reinterpret_cast<_pppFieldParticleData*>(m_editNodeNameBuffer);
+    fp = m_editFieldParticles;
     for (i = m_editParticleCount; i != 0; i--) {
         if (fp->m_fieldId == selectedId) {
             mng->m_particleEnded = 1;
@@ -1385,9 +1385,9 @@ void CPartMng::pppEditAllReleaseResource()
         }
     }
 
-    if (m_editNodeNameBuffer != 0) {
-        delete[] m_editNodeNameBuffer;
-        m_editNodeNameBuffer = 0;
+    if (m_editFieldParticles != 0) {
+        delete[] m_editFieldParticles;
+        m_editFieldParticles = 0;
     }
 
     if (m_editModelSlots != 0) {
@@ -1471,23 +1471,7 @@ static inline char* CheckSum(char* packet, unsigned long code, unsigned long pac
  */
 void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packetSize)
 {
-    static const int kLastEnvCmdOffset = 0x23560;
-    static const int kEditDrawModeOffset = 0x23570;
-    static const int kCursorRequestOffset = 0x10;
-    static const int kCursorXOffset = 0x178;
-    static const int kCursorYOffset = 0x17A;
-    static const int kCursorPacketOffset = 0x17C;
-    static const int kCursorPacket42Offset = 0x18;
-    static const int kEditCameraMatrixOffset = 0x40;
-    static const int kEditCameraExtraOffset = 0x70;
-    static const int kCmd16PayloadOffset = 0x180;
-    static const int kLoadMapArgsOffset = 0x188;
-    static const int kLoadModelArgsOffset = 0x190;
-    static const int kLoadAnimNameOffset = 0x19C;
-    static const int kMapPcsFlagOffset = 0x1BC;
-    static const int kCharaVisToggleOffset = 0x1C0;
 
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     char* payload = CheckSum(packet, code, packetSize);
     float* payloadFloats = reinterpret_cast<float*>(payload);
     int* payloadWords = reinterpret_cast<int*>(payload);
@@ -1508,8 +1492,8 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         allFreeFPrim();
         pppEditAllReleaseResource();
         ppvSysStopPartF = 1;
-        *reinterpret_cast<int*>(self + 0x800) = 0;
-        *reinterpret_cast<int*>(self + 0x804) = -1;
+        m_unk800 = 0;
+        m_unk804 = -1;
         m_editParticleCount = 0;
         m_editProgramCount = 0;
         m_isEditMode = 0;
@@ -1523,19 +1507,19 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         ppvUserStopPartF = 1;
         return;
     case 0x16:
-        memcpy(self + kCmd16PayloadOffset, payload, 8);
+        memcpy(m_editCmd16Args, payload, 8);
         return;
     case 0x18:
-        *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 0x18;
-        memcpy(self + kLoadMapArgsOffset, payload, 8);
+        m_lastEnvCmd = 0x18;
+        memcpy(&m_editStageNo, payload, 8);
         return;
     case 0x19:
-        *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 0x19;
-        memcpy(self + kLoadModelArgsOffset, payload, 0xC);
+        m_lastEnvCmd = 0x19;
+        memcpy(&m_editCharaKind, payload, 0xC);
         return;
     case 0x1A:
-        *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 0x1A;
-        memcpy(self + kLoadAnimNameOffset, payload, 0x20);
+        m_lastEnvCmd = 0x1A;
+        memcpy(m_editAnimName, payload, 0x20);
         return;
     case 3:
         if (m_isEditMode != 0) {
@@ -1568,41 +1552,41 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         m_pppMng[0].m_hitBgFlag = 0;
         return;
     case 0x1B:
-        *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 0x1B;
-        memcpy(self + kMapPcsFlagOffset, payload, 4);
+        m_lastEnvCmd = 0x1B;
+        memcpy(&m_editMapDrawEnabled, payload, 4);
         return;
     case 0x1C:
-        *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 0x1C;
-        memcpy(self + kCharaVisToggleOffset, payload, 4);
+        m_lastEnvCmd = 0x1C;
+        memcpy(&m_editModelFlag, payload, 4);
         return;
     case 1: {
         if (m_isEditMode != 0) {
             return;
         }
 
-        *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 1;
+        m_lastEnvCmd = 1;
         m_pppEnvSt.m_mapMeshPtr = reinterpret_cast<CMapMesh**>(m_editModelSlots);
         m_pppEnvSt.m_shapeTablePtr = m_editShapeSlots;
         m_pppEnvSt.m_shapeGroupPtr = m_editShapeGroups;
-        *reinterpret_cast<EditCameraMatrix*>(self + kEditCameraMatrixOffset) =
+        *reinterpret_cast<EditCameraMatrix*>(m_editCameraMatrix) =
             *reinterpret_cast<EditCameraMatrix*>(payload);
-        *reinterpret_cast<float*>(self + kEditCameraExtraOffset) = payloadFloats[0xC];
-        *reinterpret_cast<float*>(self + kEditCameraExtraOffset + 4) = payloadFloats[0xD];
-        *reinterpret_cast<EditEnvBlock*>(self + kEditCameraExtraOffset + 8) =
+        m_editCameraDepthScale = payloadFloats[0xC];
+        m_unk74 = payloadFloats[0xD];
+        *reinterpret_cast<EditEnvBlock*>(m_editEnvBlock) =
             *reinterpret_cast<EditEnvBlock*>(payload + 0x38);
-        *reinterpret_cast<unsigned char*>(self + 0x158) = payload[0x118];
-        *reinterpret_cast<unsigned char*>(self + 0x159) = payload[0x119];
-        *reinterpret_cast<unsigned char*>(self + 0x15A) = payload[0x11A];
-        *reinterpret_cast<unsigned char*>(self + 0x15B) = payload[0x11B];
-        *reinterpret_cast<unsigned char*>(self + 0x15C) = payload[0x11C];
-        *reinterpret_cast<unsigned char*>(self + 0x15D) = payload[0x11D];
-        *reinterpret_cast<unsigned char*>(self + 0x15E) = payload[0x11E];
-        *reinterpret_cast<unsigned char*>(self + 0x15F) = payload[0x11F];
-        *reinterpret_cast<float*>(self + 0x160) = *reinterpret_cast<float*>(payload + 0x120);
-        *reinterpret_cast<float*>(self + 0x164) = *reinterpret_cast<float*>(payload + 0x124);
-        *reinterpret_cast<int*>(self + 0x168) = *reinterpret_cast<int*>(payload + 0x128);
-        *reinterpret_cast<int*>(self + 0x16C) = *reinterpret_cast<int*>(payload + 0x12C);
-        *reinterpret_cast<int*>(self + 0x170) = *reinterpret_cast<int*>(payload + 0x130);
+        m_editClearColor[0] = payload[0x118];
+        m_editClearColor[1] = payload[0x119];
+        m_editClearColor[2] = payload[0x11A];
+        m_editClearColor[3] = payload[0x11B];
+        m_editFogEnable = payload[0x11C];
+        m_editFogColor[0] = payload[0x11D];
+        m_editFogColor[1] = payload[0x11E];
+        m_editFogColor[2] = payload[0x11F];
+        m_editFogNear = *reinterpret_cast<float*>(payload + 0x120);
+        m_editFogFar = *reinterpret_cast<float*>(payload + 0x124);
+        m_editDeltaTime = *reinterpret_cast<int*>(payload + 0x128);
+        m_unk16C = *reinterpret_cast<int*>(payload + 0x12C);
+        m_unk170 = *reinterpret_cast<int*>(payload + 0x130);
         m_editDrawMode = *reinterpret_cast<int*>(payload + 0x134);
 
         m_pppMng[0].m_userFloat0 = m_pppMng[0].m_userFloat1 = m_pppMng[0].m_scaleFactor = m_pppMng[0].m_ownerScale = 1.0f;
@@ -1610,7 +1594,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         m_pppMng[0].m_matrixMode = 0;
 
         for (int i = 0; i < m_editParticleCount; i++) {
-            m_pppMng[i].m_deltaTime = *reinterpret_cast<long*>(self + 0x168);
+            m_pppMng[i].m_deltaTime = m_editDeltaTime;
         }
         return;
     }
@@ -1619,29 +1603,29 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             return;
         }
 
-        *reinterpret_cast<int*>(self + kLastEnvCmdOffset) = 2;
+        m_lastEnvCmd = 2;
         m_pppEnvSt.m_mapMeshPtr = reinterpret_cast<CMapMesh**>(m_editModelSlots);
         m_pppEnvSt.m_shapeTablePtr = m_editShapeSlots;
         m_pppEnvSt.m_shapeGroupPtr = m_editShapeGroups;
-        *reinterpret_cast<EditCameraMatrix*>(self + kEditCameraMatrixOffset) =
+        *reinterpret_cast<EditCameraMatrix*>(m_editCameraMatrix) =
             *reinterpret_cast<EditCameraMatrix*>(payload);
-        *reinterpret_cast<float*>(self + kEditCameraExtraOffset) = payloadFloats[0xC];
-        *reinterpret_cast<float*>(self + kEditCameraExtraOffset + 4) = payloadFloats[0xD];
-        *reinterpret_cast<EditEnvBlock*>(self + kEditCameraExtraOffset + 8) =
+        m_editCameraDepthScale = payloadFloats[0xC];
+        m_unk74 = payloadFloats[0xD];
+        *reinterpret_cast<EditEnvBlock*>(m_editEnvBlock) =
             *reinterpret_cast<EditEnvBlock*>(payload + 0x38);
-        *reinterpret_cast<unsigned char*>(self + 0x158) = payload[0x118];
-        *reinterpret_cast<unsigned char*>(self + 0x159) = payload[0x119];
-        *reinterpret_cast<unsigned char*>(self + 0x15A) = payload[0x11A];
-        *reinterpret_cast<unsigned char*>(self + 0x15B) = payload[0x11B];
-        *reinterpret_cast<unsigned char*>(self + 0x15C) = payload[0x11C];
-        *reinterpret_cast<unsigned char*>(self + 0x15D) = payload[0x11D];
-        *reinterpret_cast<unsigned char*>(self + 0x15E) = payload[0x11E];
-        *reinterpret_cast<unsigned char*>(self + 0x15F) = payload[0x11F];
-        *reinterpret_cast<float*>(self + 0x160) = *reinterpret_cast<float*>(payload + 0x120);
-        *reinterpret_cast<float*>(self + 0x164) = *reinterpret_cast<float*>(payload + 0x124);
-        *reinterpret_cast<int*>(self + 0x168) = *reinterpret_cast<int*>(payload + 0x128);
-        *reinterpret_cast<int*>(self + 0x16C) = *reinterpret_cast<int*>(payload + 0x12C);
-        *reinterpret_cast<int*>(self + 0x170) = *reinterpret_cast<int*>(payload + 0x130);
+        m_editClearColor[0] = payload[0x118];
+        m_editClearColor[1] = payload[0x119];
+        m_editClearColor[2] = payload[0x11A];
+        m_editClearColor[3] = payload[0x11B];
+        m_editFogEnable = payload[0x11C];
+        m_editFogColor[0] = payload[0x11D];
+        m_editFogColor[1] = payload[0x11E];
+        m_editFogColor[2] = payload[0x11F];
+        m_editFogNear = *reinterpret_cast<float*>(payload + 0x120);
+        m_editFogFar = *reinterpret_cast<float*>(payload + 0x124);
+        m_editDeltaTime = *reinterpret_cast<int*>(payload + 0x128);
+        m_unk16C = *reinterpret_cast<int*>(payload + 0x12C);
+        m_unk170 = *reinterpret_cast<int*>(payload + 0x130);
         m_editDrawMode = *reinterpret_cast<int*>(payload + 0x134);
 
         ppvChrScl[2] = 1.0f;
@@ -1649,7 +1633,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         ppvChrScl[0] = 1.0f;
 
         for (int i = 0; i < m_editParticleCount; i++) {
-            m_pppMng[i].m_deltaTime = *reinterpret_cast<long*>(self + 0x168);
+            m_pppMng[i].m_deltaTime = m_editDeltaTime;
         }
         return;
     }
@@ -1678,7 +1662,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             modelSlot = new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), PARTMNG_LINE(0x5FC, 0x5FC, 0x5F2)) pppModelSt;
             m_editModelSlots[*reinterpret_cast<short*>(payload)] = modelSlot;
             pppReadRsd(chunkFile, m_editModelSlots[*reinterpret_cast<short*>(payload)]);
-            *reinterpret_cast<int*>(self + 0x804) = -1;
+            m_unk804 = -1;
         }
         return;
     case 6:
@@ -1753,26 +1737,26 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
                 delete reinterpret_cast<u8*>(m_editProgramData[0]);
                 m_editProgramData[0] = 0;
             }
-            if (m_editNodeNameBuffer != 0) {
-                delete m_editNodeNameBuffer;
-                m_editNodeNameBuffer = 0;
+            if (m_editFieldParticles != 0) {
+                delete m_editFieldParticles;
+                m_editFieldParticles = 0;
             }
             m_editProgramData[0] = reinterpret_cast<long*>(operator new[](
                 packetSize - 0x20, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), PARTMNG_LINE(0x64D, 0x64D, 0x643)));
-            m_editNodeNameBuffer =
-                new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), PARTMNG_LINE(0x64E, 0x64E, 0x644)) u8[0x3000];
+            m_editFieldParticles =
+                new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), PARTMNG_LINE(0x64E, 0x64E, 0x644)) _pppFieldParticleData[0x80];
             memcpy(m_editProgramData[0], payload, packetSize - 0x20);
             pppInitPdt(m_editProgramData[0], pppGetSysProgTable());
         }
 
-        reinterpret_cast<_pppFieldParticleData*>(m_editNodeNameBuffer)->m_autoCreateMarker = 0;
+        m_editFieldParticles->m_autoCreateMarker = 0;
         m_pppMng[0].m_baseTime = 0;
-        m_pppMng[0].m_cullRadiusSq = reinterpret_cast<_pppFieldParticleData*>(m_editNodeNameBuffer)->m_cullDistance =
+        m_pppMng[0].m_cullRadiusSq = m_editFieldParticles->m_cullDistance =
             3.4028235e38f;
         m_pppMng[0].m_cullRadius = m_pppMng[0].m_cullYOffset =
-            reinterpret_cast<_pppFieldParticleData*>(m_editNodeNameBuffer)->m_cullRadius =
-                reinterpret_cast<_pppFieldParticleData*>(m_editNodeNameBuffer)->m_cullYOffset = 100.0f;
-        reinterpret_cast<_pppFieldParticleData*>(m_editNodeNameBuffer)->m_partIndex = 0;
+            m_editFieldParticles->m_cullRadius =
+                m_editFieldParticles->m_cullYOffset = 100.0f;
+        m_editFieldParticles->m_partIndex = 0;
         m_editParticleCount = 1;
         m_editProgramCount = 1;
         m_pppMng[0].m_objHitMask = 0xFFFFFFFF;
@@ -1780,7 +1764,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         m_pppMng[0].m_paramA = 0;
         m_pppMng[0].m_slotVisible = 1;
         m_pppMng[0].m_ownerFacing = 1;
-        m_pppMng[0].m_pppResSet = self + 0x23518;
+        m_pppMng[0].m_pppResSet = m_unk23518;
         m_pppMng[0].m_nodeIndex = 0;
         m_pppMng[0].m_fieldF2 = 1;
         m_pppEnvSt.m_mapMeshPtr = reinterpret_cast<CMapMesh**>(m_editModelSlots);
@@ -1796,15 +1780,15 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             delete reinterpret_cast<u8*>(m_editProgramData[m_editProgramCount]);
             m_editProgramData[m_editProgramCount] = 0;
         }
-        if (m_editNodeNameBuffer != 0) {
-            delete m_editNodeNameBuffer;
-            m_editNodeNameBuffer = 0;
+        if (m_editFieldParticles != 0) {
+            delete m_editFieldParticles;
+            m_editFieldParticles = 0;
         }
 
         m_editProgramData[m_editProgramCount] = reinterpret_cast<long*>(operator new[](
             packetSize - 0x20, PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), PARTMNG_LINE(0x678, 0x678, 0x66E)));
-        m_editNodeNameBuffer =
-            new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), PARTMNG_LINE(0x679, 0x679, 0x66F)) u8[0x3000];
+        m_editFieldParticles =
+            new (PartPcs.m_usbStreamState.m_stageLoad, const_cast<char*>(s_partMng_cpp), PARTMNG_LINE(0x679, 0x679, 0x66F)) _pppFieldParticleData[0x80];
         memcpy(m_editProgramData[m_editProgramCount], payload, packetSize - 0x20);
         pppInitPdt(m_editProgramData[m_editProgramCount], pppGetSysProgTable());
         m_editProgramCount = m_editProgramCount + 1;
@@ -1822,10 +1806,10 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
             return;
         }
         if (m_editParticleCount == 0) {
-            m_editReceiveCursor = m_editNodeNameBuffer;
+            m_editFieldParticleCursor = m_editFieldParticles;
         }
-        memcpy(m_editReceiveCursor, payload, packetSize - 0x20);
-        m_editReceiveCursor += sizeof(_pppFieldParticleData);
+        memcpy(m_editFieldParticleCursor, payload, packetSize - 0x20);
+        m_editFieldParticleCursor++;
         m_editParticleCount += 1;
         return;
     case 0x10:
@@ -1848,26 +1832,26 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         if (m_isEditMode != 0) {
             return;
         }
-        fpIDon(static_cast<unsigned short>(*reinterpret_cast<unsigned int*>(self + 0x1C4)));
+        fpIDon(static_cast<unsigned short>(m_editFpId));
         return;
     }
     case 0x13: {
         if (m_isEditMode != 0) {
             return;
         }
-        fpIDoff(static_cast<unsigned short>(*reinterpret_cast<unsigned int*>(self + 0x1C4)));
+        fpIDoff(static_cast<unsigned short>(m_editFpId));
         return;
     }
     case 0x17:
         if (m_isEditMode != 0) {
             return;
         }
-        *reinterpret_cast<short*>(self + kCursorPacketOffset) = *reinterpret_cast<short*>(self + kCursorXOffset);
-        *reinterpret_cast<short*>(self + kCursorPacketOffset + 2) = *reinterpret_cast<short*>(self + kCursorYOffset);
-        self[0x808] = 1;
+        m_editCursorPacket[0] = m_editCursorX;
+        m_editCursorPacket[1] = m_editCursorY;
+        m_editorFlags[0] = 1;
         return;
     case 0x1E:
-        *reinterpret_cast<int*>(self + kCursorRequestOffset) = 1;
+        m_cursorRequest = 1;
         return;
     case 0x41:
         m_editCursorEnabled = 0;
@@ -1876,7 +1860,7 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
         m_editCursorEnabled = 1;
         return;
     case 0x42:
-        memcpy(self + kCursorPacket42Offset, payload, 0x28);
+        memcpy(&m_editorCursorPosition, payload, 0x28);
         m_editCursorEnabled = 1;
         return;
     case 0x20:
@@ -1969,20 +1953,19 @@ static inline void pppSetFog(unsigned char fogEnable, unsigned char fogR, unsign
  */
 void CPartMng::pppEditBeforeCalc()
 {
-    char* self = reinterpret_cast<char*>(this);
-    CGObject** editorObj = reinterpret_cast<CGObject**>(self + 0x80c);
+    CGObject** editorObj = &m_editorObject;
 
-    switch (*reinterpret_cast<int*>(self + 0x23560)) {
+    switch (m_lastEnvCmd) {
     case 1: {
         // Camera matrix handed over from editor uses opposite handedness on these axes.
-        *reinterpret_cast<float*>(self + 0x60) = -*reinterpret_cast<float*>(self + 0x60);
-        *reinterpret_cast<float*>(self + 0x68) = -*reinterpret_cast<float*>(self + 0x68);
-        *reinterpret_cast<float*>(self + 0x44) = -*reinterpret_cast<float*>(self + 0x44);
-        *reinterpret_cast<float*>(self + 0x54) = -*reinterpret_cast<float*>(self + 0x54);
-        *reinterpret_cast<float*>(self + 0x6c) = -*reinterpret_cast<float*>(self + 0x6c);
-        *reinterpret_cast<float*>(self + 0x6c) *= *reinterpret_cast<float*>(self + 0x70);
+        m_editCameraMatrix[2][0] = -m_editCameraMatrix[2][0];
+        m_editCameraMatrix[2][2] = -m_editCameraMatrix[2][2];
+        m_editCameraMatrix[0][1] = -m_editCameraMatrix[0][1];
+        m_editCameraMatrix[1][1] = -m_editCameraMatrix[1][1];
+        m_editCameraMatrix[2][3] = -m_editCameraMatrix[2][3];
+        m_editCameraMatrix[2][3] *= m_editCameraDepthScale;
 
-        PSMTXCopy(reinterpret_cast<float(*)[4]>(self + 0x40), ppvCameraMatrix);
+        PSMTXCopy(m_editCameraMatrix, ppvCameraMatrix);
         C_MTXPerspective(ppvScreenMatrix, 25.0f, 1.3333334f, 10.0f, 10000.0f);
         ppvScreenMatrixXbuff = ppvScreenMatrix[2][0];
         ppvScreenMatrixYbuff = ppvScreenMatrix[2][1];
@@ -1991,34 +1974,34 @@ void CPartMng::pppEditBeforeCalc()
         PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
 
         _GXColor clearColor;
-        clearColor.r = *reinterpret_cast<unsigned char*>(self + 0x158);
-        clearColor.g = *reinterpret_cast<unsigned char*>(self + 0x159);
-        clearColor.b = *reinterpret_cast<unsigned char*>(self + 0x15a);
+        clearColor.r = m_editClearColor[0];
+        clearColor.g = m_editClearColor[1];
+        clearColor.b = m_editClearColor[2];
         clearColor.a = 0xFF;
         GXSetCopyClear(clearColor, 0x00FFFFFF);
 
-        unsigned char fogEnable = *reinterpret_cast<unsigned char*>(self + 0x15c);
+        unsigned char fogEnable = m_editFogEnable;
         float fogNear;
-        float fogFar = *reinterpret_cast<float*>(self + 0x164);
-        fogNear = *reinterpret_cast<float*>(self + 0x160);
+        float fogFar = m_editFogFar;
+        fogNear = m_editFogNear;
         unsigned char fogG;
-        unsigned char fogB = *reinterpret_cast<unsigned char*>(self + 0x15f);
-        fogG = *reinterpret_cast<unsigned char*>(self + 0x15e);
-        unsigned char fogR = *reinterpret_cast<unsigned char*>(self + 0x15d);
+        unsigned char fogB = m_editFogColor[2];
+        fogG = m_editFogColor[1];
+        unsigned char fogR = m_editFogColor[0];
         pppSetFog(fogEnable, fogR, fogG, fogB, fogNear, fogFar);
 
         ppvSysGoPartF = 1;
         break;
     }
     case 2: {
-        *reinterpret_cast<float*>(self + 0x60) = -*reinterpret_cast<float*>(self + 0x60);
-        *reinterpret_cast<float*>(self + 0x68) = -*reinterpret_cast<float*>(self + 0x68);
-        *reinterpret_cast<float*>(self + 0x44) = -*reinterpret_cast<float*>(self + 0x44);
-        *reinterpret_cast<float*>(self + 0x54) = -*reinterpret_cast<float*>(self + 0x54);
-        *reinterpret_cast<float*>(self + 0x6c) = -*reinterpret_cast<float*>(self + 0x6c);
-        *reinterpret_cast<float*>(self + 0x6c) *= *reinterpret_cast<float*>(self + 0x70);
+        m_editCameraMatrix[2][0] = -m_editCameraMatrix[2][0];
+        m_editCameraMatrix[2][2] = -m_editCameraMatrix[2][2];
+        m_editCameraMatrix[0][1] = -m_editCameraMatrix[0][1];
+        m_editCameraMatrix[1][1] = -m_editCameraMatrix[1][1];
+        m_editCameraMatrix[2][3] = -m_editCameraMatrix[2][3];
+        m_editCameraMatrix[2][3] *= m_editCameraDepthScale;
 
-        PSMTXCopy(reinterpret_cast<float(*)[4]>(self + 0x40), ppvCameraMatrix);
+        PSMTXCopy(m_editCameraMatrix, ppvCameraMatrix);
         C_MTXPerspective(ppvScreenMatrix, 25.0f, 1.3333334f, 10.0f, 10000.0f);
         ppvScreenMatrixXbuff = ppvScreenMatrix[2][0];
         ppvScreenMatrixYbuff = ppvScreenMatrix[2][1];
@@ -2027,20 +2010,20 @@ void CPartMng::pppEditBeforeCalc()
         PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
 
         _GXColor clearColor;
-        clearColor.r = *reinterpret_cast<unsigned char*>(self + 0x158);
-        clearColor.g = *reinterpret_cast<unsigned char*>(self + 0x159);
-        clearColor.b = *reinterpret_cast<unsigned char*>(self + 0x15a);
+        clearColor.r = m_editClearColor[0];
+        clearColor.g = m_editClearColor[1];
+        clearColor.b = m_editClearColor[2];
         clearColor.a = 0xFF;
         GXSetCopyClear(clearColor, 0x00FFFFFF);
 
-        unsigned char fogEnable = *reinterpret_cast<unsigned char*>(self + 0x15c);
+        unsigned char fogEnable = m_editFogEnable;
         float fogNear;
-        float fogFar = *reinterpret_cast<float*>(self + 0x164);
-        fogNear = *reinterpret_cast<float*>(self + 0x160);
+        float fogFar = m_editFogFar;
+        fogNear = m_editFogNear;
         unsigned char fogG;
-        unsigned char fogB = *reinterpret_cast<unsigned char*>(self + 0x15f);
-        fogG = *reinterpret_cast<unsigned char*>(self + 0x15e);
-        unsigned char fogR = *reinterpret_cast<unsigned char*>(self + 0x15d);
+        unsigned char fogB = m_editFogColor[2];
+        fogG = m_editFogColor[1];
+        unsigned char fogR = m_editFogColor[0];
         pppSetFog(fogEnable, fogR, fogG, fogB, fogNear, fogFar);
 
         ppvSysGoPartF = 1;
@@ -2048,8 +2031,8 @@ void CPartMng::pppEditBeforeCalc()
     }
     case 0x18:
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), PARTMNG_LINE(0x7A4, 0x7A4, 0x79A));
-        MapPcs.LoadMap(*reinterpret_cast<int*>(self + 0x188), *reinterpret_cast<int*>(self + 0x18c), 0, 0, 0);
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MapPcs) + 0x180) = 1;
+        MapPcs.LoadMap(m_editStageNo, m_editMapNo, 0, 0, 0);
+        MapPcs.m_drawEnabled = 1;
         break;
     case 0x19: {
         Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), PARTMNG_LINE(0x7AD, 0x7AD, 0x7A3));
@@ -2059,9 +2042,8 @@ void CPartMng::pppEditBeforeCalc()
                 delete (*editorObj)->m_charaModelHandle;
                 (*editorObj)->m_charaModelHandle = 0;
             }
-            CGObject* dyingObj = *reinterpret_cast<CGObject* volatile*>(editorObj);
-            if (dyingObj != 0) {
-                operator delete(dyingObj);
+            if (*editorObj != 0) {
+                operator delete(*editorObj);
                 *editorObj = 0;
             }
         }
@@ -2075,9 +2057,9 @@ void CPartMng::pppEditBeforeCalc()
         (*editorObj)->m_charaModelHandle->Add();
         (*editorObj)->m_charaModelHandle->m_flags = 3;
         if ((*editorObj)->m_charaModelHandle->LoadModel(
-                *reinterpret_cast<int*>(self + 0x190),
-                *reinterpret_cast<unsigned long*>(self + 0x194),
-                *reinterpret_cast<unsigned long*>(self + 0x198),
+                m_editCharaKind,
+                m_editCharaNo,
+                m_editTextureVariant,
                 0,
                 -1,
                 0,
@@ -2094,20 +2076,18 @@ void CPartMng::pppEditBeforeCalc()
             Graphic._WaitDrawDone(const_cast<char*>(s_partMng_cpp), PARTMNG_LINE(0x7CE, 0x7CE, 0x7C4));
             static unsigned char cLoadAnmCnt = 0;
 
-#define handle ((*editorObj)->m_charaModelHandle)
-            handle->LoadAnim(reinterpret_cast<char*>(self + 0x19c), cLoadAnmCnt, 0, -1, -1, -1, 0);
-            handle->SetAnim(cLoadAnmCnt, -1, -1, -1, 0);
+            (*editorObj)->m_charaModelHandle->LoadAnim(m_editAnimName, cLoadAnmCnt, 0, -1, -1, -1, 0);
+            (*editorObj)->m_charaModelHandle->SetAnim(cLoadAnmCnt, -1, -1, -1, 0);
             cLoadAnmCnt++;
-#undef handle
         }
         break;
     case 0x1b:
-        *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MapPcs) + 0x180) =
-            *reinterpret_cast<unsigned int*>(self + 0x1bc);
+        MapPcs.m_drawEnabled =
+            m_editMapDrawEnabled;
         break;
     case 0x1c:
         if (*editorObj != 0) {
-            if (*reinterpret_cast<int*>(self + 0x1c0) != 0) {
+            if (m_editModelFlag != 0) {
                 (*editorObj)->m_charaModelHandle->m_flags |= 1;
             } else {
                 (*editorObj)->m_charaModelHandle->m_flags &= ~1;
@@ -2118,7 +2098,7 @@ void CPartMng::pppEditBeforeCalc()
         break;
     }
 
-    *reinterpret_cast<int*>(self + 0x23560) = 0;
+    m_lastEnvCmd = 0;
 }
 
 /*
@@ -2132,11 +2112,8 @@ void CPartMng::pppEditBeforeCalc()
  */
 void CPartMng::pppEditPartCalc()
 {
-    static const int kUsbEditOffset = 0x7F0;
     static const int kPppMngCount = 0x180;
 
-    char* self = reinterpret_cast<char*>(this);
-    char* usbEdit = reinterpret_cast<char*>(self + kUsbEditOffset);
     PppPdtSlot* pdtSlots = m_pdtSlots;
 
     if (ppvSysGoPartF != 0) {
@@ -2145,26 +2122,26 @@ void CPartMng::pppEditPartCalc()
     }
 
     g_par_calc_prof.Stop();
-    if (*reinterpret_cast<CGObject**>(self + 0x80c) != 0) {
-        (*reinterpret_cast<CGObject**>(self + 0x80c))->m_charaModelHandle->m_model->CalcMatrix();
-        (*reinterpret_cast<CGObject**>(self + 0x80c))->m_charaModelHandle->m_model->CalcSkin();
-        (*reinterpret_cast<CGObject**>(self + 0x80c))->m_charaModelHandle->m_model->SetFrame(
-            *reinterpret_cast<float*>(self + 0x23564));
+    if (m_editorObject != 0) {
+        (m_editorObject)->m_charaModelHandle->m_model->CalcMatrix();
+        (m_editorObject)->m_charaModelHandle->m_model->CalcSkin();
+        (m_editorObject)->m_charaModelHandle->m_model->SetFrame(
+            m_envParam);
         if (ppvUserStopPartF == 0) {
-            *reinterpret_cast<float*>(self + 0x23564) += 1.0f;
+            m_envParam += 1.0f;
         }
     }
     g_par_calc_prof.Start();
 
-    if (usbEdit[0x18] != 0) {
-        usbEdit[0x18] = 0;
-        usbEdit[0x19] = 1;
-        usbEdit[0x1A] = 0;
+    if (m_editorFlags[0] != 0) {
+        m_editorFlags[0] = 0;
+        m_editorFlags[1] = 1;
+        m_editorFlags[2] = 0;
 
         allFreeFPrim();
         _pppMngSt* firstMng = m_pppMng;
         firstMng->m_particleEnded = 0;
-        firstMng->m_deltaTime = *reinterpret_cast<int*>(self + 0x168);
+        firstMng->m_deltaTime = m_editDeltaTime;
         _pppStartPart(firstMng, m_editProgramData[0], 1);
     }
 
@@ -2176,7 +2153,7 @@ void CPartMng::pppEditPartCalc()
     }
 
     if (m_editDrawMode <= 3) {
-        for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
+        for (int i = 0; i < m_editParticleCount; i++) {
             _pppMngSt* mng = &m_pppMng[i];
             ppvMng = mng;
             int baseTime = mng->m_baseTime;
@@ -2201,7 +2178,7 @@ void CPartMng::pppEditPartCalc()
                     pppHeapCheckLeak(ppvEnv->m_stagePtr);
                 }
                 if (i == 0) {
-                    usbEdit[0x1A] = 1;
+                    m_editorFlags[2] = 1;
                 }
                 gPppHeapUseRateWords[1] = 0;
             }
@@ -2216,13 +2193,12 @@ void CPartMng::pppEditPartCalc()
                 }
             }
             mng->m_particleEnded = 0;
-            mng->m_deltaTime = *reinterpret_cast<int*>(self + 0x168);
-            _pppStartPart(mng, reinterpret_cast<long*>(*reinterpret_cast<long*>(self + 0x5dc +
-                                   (*reinterpret_cast<int**>(self + 0x1C8))[i * 0x18 + 0xC] * 4)), 1);
+            mng->m_deltaTime = m_editDeltaTime;
+            _pppStartPart(mng, m_editProgramData[m_editFieldParticles[i].m_partIndex], 1);
             goto runFrameA;
         }
     } else {
-        for (int i = 0; i < *reinterpret_cast<int*>(self + 0x4); i++) {
+        for (int i = 0; i < m_editParticleCount; i++) {
             _pppMngSt* mng = &m_pppMng[i];
             ppvMng = mng;
             if (mng->m_baseTime == -0x1000) {
@@ -2248,7 +2224,7 @@ void CPartMng::pppEditPartCalc()
                     pppHeapCheckLeak(ppvEnv->m_stagePtr);
                 }
                 if (i == 0) {
-                    usbEdit[0x1A] = 1;
+                    m_editorFlags[2] = 1;
                 }
                 gPppHeapUseRateWords[1] = 0;
             }
@@ -2263,9 +2239,8 @@ void CPartMng::pppEditPartCalc()
                 }
             }
             mng->m_particleEnded = 0;
-            mng->m_deltaTime = *reinterpret_cast<int*>(self + 0x168);
-            _pppStartPart(mng, reinterpret_cast<long*>(*reinterpret_cast<long*>(self + 0x5dc +
-                                   (*reinterpret_cast<int**>(self + 0x1C8))[i * 0x18 + 0xC] * 4)), 1);
+            mng->m_deltaTime = m_editDeltaTime;
+            _pppStartPart(mng, m_editProgramData[m_editFieldParticles[i].m_partIndex], 1);
             goto runFrameB;
         }
     }

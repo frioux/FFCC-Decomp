@@ -48,7 +48,6 @@ public:
     int GetCharLightHolderSize();
     void GetCharLightHolder(long, _GXColor*, Vec*);
 
-private:
     Mtx m_viewMtx;                       // 0x04
     Mtx44 m_screenMtx;                   // 0x34
     char m_mapName[0x100];               // 0x74
