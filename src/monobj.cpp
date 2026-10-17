@@ -2804,7 +2804,7 @@ inline void CGMonObj::statWatch()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CGMonObj::statAround()
+void CGMonObj::statAround()
 {
 	switch (m_subState) {
 	case 0:
