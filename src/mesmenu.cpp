@@ -191,7 +191,7 @@ void CMesMenu::onCalc()
         stageBit = CFlatEnabledEventFlags() & 2;
     }
 
-    int desiredStageFlag = stageBit != 0;
+    int desiredStageFlag = stageBit ? 1 : 0;
     if (m_stageFadeOut != desiredStageFlag) {
 #ifdef VERSION_GCCP01
         System.Printf("mesMenu表示on/offが変更されました。%d-%d\n", m_menuIndex, desiredStageFlag);
