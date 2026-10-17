@@ -477,6 +477,20 @@ int CMemoryCardMan::GetResult()
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 32b
+ * EN Address: 0x800D9448
+ * EN Size: 40b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMemoryCardMan::SetMountChan(int chan)
+{
+    m_currentSlot = chan;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800C4A04
  * PAL Size: 104b
  * EN Address: 0x800D9470
