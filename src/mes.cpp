@@ -180,7 +180,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
             case 0:
                 if (breakOnLineTag != 0) {
                     font->SetPosX((float)lineStartX);
-                    float lineAdvance = (float)font->m_glyphHeight * font->scaleY;
+                    float lineAdvance = font->GetHeight();
                     font->SetPosY((float)lineBaseY + (font->posY + lineAdvance));
                 }
                 break;
@@ -224,7 +224,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 				if (breakOnLineTag != 0)
 				{
 					font->SetPosX((float)lineStartX);
-					float lineAdvance = (float)font->m_glyphHeight * font->scaleY;
+					float lineAdvance = font->GetHeight();
 					font->SetPosY((float)lineBaseY + (font->posY + lineAdvance));
 				}
 				break;
@@ -1117,7 +1117,7 @@ void CMes::addString(char** text, int branchMode)
 		advanceLine:
 		{
 			mCurrentX = 0.0f;
-			float lineAdvance = (float)font->m_glyphHeight * font->scaleY;
+			float lineAdvance = font->GetHeight();
 			mCurrentY = mCurrentY + (-2.0f + lineAdvance);
 			if (mRubyEnabled != 0)
 			{
@@ -1165,7 +1165,7 @@ void CMes::addString(char** text, int branchMode)
 			mRubyLine = 0;
 			mRubyHeight = GET_1(text);
 			{
-				float rubyAdvance = (float)font->m_glyphHeight * font->scaleY;
+				float rubyAdvance = font->GetHeight();
 				mRubySpacing = -2.0f + rubyAdvance;
 			}
 			mRubyY = mCurrentY;

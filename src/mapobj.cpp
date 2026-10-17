@@ -702,7 +702,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             break;
         }
         case CHUNK_FSDW: {
-            CameraPcs.m_fullScreenShadowEnabled = chunkFile.Get1();
+            CameraPcs.SetFullScreenShadowEnable(chunkFile.Get1());
             break;
         }
         case CHUNK_SDST: {
