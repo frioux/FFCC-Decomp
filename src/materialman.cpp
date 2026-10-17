@@ -879,10 +879,6 @@ void CMaterialMan::SetUnderWaterTex()
  */
 void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int setVtxDesc, _GXTevScale tevScale)
 {
-    static int bTest;
-    static char init;
-    static int bTest2;
-    static char init2;
 
     CMaterial* material;
     int isStd1000 = 0;
@@ -1518,14 +1514,8 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             IncNumTevStage();
         }
         if ((tevBit & 0x2000) != 0 && m_manaParaboloidTexObj0 != 0 && m_manaParaboloidTexObj1 != 0) {
-            if (init == 0) {
-                bTest = 0;
-                init = 1;
-            }
-            if (init2 == 0) {
-                bTest2 = 0;
-                init2 = 1;
-            }
+            static int bTest = 0;
+            static int bTest2 = 0;
             unsigned int buttons = Pad.GetButtonDown(0);
             if ((buttons & 0x100) != 0) {
                 bTest = 0;
