@@ -1947,6 +1947,28 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 
 /*
  * --INFO--
+ * PAL Address: 0x8016394C
+ * PAL Size: 64b
+ * EN Address: 0x801629BC
+ * EN Size: 64b
+ * JP Address: 0x8015E4DC
+ * JP Size: 64b
+ */
+void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
+{
+	CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
+
+	if (s_Attach == 0) {
+		s_AttachItemIdx = static_cast<signed char>(itemIndex);
+		s_AttachItem = caravanWork->m_inventoryItems[itemIndex];
+	} else {
+		s_AttachItem = itemIndex;
+	}
+	s_AttachMode = flag;
+}
+
+/*
+ * --INFO--
  * PAL Address: UNUSED
  * PAL Size: 504b
  * EN Address: TODO
@@ -1986,26 +2008,3 @@ inline void CMenuPcs::LetterDrawPageMark(int pageMark)
 		MenuPcs.DrawRect(0, markX, markY, 48.0f, 48.0f, 0.0f, 0.0f, markScale, markScale, 0.0f);
 	}
 }
-
-/*
- * --INFO--
- * PAL Address: 0x8016394C
- * PAL Size: 64b
- * EN Address: 0x801629BC
- * EN Size: 64b
- * JP Address: 0x8015E4DC
- * JP Size: 64b
- */
-void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
-{
-	CCaravanWork* const caravanWork = Game.m_scriptFoodBase[0];
-
-	if (s_Attach == 0) {
-		s_AttachItemIdx = static_cast<signed char>(itemIndex);
-		s_AttachItem = caravanWork->m_inventoryItems[itemIndex];
-	} else {
-		s_AttachItem = itemIndex;
-	}
-	s_AttachMode = flag;
-}
-
