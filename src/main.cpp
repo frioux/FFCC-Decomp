@@ -27,7 +27,7 @@ static const char kLanguageArgSp[] = "sp";
  * JP Address: TODO
  * JP Size: TODO
  */
-static void game(int argc, char** argv)
+static inline void game(int argc, char** argv)
 {
     int copyScriptName;
     int i;
