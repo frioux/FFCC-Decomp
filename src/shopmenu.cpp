@@ -686,7 +686,7 @@ inline int CShopMenu::getItemHaveCnt(int itemNo)
 {
     int count;
     int i;
-    for (i = 0, count = 0; i < 0x40; i++) {
+    for (count = i = 0; i < 0x40; i++) {
         if (m_caravanWork->m_inventoryItems[i] == itemNo) {
             count++;
         }
