@@ -774,8 +774,8 @@ void CGame::loadCfd()
     FFCC_ASSERT(unkCFlatData0[1]);
     unkCFlatData0[2] = (unsigned int)m_cFlatDataArr[0].GetData(2);
     FFCC_ASSERT(unkCFlatData0[2]);
-    m_romLetterWorkBase = (unsigned int)m_cFlatDataArr[2].GetData(0);
-    FFCC_ASSERT(m_romLetterWorkBase);
+    m_romLetterWork = (CRomLetterWork*)m_cFlatDataArr[2].GetData(0);
+    FFCC_ASSERT(m_romLetterWork);
     unk_flat3_field_8_0xc7dc = (unsigned int)m_cFlatDataArr[3].GetData(0);
     FFCC_ASSERT(unk_flat3_field_8_0xc7dc);
     m_combiTable = reinterpret_cast<CCombi2*>(m_cFlatDataArr[3].GetData(1));

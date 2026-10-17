@@ -221,7 +221,7 @@ public:
     CCaravanWork m_caravanWorkArr[9];       // 0x13F0 size 0x6DB0
     CMonWork m_monWorkArr[64];              // 0x81A0 size 0x4400
     unsigned int unkCFlatData0[3];          // 0xC5A0
-    unsigned int m_romLetterWorkBase;       // 0xC5AC
+    CRomLetterWork* m_romLetterWork;        // 0xC5AC
     CGPartyObj* m_partyObjArr[4];           // 0xC5B0
     CCaravanWork* m_scriptFoodBase[4];       // 0xC5C0
     CGObject* m_monObjects[64];             // 0xC5D0

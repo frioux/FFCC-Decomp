@@ -899,7 +899,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		romLetterWork[i] = 0;
 	}
 
-	CRomLetterWork* curLetter = reinterpret_cast<CRomLetterWork*>(Game.m_romLetterWorkBase);
+	CRomLetterWork* curLetter = Game.m_romLetterWork;
 	for (letterIdx = 0; letterIdx < 0x200; letterIdx++, curLetter++) {
 		unsigned short condBits = curLetter->m_personalConditions;
 

@@ -2391,7 +2391,7 @@ renderedDone:
                 }
             }
             if (*slot != 0) {
-                int letterIndex = (reinterpret_cast<int>(*slot) - static_cast<int>(Game.m_romLetterWorkBase)) /
+                int letterIndex = (reinterpret_cast<int>(*slot) - reinterpret_cast<int>(Game.m_romLetterWork)) /
                                   static_cast<int>(sizeof(CRomLetterWork));
                 *reinterpret_cast<int*>(object->m_localBase[13] + dstOffs) = letterIndex;
             } else {
@@ -2647,7 +2647,7 @@ renderedDone:
         outResult = 0;
         break;
     case -0xDC: {
-        CRomLetterWork* letters = reinterpret_cast<CRomLetterWork*>(Game.m_romLetterWorkBase);
+        CRomLetterWork* letters = Game.m_romLetterWork;
         this->push(object, reinterpret_cast<const unsigned short*>(&letters[*object->m_localBase])[object->m_localBase[1]]);
         outResult = 0;
         break;
