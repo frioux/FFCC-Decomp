@@ -1112,7 +1112,7 @@ void CMemoryCardMan::MakeSaveData()
     saveDat->m_gameInitFlag = Game.m_gameWork.m_gameInitFlag != 0;
     for (int i = 0; i < 4; i++)
     {
-        saveDat->m_spModeFlags[i] = Game.m_gameWork.m_spModeFlags[i] != 0;
+        saveDat->m_spModeFlags[i] = Game.m_gameWork.m_spModeFlags[i] ? 1 : 0;
     }
 
     for (int c = 0; c < 8; c++)
