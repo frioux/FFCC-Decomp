@@ -225,7 +225,7 @@ public:
     CCaravanWork* m_scriptFoodBase[4];       // 0xC5C0
     CGObject* m_monObjects[64];             // 0xC5D0
     CMonWork* m_monWorkRefs[64];             // 0xC6D0
-    unsigned int unk_flat3_0xc7d0;          // 0xC7D0
+    CGObject* m_chaliceObject;              // 0xC7D0
     unsigned int m_combiCount;             // 0xC7D4
     CCombi2* m_combiTable;                 // 0xC7D8
     unsigned int unk_flat3_field_8_0xc7dc;  // 0xC7DC

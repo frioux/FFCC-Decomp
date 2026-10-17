@@ -458,8 +458,8 @@ void CGCharaObj::onFramePostCalc()
  */
 void CGCharaObj::onFramePreCalc()
 {
-	if (Game.unk_flat3_0xc7d0 != 0) {
-		PSVECSubtract(reinterpret_cast<Vec*>(Game.unk_flat3_0xc7d0 + 0x15C), &m_worldPosition,
+	if (Game.m_chaliceObject != 0) {
+		PSVECSubtract(&Game.m_chaliceObject->m_worldPosition, &m_worldPosition,
 			&m_targetDelta);
 		m_targetDist = PSVECMag(&m_targetDelta);
 		CharaObjTargetAngle(this) = reinterpret_cast<CVector*>(&m_targetDelta)->GetRotateY();

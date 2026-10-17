@@ -989,7 +989,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 		case -0x16:
 			engineObject->m_objectFlags = object->m_localBase[0];
 			if ((engineObject->m_objectFlags & 0x10) != 0) {
-				Game.unk_flat3_0xc7d0 = reinterpret_cast<unsigned int>(engineObject);
+				Game.m_chaliceObject = engineObject;
 			}
 			push(object, 0);
 			outResult = 0;

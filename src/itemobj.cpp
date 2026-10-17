@@ -255,8 +255,8 @@ void CGItemObj::onFrameStat()
 		    m_stateFlags0Bits.unk4 != 0) {
 			float distance = 0.0f;
 
-			if (Game.unk_flat3_0xc7d0 != 0) {
-				distance = PSVECDistance(&m_worldPosition, &reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)->m_worldPosition);
+			if (Game.m_chaliceObject != 0) {
+				distance = PSVECDistance(&m_worldPosition, &Game.m_chaliceObject->m_worldPosition);
 			} else {
 				if (static_cast<int>(CFlatCenterState()) == 1) {
 					Vec partyCenter;

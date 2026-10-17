@@ -773,8 +773,8 @@ void CGPartyObj::onFramePreCalc()
 
 	CGCharaObj::onFramePreCalc();
 
-	if (Game.unk_flat3_0xc7d0 != 0) {
-		const Vec* chalicePos = &reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)->m_worldPosition;
+	if (Game.m_chaliceObject != 0) {
+		const Vec* chalicePos = &Game.m_chaliceObject->m_worldPosition;
 		m_targetDist = PSVECDistance(&m_worldPosition, chalicePos);
 	}
 
@@ -1346,14 +1346,14 @@ void CGPartyObj::shouki()
 	     CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 != 0) &&
 	    m_weaponNodeFlagAll.m_bits1.m_shield != 0) {
 
-		const Vec* chalicePos = &reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)->m_worldPosition;
+		const Vec* chalicePos = &Game.m_chaliceObject->m_worldPosition;
 		float chaliceDist = PSVECDistance(&m_worldPosition, chalicePos);
 		if (1.1f * Game.unkFloat_0xca10 < chaliceDist ||
 		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 != 0) {
 			if (m_unk688 != 2) {
 				deletePSlotBit(0x200);
 				CFlat.ResetParticleWork(1, m_particleSlots[9]);
-				CFlat.SetParticleWorkTrace(reinterpret_cast<CFlatRuntime::CObject*>(Game.unk_flat3_0xc7d0));
+				CFlat.SetParticleWorkTrace(reinterpret_cast<CFlatRuntime::CObject*>(Game.m_chaliceObject));
 				CFlat.SetParticleWorkBind(this);
 				CFlat.PutParticleWork();
 			}
@@ -1366,7 +1366,7 @@ void CGPartyObj::shouki()
 					playSe3D(0x1E, 0x32, 0x96, 0, 0);
 					CFlat.ResetParticleWork(2, 0);
 					CFlat.SetParticleWorkPos(m_worldPosition, m_rotBaseY);
-					CFlat.SetParticleWorkTrace(reinterpret_cast<CFlatRuntime::CObject*>(Game.unk_flat3_0xc7d0));
+					CFlat.SetParticleWorkTrace(reinterpret_cast<CFlatRuntime::CObject*>(Game.m_chaliceObject));
 					CFlat.SetParticleWorkBind(this);
 					CFlat.PutParticleWork();
 				}
@@ -1379,7 +1379,7 @@ void CGPartyObj::shouki()
 		if (m_unk688 == 0 &&
 		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 == 0) {
 			int healCount = 0;
-			if (m_partyData.carryObject == reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
+			if (m_partyData.carryObject == Game.m_chaliceObject) {
 				if (isFrameInterval(m_updateCounter, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4))) {
 					healCount = 1;
 				}
@@ -1452,7 +1452,7 @@ void CGPartyObj::onFrameStat()
 			m_unk63CBits.m_bit80 = 1;
 		}
 		if (((DbgMenuPcs.GetDbgFlag() & 8) != 0) ||
-		    ((Game.unk_flat3_0xc7d0 != 0) &&
+		    ((Game.m_chaliceObject != 0) &&
 		     (Joybus.GetCtrlMode(m_animStateMisc) == 1) &&
 		     (m_unk63CBits.m_bit80 != 0) &&
 		     (m_weaponNodeFlagAll.m_bits1.m_shield != 0) &&
@@ -1464,7 +1464,7 @@ void CGPartyObj::onFrameStat()
 			    (m_scriptHandle->m_statusTimers[3] == 0) &&
 			    (Game.m_gameWork.m_bossArtifactStageIndex != 0x17)) {
 				Vec moveVec;
-				CVector diff = CVector(reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)->m_worldPosition) - CVector(m_worldPosition);
+				CVector diff = CVector(Game.m_chaliceObject->m_worldPosition) - CVector(m_worldPosition);
 				moveVec.x = diff.x;
 				moveVec.y = diff.y;
 				moveVec.z = diff.z;
@@ -1475,7 +1475,7 @@ void CGPartyObj::onFrameStat()
 		    Game.m_gameWork.m_menuStageMode != 0 &&
 		    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId == 0) {
 			CGPartyObj* gbaParty = Game.m_partyObjArr[1];
-			CGObject* chaliceObj = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
+			CGObject* chaliceObj = Game.m_chaliceObject;
 			if (gbaParty != nullptr && gbaParty->m_lastStateId == 0) {
 				unsigned short held = Pad.GetButton(m_animStateMisc);
 				int heldMask = held & 0x400;
@@ -2749,7 +2749,7 @@ void CGPartyObj::statCarry()
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		static float d;
 		static float h;
-		CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
+		CGObject* chalice = Game.m_chaliceObject;
 		if (m_stateFrame == 0) {
 			CancelMove(1);
 			d = m_targetDist - 6.0f;
@@ -2792,7 +2792,7 @@ void CGPartyObj::statPut()
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		static float d;
 		static float h;
-		CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
+		CGObject* chalice = Game.m_chaliceObject;
 		if (m_stateFrame == 0) {
 			CancelMove(1);
 			d = 3.0f;
@@ -4184,7 +4184,7 @@ void CGPartyObj::gpmMove()
 {
 	int pressureLimit;
 	CGPartyObj* leader = Game.m_partyObjArr[0];
-	CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
+	CGObject* chalice = Game.m_chaliceObject;
 
 	if (leader->m_lastStateId == 0 &&
 	    leader->m_animSlotSel == 0x0C &&

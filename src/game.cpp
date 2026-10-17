@@ -540,7 +540,7 @@ void CGame::clearWorkScript()
         m_scriptFoodBase[i] = 0;
     }
 
-    unk_flat3_0xc7d0 = 0;
+    m_chaliceObject = 0;
 
     for (i = 0; i < 64; i++) {
         m_monObjects[i] = 0;
