@@ -9,8 +9,6 @@ extern "C" {
 #endif
 
 extern GXRenderModeObj _GXPal528IntDf;
-extern const char sGraphicInitData[];
-extern const char sGraphicSourceStrings[];
 
 #ifdef __cplusplus
 }

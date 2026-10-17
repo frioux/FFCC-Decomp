@@ -1,4 +1,6 @@
 #include "ffcc/graphic.h"
+#include "ffcc/joybusconst.h"
+#include "ffcc/cardconst.h"
 #include "global.h"
 #include "ffcc/graphic_symbols.h"
 #include "ffcc/gxfunc.h"
@@ -72,27 +74,6 @@ OSThread m_thread;
 u8 m_threadStack[0x4000] ATTRIBUTE_ALIGN(8);
 }
 
-#ifdef VERSION_GCCJGC
-enum GraphicCppStringOffset {
-    kGraphicInitCGraphic = 0xA8,
-    kGraphicInitSource = 0xC0,
-    kGraphicInitCGraphic2 = 0x200,
-    kGraphicCppPartControlDoneFmt = 0xF4,
-    kGraphicCppPartCharaDoneFmt = 0x138,
-    kGraphicCppPartDoneFmt = 0x178,
-    kGraphicCppDrawDoneFmt = 0x1B4,
-};
-#else
-enum GraphicCppStringOffset {
-    kGraphicInitCGraphic = 0xA0,
-    kGraphicInitSource = 0xB8,
-    kGraphicInitCGraphic2 = 0x1F8,
-    kGraphicCppPartControlDoneFmt = 0xEC,
-    kGraphicCppPartCharaDoneFmt = 0x130,
-    kGraphicCppPartDoneFmt = 0x170,
-    kGraphicCppDrawDoneFmt = 0x1AC,
-};
-#endif
 
 
 struct GraphicSleepAlarm {
@@ -149,10 +130,8 @@ static int checkThread(void*)
  */
 void CGraphic::Init()
 {
-    char* graphicInitData = const_cast<char*>(sGraphicInitData);
-
-    m_graphicStage = Memory.CreateStage(0x19C000, graphicInitData + kGraphicInitCGraphic, 0);
-    m_scratchStage = Memory.CreateStage(0xD6000, graphicInitData + kGraphicInitCGraphic2, 0);
+    m_graphicStage = Memory.CreateStage(0x19C000, "CGraphic", 0);
+    m_scratchStage = Memory.CreateStage(0xD6000, "CGraphic2", 0);
 
     m_debugStringCount = 0;
     m_fogColor.r = 0;
@@ -196,10 +175,10 @@ void CGraphic::Init()
 #endif
     u32 xfbBufferSize = alignedWidth * xfbHeight * 2;
 
-    m_frameBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, GraphicFrameBufferLine) u8[xfbBufferSize];
+    m_frameBuffer = new (m_graphicStage, "graphic.cpp", GraphicFrameBufferLine) u8[xfbBufferSize];
     memset(m_frameBuffer, 0, 4);
 
-    m_savedFrameBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, GraphicSavedBufferLine) u8[savedBufferSize];
+    m_savedFrameBuffer = new (m_graphicStage, "graphic.cpp", GraphicSavedBufferLine) u8[savedBufferSize];
     memset(m_savedFrameBuffer, 0, 4);
 
 #ifdef VERSION_GCCJGC
@@ -207,10 +186,10 @@ void CGraphic::Init()
 #else
     u32 scratchBufferSize = (((m_renderMode->fbWidth + 0xF) & 0xFFF0) * m_renderMode->efbHeight * 2) + 0x46000;
 #endif
-    m_scratchTextureBuffer = Memory._Alloc(scratchBufferSize, m_scratchStage, graphicInitData + kGraphicInitSource, GraphicTempBufferLine, 0);
+    m_scratchTextureBuffer = Memory._Alloc(scratchBufferSize, m_scratchStage, "graphic.cpp", GraphicTempBufferLine, 0);
     memset(m_scratchTextureBuffer, 0, 0x46004);
 
-    m_fifoBuffer = new (m_graphicStage, graphicInitData + kGraphicInitSource, GraphicFifoLine) u8[kGraphicFifoSize];
+    m_fifoBuffer = new (m_graphicStage, "graphic.cpp", GraphicFifoLine) u8[kGraphicFifoSize];
 
     VIConfigure(m_renderMode);
     GXInit(m_fifoBuffer, kGraphicFifoSize);
@@ -259,7 +238,7 @@ void CGraphic::Init()
     m_blurBufferIndex = 0;
     m_blurTextureCount = 0;
     GXCopyDisp(m_frameBuffer, GX_TRUE);
-    m_drawDoneFile = graphicInitData + kGraphicInitSource;
+    m_drawDoneFile = "graphic.cpp";
     m_drawDoneLine = GraphicInitDrawDoneLine;
     m_drawDoneWaiting = 1;
     GXSetDrawDone();
@@ -571,7 +550,6 @@ void CGraphic::_WaitDrawDone(char* file, int line)
  */
 void CGraphic::Thread()
 {
-    char* debugFmtBase = const_cast<char*>(sGraphicInitData);
     int lastCounter = -1;
     int debugCountdown = 5;
 
@@ -589,11 +567,11 @@ void CGraphic::Thread()
                     drawSyncPart &= 0xFFFF;
                     drawSyncPart &= 0x7FFF;
                     if (drawSyncPart == 0x7FFF) {
-                        System.Printf(debugFmtBase + kGraphicCppPartControlDoneFmt, m_drawDoneFile, m_drawDoneLine);
+                        System.Printf("PartDrawDone(file = %s line = %d) PART CTRL 以外が終了しません。\n", m_drawDoneFile, m_drawDoneLine);
                     } else if (drawSyncPart == 0x7FFE) {
-                        System.Printf(debugFmtBase + kGraphicCppPartCharaDoneFmt, m_drawDoneFile, m_drawDoneLine);
+                        System.Printf("PartDrawDone(file = %s line = %d) PART CHARA が終了しません。\n", m_drawDoneFile, m_drawDoneLine);
                     } else {
-                        System.Printf(debugFmtBase + kGraphicCppPartDoneFmt, m_drawDoneFile, m_drawDoneLine,
+                        System.Printf("PartDrawDone(file = %s line = %d) ctrl=%s が終了しません。\n", m_drawDoneFile, m_drawDoneLine,
                                       pppSysProgTbl[drawSyncPart].m_pppName);
                     }
                 }
@@ -602,7 +580,7 @@ void CGraphic::Thread()
                 char drawSyncByte = drawSyncPart & 0xFF;
                 int orderIndex = (order != nullptr) ? order->m_insertIndex : -1;
                 const char* orderName = (order != nullptr) ? order->m_debugName : "---";
-                System.Printf(debugFmtBase + kGraphicCppDrawDoneFmt, m_drawDoneFile, m_drawDoneLine, orderName, orderIndex,
+                System.Printf("DrawDone(file = %s line = %d process = %s(%d) data = %d)が終了しません。\n", m_drawDoneFile, m_drawDoneLine, orderName, orderIndex,
                               drawSyncByte);
             }
         } else {
@@ -692,7 +670,7 @@ void CGraphic::Flip()
 
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
         GXCopyDisp(m_frameBuffer, GX_TRUE);
-        m_drawDoneFile = const_cast<char*>(sGraphicSourceStrings);
+        m_drawDoneFile = "graphic.cpp";
         m_drawDoneLine = GraphicFlipDrawDoneLine;
         m_drawDoneWaiting = 1;
         GXSetDrawDone();
@@ -1120,7 +1098,7 @@ void CGraphic::makeSphere()
     vertices[vertexCount][2] = 0.0f;
 
     m_sphereDisplayListSize = 0x880;
-    m_sphereDisplayList = new (m_graphicStage, const_cast<char*>(sGraphicSourceStrings), GraphicSphereDisplayListLine) u8[m_sphereDisplayListSize];
+    m_sphereDisplayList = new (m_graphicStage, "graphic.cpp", GraphicSphereDisplayListLine) u8[m_sphereDisplayListSize];
 
     DCInvalidateRange(m_sphereDisplayList, m_sphereDisplayListSize);
     GXBeginDisplayList(m_sphereDisplayList, m_sphereDisplayListSize);
@@ -1941,6 +1919,162 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
 
 /*
  * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 1308b
+ * EN Address: UNUSED
+ * EN Size: 1548b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGraphic::genMapSphere(void* displayListBuffer, unsigned long* outDisplayListSize, unsigned short detail, _GXVtxFmt vtxFmt)
+{
+    const int ringVertexCount = detail + 1;
+    unsigned long displayListSize =
+        ((ringVertexCount + (detail - 2) * ringVertexCount * 2) * 6 * sizeof(float) + 0x1F) & ~0x1F;
+
+    DCInvalidateRange(displayListBuffer, displayListSize);
+    GXBeginDisplayList(displayListBuffer, displayListSize);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_NRM, GX_DIRECT);
+    GXSetVtxAttrFmt(vtxFmt, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(vtxFmt, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
+
+    float latStep = 3.1415927f / (float)detail;
+    float ringSin = (float)sin(latStep);
+    float ringCos = (float)cos(latStep);
+
+    GXBegin(GX_TRIANGLEFAN, vtxFmt, detail + 2);
+    GXPosition3f32(0.0f, 0.0f, 1.0f);
+    GXNormal3f32(0.0f, 0.0f, 1.0f);
+    for (int i = 0; i <= (int)detail; i++) {
+        float lon = (-6.2831855f * (float)i) / (float)detail;
+        float x = ringSin * (float)cos(lon);
+        float y = ringSin * (float)sin(lon);
+        GXPosition3f32(x, y, ringCos);
+        GXNormal3f32(x, y, ringCos);
+    }
+
+    for (int ring = 2; ring < (int)detail; ring++) {
+        float ringLat = (3.1415927f * (float)ring) / (float)detail;
+        float upperLat = (3.1415927f * (float)(ring - 1)) / (float)detail;
+        float upperSin = (float)sin(upperLat);
+        float upperCos = (float)cos(upperLat);
+        ringSin = (float)sin(ringLat);
+        ringCos = (float)cos(ringLat);
+
+        GXBegin(GX_TRIANGLESTRIP, vtxFmt, ringVertexCount * 2);
+        for (int i = 0; i <= (int)detail; i++) {
+            float lon = (6.2831855f * (float)i) / (float)detail;
+            float lx = ringSin * (float)cos(lon);
+            float ly = ringSin * (float)sin(lon);
+            GXPosition3f32(lx, ly, ringCos);
+            GXNormal3f32(lx, ly, ringCos);
+
+            float ux = upperSin * (float)cos(lon);
+            float uy = upperSin * (float)sin(lon);
+            GXPosition3f32(ux, uy, upperCos);
+            GXNormal3f32(ux, uy, upperCos);
+        }
+    }
+
+    *outDisplayListSize = GXEndDisplayList();
+    if (*outDisplayListSize > displayListSize) {
+        OSReport("Error allocating display list (%d, %d)\n", displayListSize, *outDisplayListSize);
+        OSPanic("graphic.cpp", 0x3A4, "Exiting");
+    }
+
+    DCFlushRange(displayListBuffer, *outDisplayListSize);
+}
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: 2552b
+ * EN Address: UNUSED
+ * EN Size: 2752b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CGraphic::drawSphereMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displayList, unsigned long displayListSize,
+                             _GXTexObj* blendTexObj)
+{
+    const Vec cameraPos = {0.0f, 0.0f, 6.0f};
+    const Vec cameraUp = {0.0f, 1.0f, 0.0f};
+    const Vec cameraLook = {0.0f, 0.0f, 0.0f};
+    const float xAxisAngles[6] = {90.0f, 180.0f, 270.0f, 0.0f, 90.0f, -90.0f};
+    const float yAxisAngles[6] = {0.0f, 0.0f, 0.0f, 0.0f, 180.0f, 180.0f};
+    Mtx44 orthoMtx;
+    Mtx cameraMtx;
+    Mtx objectMtx;
+    Mtx lightFrustumMtx;
+    Mtx tempMtx;
+    GXLightObj lightObj;
+    _GXColor color;
+
+    u16 width = GXGetTexObjWidth(targetTexObj);
+    u16 height = GXGetTexObjHeight(targetTexObj);
+    GXTexFmt targetFmt = GXGetTexObjFmt(targetTexObj);
+    void* targetData = GXGetTexObjData(targetTexObj);
+
+    C_MTXOrtho(orthoMtx, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 100.0f);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+    C_MTXLookAt(cameraMtx, &cameraPos, &cameraUp, &cameraLook);
+    GXLoadPosMtxImm(cameraMtx, GX_PNMTX0);
+
+    GXSetCullMode(GX_CULL_BACK);
+    GXSetViewport(0.0f, 0.0f, width, height, 0.0f, 1.0f);
+    GXSetScissor(0, 0, width, height);
+    GXSetTexCopySrc(0, 0, width, height);
+    GXSetTexCopyDst(width, height, targetFmt, GX_FALSE);
+
+    color.r = 0xFF;
+    color.g = 0xFF;
+    color.b = 0xFF;
+    color.a = 0xFF;
+    GXInitLightColor(&lightObj, color);
+    GXSetChanMatColor(GX_COLOR0A0, color);
+    color.r = 0;
+    color.g = 0;
+    color.b = 0;
+    color.a = 0;
+    GXSetChanAmbColor(GX_COLOR0A0, color);
+    GXInitLightPos(&lightObj, 0.0f, 0.0f, -1.0f);
+    GXInitLightDir(&lightObj, 0.0f, 0.0f, -1.0f);
+    GXLoadLightObjImm(&lightObj, GX_LIGHT0);
+
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX3x4, GX_TG_NRM, 0x1E, GX_FALSE, GX_PTIDENTITY);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    GXSetNumTevStages(1);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+    if (blendTexObj != 0) {
+        GXLoadTexObj(blendTexObj, GX_TEXMAP1);
+    }
+
+    C_MTXLightFrustum(lightFrustumMtx, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 0.5f);
+    for (int i = 0; i < 6; i++) {
+        GXLoadTexObj(&texObjs[i], GX_TEXMAP0);
+        PSMTXIdentity(objectMtx);
+        if (yAxisAngles[i] != 0.0f) {
+            PSMTXRotRad(tempMtx, 'y', 0.017453292f * yAxisAngles[i]);
+            PSMTXConcat(objectMtx, tempMtx, objectMtx);
+        }
+        PSMTXRotRad(tempMtx, (i < 4) ? 'y' : 'x', 0.017453292f * xAxisAngles[i]);
+        PSMTXConcat(objectMtx, tempMtx, objectMtx);
+        PSMTXConcat(lightFrustumMtx, objectMtx, objectMtx);
+        GXLoadTexMtxImm(objectMtx, 0x1E, GX_MTX3x4);
+        GXLoadNrmMtxImm(objectMtx, GX_PNMTX0);
+        GXCallDisplayList(displayList, displayListSize);
+    }
+
+    GetBackBufferRect2(targetData, targetTexObj, 0, 0, width, height, 0, GX_LINEAR, GX_TF_RGB565, 0);
+    GXSetScissor(0, 0, 0x280, 0x1C0);
+    SetViewport();
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80016440
  * PAL Size: 132b
  * EN Address: 0x8001623C
@@ -1958,7 +2092,7 @@ void CGraphic::CreateTempBuffer()
 #endif
 	u32 alignedWidth = (renderMode->fbWidth + 0xF) & 0xFFF0;
 	m_scratchTextureBuffer =
-	    Memory._Alloc(alignedWidth * (u32)bufferHeight * 2 + 0x46000, m_scratchStage, const_cast<char*>(sGraphicSourceStrings),
+	    Memory._Alloc(alignedWidth * (u32)bufferHeight * 2 + 0x46000, m_scratchStage, "graphic.cpp",
 	                  GraphicTempBufferLine, 0);
 	memset(m_scratchTextureBuffer, 0, 0x46004);
 }
