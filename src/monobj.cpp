@@ -3082,7 +3082,7 @@ void CGMonObj::setIceJEffect(int enabled)
 		unsigned short count = m_scriptHandle->m_romWork[0xD5];
 		for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(count)); i++) {
 			int dataNo = m_charaModelHandle->GetPdtId();
-			putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x5A8), this, 1.0f, 0);
+			putParticleBindTrace((i + 0x5A) | (dataNo << 8), m_particleSlots[0x11], this, 1.0f, 0);
 		}
 	}
 }

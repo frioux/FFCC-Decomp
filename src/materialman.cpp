@@ -932,7 +932,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 m_numTevStage = 0;
 
                 if (material->m_unkA5 != 0) {
-                    GXColor tevColor = *reinterpret_cast<GXColor*>(reinterpret_cast<char*>(material->m_bumpLight) + 0x54);
+                    GXColor tevColor = material->m_bumpLight->m_targetColor[1];
                     GXSetTevColor(GX_TEVREG1, tevColor);
                 } else {
                     GXColor tevColor = *reinterpret_cast<GXColor*>(&material->m_materialColor);
@@ -1156,7 +1156,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
 
                 if ((tevBit & 0x80000) != 0) {
                     if (material->m_unkA5 != 0) {
-                        GXColor tevColor = *reinterpret_cast<GXColor*>(reinterpret_cast<char*>(material->m_bumpLight) + 0x54);
+                        GXColor tevColor = material->m_bumpLight->m_targetColor[1];
                         GXSetTevColor(GX_TEVREG1, tevColor);
                     } else {
                         GXColor tevColor = *reinterpret_cast<GXColor*>(&material->m_materialColor);
@@ -1259,7 +1259,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
                 return;
             }
             if (material->m_unkA5 != 0) {
-                GXColor tevColor = *reinterpret_cast<GXColor*>(reinterpret_cast<char*>(material->m_bumpLight) + 0x54);
+                GXColor tevColor = material->m_bumpLight->m_targetColor[1];
                 GXSetTevColor(GX_TEVREG1, tevColor);
             } else {
                 GXColor tevColor = *reinterpret_cast<GXColor*>(&material->m_materialColor);

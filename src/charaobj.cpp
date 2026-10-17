@@ -130,10 +130,9 @@ static __inline bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj
 static inline unsigned int CharaObjResolveHitParticleBank(CGPrgObj* sourceObj, unsigned int particleBank)
 {
 	if (particleBank == 0xFE) {
-		int sourceData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0xF8);
-		int effectData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceData) + 0x178);
-		return effectData != 0 ? *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(effectData) + 0x14)
-		                       : 0xFFFFFFFF;
+		CCharaPcs::CHandle* handle = sourceObj->m_charaModelHandle;
+		CCharaPcs::CLoadPdt* pdt = handle->m_pdtLoadRef;
+		return pdt != 0 ? pdt->m_pdtSlot : 0xFFFFFFFF;
 	}
 
 	if (particleBank == 0xFD) {
@@ -2343,7 +2342,7 @@ checkParticle:
 			CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
 			SCharaItemRow* traceRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 			if ((traceRows[effectId].m_particleFlags & 0x2000) != 0) {
-				int partyIndex = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4);
+				int partyIndex = reinterpret_cast<CGMonObj*>(this)->m_targetPartyIndex;
 				if (partyIndex >= 0 && partyIndex < 4) {
 					CFlatRuntime2Storage().SetParticleWorkTrace(Game.m_partyObjArr[partyIndex]);
 				}
