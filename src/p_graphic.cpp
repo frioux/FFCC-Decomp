@@ -85,6 +85,8 @@ extern const float kDebugIndicatorFifoLeft;
 extern const float kDebugIndicatorFifoRight;
 #endif
 static const int kDebugBarLineStep = 8;
+static const char s_debug_pad_port_fmt[] = "%dP";
+static const char s_debug_frame_fmt[] = "%d";
 
 static const char s_graphic_order_debug_fmt[] = "%s(%d) %.3f%%";
 static const char s_graphic_move_debug_fmt[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
@@ -316,7 +318,7 @@ void CGraphicPcs::drawEnd()
 		}
 
 		if (Pad.GetPortEmulation() != -1) {
-			sprintf(debugPadString, "%dP", Pad.GetPortEmulation() + 1);
+			sprintf(debugPadString, s_debug_pad_port_fmt, Pad.GetPortEmulation() + 1);
 			Graphic.DrawDebugStringDirect(0x10, 0x11, debugPadString, 0xC);
 		}
 
@@ -342,7 +344,7 @@ void CGraphicPcs::drawEnd()
 			x += 0x60;
 		}
 
-		sprintf(debugInputString, "%d", System.GetCounter());
+		sprintf(debugInputString, s_debug_frame_fmt, System.GetCounter());
 		Graphic.DrawDebugStringDirect(port * 0x60 + 0x10, 0x1A8, debugInputString, 8);
 	}
 
