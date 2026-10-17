@@ -180,7 +180,7 @@ static inline bool isFrameInterval(int frame, int interval)
 }
 
 #define PARTY_GHOST_TARGET_MODE(self) \
-	(Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F && \
+	(Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.IsBattleStage() && \
 	 (self)->IsKindOf(0x6D) && reinterpret_cast<CCaravanWork*>((self)->m_scriptHandle)->m_joybusCaravanId != 0)
 
 static inline bool isGhostPartyTargetMode(CGPartyObj* self)
@@ -645,7 +645,7 @@ void CGPartyObj::onFrameAlways()
 	}
 	if ((Game.m_gameWork.m_menuStageMode != 0) &&
 	    (Game.m_gameWork.m_menuStageMode != 0) &&
-	    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
+	    Game.m_gameWork.IsBattleStage() &&
 	    IsKindOf(0x6D) &&
 	    (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0)) {
 		showTraceParticle = 0;
@@ -803,7 +803,7 @@ void CGPartyObj::onFramePostCalc()
 	}
 
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
-	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	    Game.m_gameWork.IsBattleStage() &&
 	    IsKindOf(0x6D) &&
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		ghostPartyMog();
@@ -1702,7 +1702,7 @@ void CGPartyObj::enableDamageCol(int onOff)
 
 	if (onOff != 0 &&
 	    (Game.m_gameWork.m_menuStageMode == 0 ||
-	     Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F ||
+	     !Game.m_gameWork.IsBattleStage() ||
 	     !IsKindOf(0x6D) ||
 	     reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId == 0)) {
 		m_damageColliders[0].m_hitMask = hitMask;
@@ -2231,7 +2231,7 @@ void CGPartyObj::checkTargetParticle()
 	input.Identity();
 
 	if ((Game.m_gameWork.m_menuStageMode == 0) ||
-	    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
+	    !Game.m_gameWork.IsBattleStage() ||
 	    !IsKindOf(0x6D) ||
 	    (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId == 0)) {
 		if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
@@ -2707,7 +2707,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 inline void CGPartyObj::statCarry()
 {
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
-	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	    Game.m_gameWork.IsBattleStage() &&
 	    IsKindOf(0x6D) &&
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		static float d;
@@ -2750,7 +2750,7 @@ inline void CGPartyObj::statCarry()
 void CGPartyObj::statPut()
 {
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
-	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	    Game.m_gameWork.IsBattleStage() &&
 	    IsKindOf(0x6D) &&
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		static float d;
@@ -3375,7 +3375,7 @@ void CGPartyObj::CheckGameOver()
 			continue;
 		}
 
-		if ((Game.m_gameWork.m_menuStageMode != 0) && (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
+		if ((Game.m_gameWork.m_menuStageMode != 0) && Game.m_gameWork.IsBattleStage() &&
 		    party->IsKindOf(0x6D) &&
 		    (reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_joybusCaravanId != 0)) {
 			continue;
@@ -3495,7 +3495,7 @@ void CGPartyObj::InitFinished()
 #endif
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_menuStageMode != 0 &&
-	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	    Game.m_gameWork.IsBattleStage() &&
 	    IsKindOf(0x6D) &&
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		m_pushParamA = 0;
@@ -4387,7 +4387,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 	    ((DbgMenuPcs.GetDbgFlag() & 0x80) != 0)) {
 		char text[256];
 		if ((Game.m_gameWork.m_menuStageMode != 0) &&
-		    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
+		    Game.m_gameWork.IsBattleStage() &&
 		    IsKindOf(0x6D) && (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0)) {
 			int weightMax = calcWeightMax();
 
