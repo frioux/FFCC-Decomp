@@ -71,7 +71,7 @@ static __inline bool CharaObjSkipComboScript(CGPrgObj* obj)
 	}
 
 	return ((static_cast<unsigned short>(obj->GetCID()) & 0x6D) == 0x6D) &&
-	       (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(obj->m_scriptHandle) + 0x3B4) != 0);
+	       (reinterpret_cast<CCaravanWork*>(obj->m_scriptHandle)->m_joybusCaravanId != 0);
 }
 
 static inline bool CharaObjIsPlayerCid(unsigned int cid)
@@ -130,10 +130,9 @@ static __inline bool CharaObjCanFrontGuard(CGCharaObj* self, CGPrgObj* sourceObj
 static inline unsigned int CharaObjResolveHitParticleBank(CGPrgObj* sourceObj, unsigned int particleBank)
 {
 	if (particleBank == 0xFE) {
-		int sourceData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0xF8);
-		int effectData = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceData) + 0x178);
-		return effectData != 0 ? *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(effectData) + 0x14)
-		                       : 0xFFFFFFFF;
+		CCharaPcs::CHandle* handle = sourceObj->m_charaModelHandle;
+		CCharaPcs::CLoadPdt* pdt = handle->m_pdtLoadRef;
+		return pdt != 0 ? pdt->m_pdtSlot : 0xFFFFFFFF;
 	}
 
 	if (particleBank == 0xFD) {
@@ -196,7 +195,7 @@ static __inline SCharaItemRow* CharaObjItemRow(int itemId)
 
 static __inline float CharaObjGetStatusMultiplier(int offset)
 {
-	return (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + offset)) * 0.01f) + 1.0e-07f;
+	return (static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.m_battleParams) + offset)) * 0.01f) + 1.0e-07f;
 }
 
 static __inline float CharaObjGetMonsterScale(unsigned char* script9, bool isMon)
@@ -367,7 +366,7 @@ void CGCharaObj::onFramePostCalc()
 {
 	if (m_scriptHandle->m_statusTimers[2] != 0) {
 		if (m_stateTick != 0 &&
-		    (m_stateTick % static_cast<int>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3A))) == 0) {
+		    (m_stateTick % static_cast<int>(Game.m_battleParams[0x1D])) == 0) {
 			if (m_scriptHandle->m_hp > 1 &&
 			    !CharaObjGameFlagBit5Set()) {
 				playSe3D(0x19, 0x32, 0x96, 0, 0);
@@ -390,7 +389,7 @@ void CGCharaObj::onFramePostCalc()
 				padMask |= Pad.GetButtonDownAnalog(m_animStateMisc);
 			}
 			if ((padMask & 0xF) != 0) {
-				statusValue -= *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x3C);
+				statusValue -= Game.m_battleParams[0x1E];
 				System.Printf("ギアガチャ\n");
 			}
 		}
@@ -457,13 +456,13 @@ void CGCharaObj::onFramePreCalc()
 
 	m_pushScale = 1.0f;
 	if (m_scriptHandle->m_statusTimers[8] != 0) {
-		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x34)) * 0.01f) + 1.0e-07f;
+		m_pushScale *= (static_cast<float>(Game.m_battleParams[0x1A]) * 0.01f) + 1.0e-07f;
 	}
 	if (m_scriptHandle->m_statusTimers[7] != 0) {
-		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x36)) * 0.01f) + 1.0e-07f;
+		m_pushScale *= (static_cast<float>(Game.m_battleParams[0x1B]) * 0.01f) + 1.0e-07f;
 	}
 	if (m_scriptHandle->m_statusTimers[1] != 0) {
-		m_pushScale *= (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x40)) * 0.01f) + 1.0e-07f;
+		m_pushScale *= (static_cast<float>(Game.m_battleParams[0x20]) * 0.01f) + 1.0e-07f;
 	}
 	m_pushScale = (m_pushScale < 1.2f) ? m_pushScale : 1.2f;
 
@@ -681,7 +680,7 @@ void CGCharaObj::onFrameStat()
 					reqAnim(6, 1, 0);
 
 					if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D) {
-						playSe3D(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0) + 0x10,
+						playSe3D(reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId + 0x10,
 						         0x32, 0x96, 0, 0);
 					}
 				}
@@ -830,7 +829,7 @@ int CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 	if ((sourceCid & 0x6D) == 0x6D && Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 		sourceCid = sourceObj->GetCID();
 		if ((sourceCid & 0x6D) == 0x6D &&
-			*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj->m_scriptHandle) + 0x3B4) != 0) {
+			reinterpret_cast<CCaravanWork*>(sourceObj->m_scriptHandle)->m_joybusCaravanId != 0) {
 			return 0;
 		}
 	}
@@ -882,7 +881,7 @@ void CGCharaObj::onHitParticle(int effectIndex, int, int, int colliderIndex, Vec
 
 	if ((cid & 0x6D) == 0x6D && Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
 		cid = GetCID();
-		if ((cid & 0x6D) == 0x6D && *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3B4) != 0) {
+		if ((cid & 0x6D) == 0x6D && reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 			return;
 		}
 	}
@@ -1413,40 +1412,40 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 	int itemType;
 	switch (staIndex) {
 		case 1:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x0E);
+			base = Game.m_battleParams[0x7];
 			break;
 		case 0:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x10);
+			base = Game.m_battleParams[0x8];
 			break;
 		case 4:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x12);
+			base = Game.m_battleParams[0x9];
 			break;
 		case 8:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x14);
+			base = Game.m_battleParams[0xA];
 			break;
 		case 9:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x16);
+			base = Game.m_battleParams[0xB];
 			break;
 		case 7:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x18);
+			base = Game.m_battleParams[0xC];
 			break;
 		case 10:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x1A);
+			base = Game.m_battleParams[0xD];
 			break;
 		case 0x1C:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x1C);
+			base = Game.m_battleParams[0xE];
 			break;
 		case 2:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x1E);
+			base = Game.m_battleParams[0xF];
 			break;
 		case 6:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x20);
+			base = Game.m_battleParams[0x10];
 			break;
 		case 3:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x22);
+			base = Game.m_battleParams[0x11];
 			break;
 		case 0x6A:
-			base = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x24);
+			base = Game.m_battleParams[0x12];
 			break;
 		default:
 			break;
@@ -1473,7 +1472,7 @@ int CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 		}
 
 		if (stageLevel > 0) {
-			power += reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(Game.unk_flat3_field_8_0xc7dc) + 0x5C)[stageLevel];
+			power += Game.m_battleParams[0x2E + stageLevel];
 		}
 	}
 
@@ -1917,7 +1916,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				if ((static_cast<unsigned short>(GetCID()) & 0xAD) == 0xAD && static_cast<CGMonObj*>(this)->m_unk6C2 != 0) {
 					damageAmount = 1;
 				} else {
-					float recoilRate = (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x26 + resistType * 2)) * 0.01f) + 1.0e-07f;
+					float recoilRate = (static_cast<float>(Game.m_battleParams[0x13 + resistType]) * 0.01f) + 1.0e-07f;
 					int raw = static_cast<int>(static_cast<float>(static_cast<unsigned int>(m_scriptHandle->m_hp)) * recoilRate);
 					damageAmount = 1;
 					if (raw >= 1) {
@@ -1980,7 +1979,7 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				break;
 			}
 			case 10: {
-				float recoilRate = (static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x26 + resistType * 2)) * 0.01f) + 1.0e-07f;
+				float recoilRate = (static_cast<float>(Game.m_battleParams[0x13 + resistType]) * 0.01f) + 1.0e-07f;
 				int raw = static_cast<int>(static_cast<float>(static_cast<unsigned int>(sourceObj->m_scriptHandle->m_hp)) * recoilRate);
 				damageAmount = (raw < 1) ? 1 : raw;
 				System.Printf("MON->PC GRAダメージ %d\n", damageAmount);
@@ -2239,11 +2238,11 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 	} else if ((particleEntry & 0x4000) != 0) {
 		particleBank = 3;
 	} else if (particleBank == 1 && particleNo < 8) {
-		particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E0);
+		particleNo += reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId;
 	}
 
 	if ((particleEntry & 0x800) != 0) {
-		particleNo += *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2);
+		particleNo += reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag;
 	}
 	hasParticle = 1;
 
@@ -2343,7 +2342,7 @@ checkParticle:
 			CFlatRuntime2Storage().SetParticleWorkVector(m_rotTargetY, 0.0f);
 			SCharaItemRow* traceRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 			if ((traceRows[effectId].m_particleFlags & 0x2000) != 0) {
-				int partyIndex = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4);
+				int partyIndex = reinterpret_cast<CGMonObj*>(this)->m_targetPartyIndex;
 				if (partyIndex >= 0 && partyIndex < 4) {
 					CFlatRuntime2Storage().SetParticleWorkTrace(Game.m_partyObjArr[partyIndex]);
 				}
@@ -2439,9 +2438,9 @@ checkParticle:
 				int a = m_unk68C;
 				int b = m_comboFramePrev;
 				if (a * 3 <= b) {
-					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) + 0x75));
+					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag + 0x75));
 				} else if (a * 2 <= b) {
-					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E2) + 0x73));
+					CFlatRuntime2Storage().SetParticleWorkNo((particleBank << 8) | (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag + 0x73));
 				}
 			}
 			break;
@@ -2718,7 +2717,7 @@ int CGCharaObj::calcCastTime(int itemId)
 				stageLevel = 0;
 			}
 			if (stageLevel > 0) {
-				castBonus -= *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x58 + (stageLevel * 2));
+				castBonus -= Game.m_battleParams[0x2C + stageLevel];
 				castBonus = castBonus < 0 ? 0 : castBonus;
 			}
 		}
@@ -2998,7 +2997,7 @@ void CGCharaObj::combi2()
 			if (playedComboSe == 0 &&
 			    (Game.m_gameWork.m_menuStageMode == 0 || Game.m_gameWork.m_bossArtifactStageIndex >= 0xF ||
 			     (static_cast<unsigned short>(party->GetCID()) & 0x6D) != 0x6D ||
-			     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x3B4) == 0)) {
+			     reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_joybusCaravanId == 0)) {
 				party->m_itemId = comboData->m_command;
 				party->playSe3D(0x3F, 0x32, 0x96, 0, 0);
 				playedComboSe = 1;
@@ -3053,7 +3052,7 @@ void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 		if (m_comboLinks[entry] != 0) {
 			if (Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
 			    (static_cast<unsigned short>(m_comboLinks[entry]->GetCID()) & 0x6D) == 0x6D &&
-			    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_comboLinks[entry]->m_scriptHandle) + 0x3B4) != 0) {
+			    reinterpret_cast<CCaravanWork*>(m_comboLinks[entry]->m_scriptHandle)->m_joybusCaravanId != 0) {
 				goto next_link;
 			} else if (m_comboLinks[entry]->m_lastStateId != 6 && m_comboLinks[entry]->m_lastStateId != 2) {
 				break;

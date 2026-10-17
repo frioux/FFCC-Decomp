@@ -382,8 +382,8 @@ inline int CSystem::GetErrorLevel()
  */
 inline void CCameraPcs::SetWorldMapMatrix(float (*matrix)[4])
 {
-    PSMTXCopy(matrix, (MtxPtr)((char*)this + 0x34));
-    PSMTXInverse(matrix, (MtxPtr)((char*)this + 0x64));
+    PSMTXCopy(matrix, m_worldMapMatrix);
+    PSMTXInverse(matrix, m_cameraWorldMtx);
 }
 
 /*
@@ -397,7 +397,7 @@ inline void CCameraPcs::SetWorldMapMatrix(float (*matrix)[4])
  */
 inline void CCameraPcs::GetWorldMapMatrix(float (*matrix)[4])
 {
-    PSMTXCopy((MtxPtr)((char*)this + 0x34), matrix);
+    PSMTXCopy(m_worldMapMatrix, matrix);
 }
 
 /*

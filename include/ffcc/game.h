@@ -231,7 +231,7 @@ public:
     CGObject* m_chaliceObject;              // 0xC7D0
     unsigned int m_combiCount;             // 0xC7D4
     CCombi2* m_combiTable;                 // 0xC7D8
-    unsigned int unk_flat3_field_8_0xc7dc;  // 0xC7DC
+    unsigned short* m_battleParams;         // 0xC7DC
     SPartyAnimRow* m_partyAnimTable;        // 0xC7E0
     CBossArtifactStage* m_bossArtifactBase; // 0xC7E4
     unsigned int m_currentMapId;            // 0xC7E8

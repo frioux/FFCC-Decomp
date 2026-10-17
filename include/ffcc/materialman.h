@@ -206,9 +206,10 @@ private:
     Mtx m_fullScreenShadowMtx1;          // 0x94
     _GXTexObj* m_fullScreenShadowTexObj0; // 0xC4
     _GXTexObj* m_fullScreenShadowTexObj1; // 0xC8
-    unsigned char m_pad0CC[0x04];
+    int m_manaParaboloidTexMapId;        // 0xCC
     _GXTexObj* m_manaParaboloidTexObj0;  // 0xD0
-    unsigned char m_pad0D4[0x08];
+    int m_manaParaboloidTexCoordId;      // 0xD4
+    unsigned char m_pad0D8[0x04];
     _GXTexObj* m_manaParaboloidTexObj1;  // 0xDC
     unsigned char m_pad0E0[0x04];
     unsigned char m_reflectionAlpha;    // 0xE4

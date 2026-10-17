@@ -1380,11 +1380,11 @@ void CGPartyObj::shouki()
 		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 == 0) {
 			int healCount = 0;
 			if (m_partyData.carryObject == Game.m_chaliceObject) {
-				if (isFrameInterval(m_updateCounter, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4))) {
+				if (isFrameInterval(m_updateCounter, Game.m_battleParams[2])) {
 					healCount = 1;
 				}
 			} else {
-				if (isFrameInterval(m_updateCounter, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 6))) {
+				if (isFrameInterval(m_updateCounter, Game.m_battleParams[3])) {
 					healCount = 1;
 				}
 			}
@@ -1398,7 +1398,7 @@ void CGPartyObj::shouki()
 		} else if (m_unk688 == 2) {
 			unsigned int damageInterval = reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_romWork[CRomWork::ShoukiDamageIntervalOffset];
 			if ((reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_equipEffectFlags & 0x2000) != 0) {
-				damageInterval += *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 8);
+				damageInterval += Game.m_battleParams[4];
 			}
 			if (isFrameInterval(m_updateCounter, damageInterval)) {
 				playSe3D(0x19, 0x32, 0x96, 0, 0);
@@ -1893,11 +1893,11 @@ void CGPartyObj::statCharge()
 					CVector dest(m_comboCenter);
 					SCfdItemRow* flagRows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 					if ((flagRows[m_itemId].m_field32 & 0x10) != 0) {
-						unsigned int maxReach = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70);
+						unsigned int maxReach = Game.m_battleParams[0x38];
 						if (static_cast<float>(maxReach) < mag) {
 							dest = CVector(m_worldPosition) +
 							       (CVector(delta) * (mag - static_cast<float>(maxReach))) / mag;
-							mag = mag - static_cast<float>(*reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70));
+							mag = mag - static_cast<float>(Game.m_battleParams[0x38]);
 						} else {
 							mag = 0.0f;
 						}
@@ -2337,7 +2337,7 @@ void CGPartyObj::checkTargetParticle()
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
 			int vFlag;
 			if ((work->m_equipEffectFlags & 0x4000) != 0) {
-				vFlag = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0A);
+				vFlag = Game.m_battleParams[0x5];
 			} else {
 				vFlag = 0;
 			}
@@ -2350,7 +2350,7 @@ void CGPartyObj::checkTargetParticle()
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
 			int vFlag;
 			if ((work->m_equipEffectFlags & 0x8000) != 0) {
-				vFlag = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x0C);
+				vFlag = Game.m_battleParams[0x6];
 			} else {
 				vFlag = 0;
 			}
@@ -3153,7 +3153,7 @@ int CGPartyObj::useItem(int itemId)
 					if (value >= 1) {
 						heal = value;
 					}
-					SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_tempStatBuffTimer = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x68);
+					SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_tempStatBuffTimer = Game.m_battleParams[0x34];
 					SAFE_CAST_CARAVAN_WORK(m_scriptHandle)->m_tempStatBuffId = itemId;
 				} else {
 					heal = 4;

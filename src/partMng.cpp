@@ -970,7 +970,7 @@ void CPartMng::drawEnd()
     gPppHeapUseRateWords[0] = pppHeapUseRate(ppvEnv->m_stagePtr);
     if ((gPppHeapUseRateWords[2]-- == 0) || (gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1])) {
         gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
-        gPppHeapUseRateWords[2] = *(int*)((char*)this + 0x16C) << 1;
+        gPppHeapUseRateWords[2] = m_unk16C << 1;
     }
 }
 
@@ -2736,7 +2736,7 @@ void CPartMng::pppPartDrawAfter()
     gPppHeapUseRateWords[0] = pppHeapUseRate(ppvEnv->m_stagePtr);
     if ((gPppHeapUseRateWords[2]-- == 0) || (gPppHeapUseRateWords[0] > gPppHeapUseRateWords[1])) {
         gPppHeapUseRateWords[1] = gPppHeapUseRateWords[0];
-        gPppHeapUseRateWords[2] = *(int*)((char*)this + 0x16C) << 1;
+        gPppHeapUseRateWords[2] = m_unk16C << 1;
     }
 }
 

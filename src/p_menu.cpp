@@ -956,8 +956,8 @@ void CMenuPcs::SetTexture(CMenuPcs::TEX tex)
         texture = m_textures[(int)tex];
         TextureMan.SetTexture(GX_TEXMAP0, texture);
 
-        width = *(u32*)((u8*)texture + 0x64);
-        height = *(u32*)((u8*)texture + 0x68);
+        width = texture->GetWidth();
+        height = texture->GetHeight();
         PSMTXScale(texMtx, 1.0f / (f32)width, 1.0f / (f32)height, 1.0f);
         GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
         GXSetNumTexGens(1);
