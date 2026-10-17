@@ -94,7 +94,6 @@ enum GraphicCppStringOffset {
 };
 #endif
 
-extern const char sGraphicUnknownOrderName[4] = "---";
 
 struct GraphicSleepAlarm {
     OSAlarm alarm;
@@ -602,7 +601,7 @@ void CGraphic::Thread()
                 CSystem::COrder* order = System.GetOrder(drawSyncPart >> 8);
                 char drawSyncByte = drawSyncPart & 0xFF;
                 int orderIndex = (order != nullptr) ? order->m_insertIndex : -1;
-                const char* orderName = sGraphicUnknownOrderName;
+                const char* orderName = "---";
                 if (order != nullptr) {
                     orderName = order->m_debugName;
                 }
