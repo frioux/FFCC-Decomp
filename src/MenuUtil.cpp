@@ -555,7 +555,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 			y = static_cast<int>(static_cast<float>(static_cast<int>(y)) + lineStep);
 		}
 
-	const SItemFlatRow* item = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2]) + msgNo;
+	const SItemFlatRow* item = reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable) + msgNo;
 	u16 flags = item->m_equipFlags;
 	if ((flags & 0x100) != 0) {
 		strcpy(scratch, g_strMenuUtilMes[languageIndex * 20]);
@@ -640,7 +640,7 @@ void CMenuPcs::DrawHelpMessageUS(int msgNo, CFont* font, int, int, _GXColor colo
 
 						if (ChkEquipActive(static_cast<int>(m_artiState->selections[sel]) +
 						                   static_cast<int>(m_artiState->scrollOffset))) {
-							const SItemFlatRow* current = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2]) + currentItem;
+							const SItemFlatRow* current = reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable) + currentItem;
 							unsigned int currentValue;
 							if (currentItem == -1) {
 								currentValue = 0;

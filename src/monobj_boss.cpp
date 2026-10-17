@@ -194,8 +194,8 @@ void CGMonObj::suikomi(int endFrame, float zOffset)
 			}
 		}
 
-		if ((Game.unk_flat3_0xc7d0 != 0) && (reinterpret_cast<CGItemObj*>(Game.unk_flat3_0xc7d0)->m_owner == 0)) {
-			suikomiSub(reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0), zOffset);
+		if ((Game.m_chaliceObject != 0) && (reinterpret_cast<CGItemObj*>(Game.m_chaliceObject)->m_owner == 0)) {
+			suikomiSub(Game.m_chaliceObject, zOffset);
 		}
 
 		if (m_stateFrame == endFrame) {

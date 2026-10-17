@@ -7945,7 +7945,7 @@ inline void CMenuPcs::SetMakeChara(int channel)
 	const int baseDataIndex =
 	    static_cast<int>(caravanWork.m_genderFlag) + static_cast<int>(caravanWork.m_tribeId) * 2;
 	caravanWork.Init(baseDataIndex,
-	                 reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0]) + baseDataIndex,
+	                 Game.m_charaRomTable + baseDataIndex,
 	                 static_cast<int>(caravanWork.m_appearanceVariant));
 	caravanWork.LoadFinished();
 

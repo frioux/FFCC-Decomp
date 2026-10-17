@@ -9,6 +9,33 @@
 #include <dolphin/mtx.h>
 #include <string.h>
 
+struct _PARTICLE_DATA
+{
+    Vec m_position;          // 0x00
+    u8 _pad0C[0x04];
+    Vec m_direction;         // 0x10
+    u16 m_frameTimer;        // 0x1c
+    u16 m_shapeFrame;        // 0x1e
+    u16 m_drawFrame;         // 0x20
+    u16 m_life;              // 0x22
+    u8 _pad24[0x04];
+    float m_speed;           // 0x28
+    float m_tailSpeed;       // 0x2c
+    float m_alphaFade;       // 0x30
+    u8 m_age;                // 0x34
+    u8 m_fadeInFrames;       // 0x35
+    u8 m_fadeOutFrames;      // 0x36
+    u8 m_historyCount;       // 0x37
+    u8 m_historyIndex;       // 0x38
+    u8 _pad39;
+    u16 m_unk3A[3];          // 0x3a
+    Vec m_history[31];       // 0x40
+    u8 _pad1B4[0x04];
+}; // Size 0x1b8
+
+STATIC_ASSERT(sizeof(_PARTICLE_DATA) == 0x1b8);
+STATIC_ASSERT(offsetof(_PARTICLE_DATA, m_history) == 0x40);
+
 struct VYmMegaBirthShpTail2
 {
     pppFMATRIX m_emitterMatrix;
@@ -149,14 +176,13 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShp
            _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat,
            _PARTICLE_COLOR* particleColor)
 {
-    u8* particleBytes = (u8*)particleData;
     float vx;
     float vy;
     float vz;
     float spread = (float)pYmMegaBirthShpTail2->m_spread;
     float spreadRange = 2.0f * spread;
 
-    memset(particleData, 0, 0x1b8);
+    memset(particleData, 0, sizeof(_PARTICLE_DATA));
     if (particleWMat != 0) {
         memset(particleWMat, 0, sizeof(_PARTICLE_WMAT));
     }
@@ -192,12 +218,12 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShp
         }
 
         pppGetRotMatrixXYZ(rot, &angles);
-        PSMTXMultVecSR(rot.value, (Vec*)&baseDir, reinterpret_cast<Vec*>(particleData->m_matrix[1]));
-        reinterpret_cast<Vec*>(particleData->m_matrix[1])->x *= pYmMegaBirthShpTail2->m_spawnScale.x;
-        reinterpret_cast<Vec*>(particleData->m_matrix[1])->y *= pYmMegaBirthShpTail2->m_spawnScale.y;
-        reinterpret_cast<Vec*>(particleData->m_matrix[1])->z *= pYmMegaBirthShpTail2->m_spawnScale.z;
-        pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]),
-                     *reinterpret_cast<Vec*>(particleData->m_matrix[1]));
+        PSMTXMultVecSR(rot.value, (Vec*)&baseDir, &particleData->m_direction);
+        particleData->m_direction.x *= pYmMegaBirthShpTail2->m_spawnScale.x;
+        particleData->m_direction.y *= pYmMegaBirthShpTail2->m_spawnScale.y;
+        particleData->m_direction.z *= pYmMegaBirthShpTail2->m_spawnScale.z;
+        pppNormalize(particleData->m_direction,
+                     particleData->m_direction);
         break;
     }
     }
@@ -250,8 +276,8 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShp
             }
             }
 
-            Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[1]);
-            pppScaleVectorXYZ(*reinterpret_cast<Vec*>(particleData->m_matrix[0]), velocity, scale);
+            Vec velocity = particleData->m_direction;
+            pppScaleVectorXYZ(particleData->m_position, velocity, scale);
         }
         break;
     }
@@ -271,46 +297,46 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShp
         float rand4;
         switch (pYmMegaBirthShpTail2->m_randType) {
         default:
-            particleData->m_matrix[0][0] = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
-            particleData->m_matrix[0][0] -= speedRandHalf;
-            particleData->m_matrix[0][1] = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
-            particleData->m_matrix[0][1] -= speedRandHalf;
-            particleData->m_matrix[0][2] = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
-            particleData->m_matrix[0][2] -= speedRandHalf;
+            particleData->m_position.x = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
+            particleData->m_position.x -= speedRandHalf;
+            particleData->m_position.y = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
+            particleData->m_position.y -= speedRandHalf;
+            particleData->m_position.z = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
+            particleData->m_position.z -= speedRandHalf;
             break;
         case 1:
             Math.RandF();
-            particleData->m_matrix[0][0] = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
-            particleData->m_matrix[0][0] -= speedRandHalf;
-            particleData->m_matrix[0][1] = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
-            particleData->m_matrix[0][1] -= speedRandHalf;
-            particleData->m_matrix[0][2] = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
-            particleData->m_matrix[0][2] -= speedRandHalf;
+            particleData->m_position.x = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
+            particleData->m_position.x -= speedRandHalf;
+            particleData->m_position.y = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
+            particleData->m_position.y -= speedRandHalf;
+            particleData->m_position.z = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF();
+            particleData->m_position.z -= speedRandHalf;
             break;
         case 2:
-            particleData->m_matrix[0][0] = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF() * Math.RandF();
-            particleData->m_matrix[0][0] -= speedRandHalf;
-            particleData->m_matrix[0][1] = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF() * Math.RandF();
-            particleData->m_matrix[0][1] -= speedRandHalf;
-            particleData->m_matrix[0][2] = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF() * Math.RandF();
-            particleData->m_matrix[0][2] -= speedRandHalf;
+            particleData->m_position.x = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF() * Math.RandF();
+            particleData->m_position.x -= speedRandHalf;
+            particleData->m_position.y = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF() * Math.RandF();
+            particleData->m_position.y -= speedRandHalf;
+            particleData->m_position.z = pYmMegaBirthShpTail2->m_spawnRange * Math.RandF() * Math.RandF();
+            particleData->m_position.z -= speedRandHalf;
             break;
         case 3:
             rand1 = Math.RandF();
             rand2 = Math.RandF();
             rand2 = pYmMegaBirthShpTail2->m_spawnRange * rand2;
-            particleData->m_matrix[0][0] = pYmMegaBirthShpTail2->m_spawnRange - 0.7f * (rand2 * rand1);
-            particleData->m_matrix[0][0] -= speedRandHalf;
+            particleData->m_position.x = pYmMegaBirthShpTail2->m_spawnRange - 0.7f * (rand2 * rand1);
+            particleData->m_position.x -= speedRandHalf;
             rand1 = Math.RandF();
             rand2 = Math.RandF();
             rand2 = pYmMegaBirthShpTail2->m_spawnRange * rand2;
-            particleData->m_matrix[0][1] = pYmMegaBirthShpTail2->m_spawnRange - 0.7f * (rand2 * rand1);
-            particleData->m_matrix[0][1] -= speedRandHalf;
+            particleData->m_position.y = pYmMegaBirthShpTail2->m_spawnRange - 0.7f * (rand2 * rand1);
+            particleData->m_position.y -= speedRandHalf;
             rand1 = Math.RandF();
             rand2 = Math.RandF();
             rand2 = pYmMegaBirthShpTail2->m_spawnRange * rand2;
-            particleData->m_matrix[0][2] = pYmMegaBirthShpTail2->m_spawnRange - 0.7f * (rand2 * rand1);
-            particleData->m_matrix[0][2] -= speedRandHalf;
+            particleData->m_position.z = pYmMegaBirthShpTail2->m_spawnRange - 0.7f * (rand2 * rand1);
+            particleData->m_position.z -= speedRandHalf;
             break;
         case 4:
             rand1 = Math.RandF();
@@ -318,49 +344,49 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShp
             rand3 = Math.RandF();
             rand4 = Math.RandF();
             rand2 = pYmMegaBirthShpTail2->m_spawnRange * rand2;
-            particleData->m_matrix[0][0] = rand4 * (rand3 * (rand2 * rand1));
-            particleData->m_matrix[0][0] -= speedRandHalf;
+            particleData->m_position.x = rand4 * (rand3 * (rand2 * rand1));
+            particleData->m_position.x -= speedRandHalf;
             rand1 = Math.RandF();
             rand2 = Math.RandF();
             rand3 = Math.RandF();
             rand4 = Math.RandF();
             rand2 = pYmMegaBirthShpTail2->m_spawnRange * rand2;
-            particleData->m_matrix[0][1] = rand4 * (rand3 * (rand2 * rand1));
-            particleData->m_matrix[0][1] -= speedRandHalf;
+            particleData->m_position.y = rand4 * (rand3 * (rand2 * rand1));
+            particleData->m_position.y -= speedRandHalf;
             rand1 = Math.RandF();
             rand2 = Math.RandF();
             rand3 = Math.RandF();
             rand4 = Math.RandF();
             rand2 = pYmMegaBirthShpTail2->m_spawnRange * rand2;
-            particleData->m_matrix[0][2] = rand4 * (rand3 * (rand2 * rand1));
-            particleData->m_matrix[0][2] -= speedRandHalf;
+            particleData->m_position.z = rand4 * (rand3 * (rand2 * rand1));
+            particleData->m_position.z -= speedRandHalf;
             break;
         case 5:
             rand1 = Math.RandF();
             rand2 = Math.RandF();
             rand3 = Math.RandF();
             rand2 = pYmMegaBirthShpTail2->m_spawnRange * rand2;
-            particleData->m_matrix[0][0] = pYmMegaBirthShpTail2->m_spawnRange - 0.5f * (rand3 * (rand2 * rand1));
-            particleData->m_matrix[0][0] -= speedRandHalf;
+            particleData->m_position.x = pYmMegaBirthShpTail2->m_spawnRange - 0.5f * (rand3 * (rand2 * rand1));
+            particleData->m_position.x -= speedRandHalf;
             rand1 = Math.RandF();
             rand2 = Math.RandF();
             rand3 = Math.RandF();
             rand2 = pYmMegaBirthShpTail2->m_spawnRange * rand2;
-            particleData->m_matrix[0][1] = pYmMegaBirthShpTail2->m_spawnRange - 0.5f * (rand3 * (rand2 * rand1));
-            particleData->m_matrix[0][1] -= speedRandHalf;
+            particleData->m_position.y = pYmMegaBirthShpTail2->m_spawnRange - 0.5f * (rand3 * (rand2 * rand1));
+            particleData->m_position.y -= speedRandHalf;
             rand1 = Math.RandF();
             rand2 = Math.RandF();
             rand3 = Math.RandF();
             rand2 = pYmMegaBirthShpTail2->m_spawnRange * rand2;
-            particleData->m_matrix[0][2] = pYmMegaBirthShpTail2->m_spawnRange - 0.5f * (rand3 * (rand2 * rand1));
-            particleData->m_matrix[0][2] -= speedRandHalf;
+            particleData->m_position.z = pYmMegaBirthShpTail2->m_spawnRange - 0.5f * (rand3 * (rand2 * rand1));
+            particleData->m_position.z -= speedRandHalf;
             break;
         }
         }
 
-        particleData->m_matrix[0][0] *= pYmMegaBirthShpTail2->m_spawnScale.x;
-        particleData->m_matrix[0][1] *= pYmMegaBirthShpTail2->m_spawnScale.y;
-        particleData->m_matrix[0][2] *= pYmMegaBirthShpTail2->m_spawnScale.z;
+        particleData->m_position.x *= pYmMegaBirthShpTail2->m_spawnScale.x;
+        particleData->m_position.y *= pYmMegaBirthShpTail2->m_spawnScale.y;
+        particleData->m_position.z *= pYmMegaBirthShpTail2->m_spawnScale.z;
         break;
     }
 
@@ -452,13 +478,13 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShp
                 }
                 path_store:
 
-                particleData->m_matrix[0][0] = vx * pYmMegaBirthShpTail2->m_spawnScale.x;
-                particleData->m_matrix[0][1] = vy * pYmMegaBirthShpTail2->m_spawnScale.y;
-                particleData->m_matrix[0][2] = vz * pYmMegaBirthShpTail2->m_spawnScale.z;
+                particleData->m_position.x = vx * pYmMegaBirthShpTail2->m_spawnScale.x;
+                particleData->m_position.y = vy * pYmMegaBirthShpTail2->m_spawnScale.y;
+                particleData->m_position.z = vz * pYmMegaBirthShpTail2->m_spawnScale.z;
 
                 if ((pYmMegaBirthShpTail2->m_spawnMode == 8) || (pYmMegaBirthShpTail2->m_spawnMode == 9)) {
-                    Vec velocity = *reinterpret_cast<Vec*>(particleData->m_matrix[0]);
-                    pppNormalize(*reinterpret_cast<Vec*>(particleData->m_matrix[1]), velocity);
+                    Vec velocity = particleData->m_position;
+                    pppNormalize(particleData->m_direction, velocity);
                 }
             }
         }
@@ -469,28 +495,28 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShp
 
 
     if (pYmMegaBirthShpTail2->m_fadeInFrames != 0) {
-        *(float*)(particleBytes + 0x30) = (float)vColor->m_color.rgba[3];
-        particleBytes[0x35] = pYmMegaBirthShpTail2->m_fadeInFrames;
+        particleData->m_alphaFade = (float)vColor->m_color.rgba[3];
+        particleData->m_fadeInFrames = pYmMegaBirthShpTail2->m_fadeInFrames;
     }
     if (pYmMegaBirthShpTail2->m_fadeOutFrames != 0) {
-        particleBytes[0x36] = pYmMegaBirthShpTail2->m_fadeOutFrames;
+        particleData->m_fadeOutFrames = pYmMegaBirthShpTail2->m_fadeOutFrames;
     }
 
-    particleData->m_matrix[2][2] = pYmMegaBirthShpTail2->m_speed;
-    particleData->m_matrix[2][3] = pYmMegaBirthShpTail2->m_tailSpeed;
+    particleData->m_speed = pYmMegaBirthShpTail2->m_speed;
+    particleData->m_tailSpeed = pYmMegaBirthShpTail2->m_tailSpeed;
     if (pYmMegaBirthShpTail2->m_speedRandom != 0.0f) {
         float rand1 = Math.RandF();
-        particleData->m_matrix[2][2] +=
+        particleData->m_speed +=
             (2.0f * pYmMegaBirthShpTail2->m_speedRandom) * rand1 -
             pYmMegaBirthShpTail2->m_speedRandom;
     }
 
     if (pYmMegaBirthShpTail2->m_life == 0) {
-        *(u16*)((u8*)particleData + 0x22) = 0xFFFF;
+        particleData->m_life = 0xFFFF;
     } else {
-        *(s16*)((u8*)particleData + 0x22) = pYmMegaBirthShpTail2->m_life;
+        particleData->m_life = pYmMegaBirthShpTail2->m_life;
     }
-    particleBytes[0x34] = 0;
+    particleData->m_age = 0;
 
     switch (pYmMegaBirthShpTail2->m_matrixMode) {
     case 0:
@@ -501,24 +527,24 @@ static void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShp
         break;
     }
 
-    *(u16*)(particleBytes + 0x3a) = 0;
-    *(u16*)(particleBytes + 0x3c) = 0;
-    *(u16*)(particleBytes + 0x3e) = 0;
-    particleBytes[0x38] = 0;
-    particleBytes[0x37] = 0x1f;
+    particleData->m_unk3A[0] = 0;
+    particleData->m_unk3A[1] = 0;
+    particleData->m_unk3A[2] = 0;
+    particleData->m_historyIndex = 0;
+    particleData->m_historyCount = 0x1f;
 
     pppFVECTOR4 zeroVec;
     zeroVec.z = 0.0f;
     zeroVec.y = 0.0f;
     zeroVec.x = 0.0f;
-    Vec* history = (Vec*)(particleBytes + 0x40);
+    Vec* history = particleData->m_history;
     for (int i = 0x1e; i >= 0; i--) {
         pppCopyVector(*history, *(Vec*)&zeroVec);
         history++;
     }
 
-    particleBytes[0x38] = particleBytes[0x37];
-    particleBytes[0x38] = particleBytes[0x38] - 1;
+    particleData->m_historyIndex = particleData->m_historyCount;
+    particleData->m_historyIndex = particleData->m_historyIndex - 1;
 }
 
 /*
@@ -535,97 +561,92 @@ static void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpT
           VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
     s32 alpha = vColor->m_color.rgba[3];
-    u8* color = (u8*)particleData;
-    float* blend = (float*)(color + 0x30);
-    float* velocityScale = (float*)(color + 0x28);
-    float* tailScale = (float*)(color + 0x2c);
-    u8* frameState = color + 0x30;
     u8 frameWindow;
-    u8 fadeInFrames;
+    u8 fadeOutFrames;
     u8 historyIndex;
     u16 frameIndex;
     pppShapeAnimData* shapeAnim;
     pppShapeAnimFrame* frameEntry;
     Vec scaled;
 
-    *velocityScale = *velocityScale + pYmMegaBirthShpTail2->m_speedStep;
-    *tailScale = *tailScale + pYmMegaBirthShpTail2->m_tailSpeedStep;
+    particleData->m_speed = particleData->m_speed + pYmMegaBirthShpTail2->m_speedStep;
+    particleData->m_tailSpeed = particleData->m_tailSpeed + pYmMegaBirthShpTail2->m_tailSpeedStep;
 
-    pppScaleVectorXYZ(scaled, *reinterpret_cast<Vec*>(color + 0x10), *velocityScale);
-    pppAddVector(*(Vec*)(color + 0x0), *(Vec*)(color + 0x0), scaled);
+    pppScaleVectorXYZ(scaled, particleData->m_direction, particleData->m_speed);
+    pppAddVector(particleData->m_position, particleData->m_position, scaled);
 
-    pppScaleVectorXYZ(scaled, vYmMegaBirthShpTail2->m_tailScaleDirection, *tailScale);
-    pppAddVector(*(Vec*)(color + 0x0), *(Vec*)(color + 0x0), scaled);
+    pppScaleVectorXYZ(scaled, vYmMegaBirthShpTail2->m_tailScaleDirection, particleData->m_tailSpeed);
+    pppAddVector(particleData->m_position, particleData->m_position, scaled);
 
     if (pYmMegaBirthShpTail2->m_life != 0) {
-        *(u16*)(color + 0x22) = *(u16*)(color + 0x22) - 1;
+        particleData->m_life = particleData->m_life - 1;
     }
 
-    frameState[4] = frameState[4] + 1;
-    frameWindow = frameState[5];
-    if ((frameWindow != 0) && (frameState[4] <= frameWindow)) {
-        *blend = *blend - ((float)alpha / (float)frameWindow);
-        if (*blend < 0.0f) {
-            *blend = 0.0f;
+    particleData->m_age = particleData->m_age + 1;
+    frameWindow = particleData->m_fadeInFrames;
+    if ((frameWindow != 0) && (particleData->m_age <= frameWindow)) {
+        particleData->m_alphaFade = particleData->m_alphaFade - ((float)alpha / (float)frameWindow);
+        if (particleData->m_alphaFade < 0.0f) {
+            particleData->m_alphaFade = 0.0f;
         }
     }
 
-    if ((frameState[6] != 0) && (*(u16*)(color + 0x22) <= frameState[6])) {
-        fadeInFrames = pYmMegaBirthShpTail2->m_fadeOutFrames;
-        *blend = *blend + ((float)alpha / (float)fadeInFrames);
-        if (*blend > 127.0f) {
-            *blend = 127.0f;
+    if ((particleData->m_fadeOutFrames != 0) && (particleData->m_life <= particleData->m_fadeOutFrames)) {
+        fadeOutFrames = pYmMegaBirthShpTail2->m_fadeOutFrames;
+        particleData->m_alphaFade = particleData->m_alphaFade + ((float)alpha / (float)fadeOutFrames);
+        if (particleData->m_alphaFade > 127.0f) {
+            particleData->m_alphaFade = 127.0f;
         }
     }
 
-    if (frameState[8] == 0) {
-        frameState[8] = frameState[7];
+    if (particleData->m_historyIndex == 0) {
+        particleData->m_historyIndex = particleData->m_historyCount;
     }
-    frameState[8] = frameState[8] - 1;
-    historyIndex = frameState[8];
+    particleData->m_historyIndex = particleData->m_historyIndex - 1;
+    historyIndex = particleData->m_historyIndex;
 
-    PSMTXMultVec(pppPObject->m_localMatrix.value, (Vec*)(color + 0x0),
-                 (Vec*)(color + historyIndex * sizeof(Vec) + 0x40));
+    PSMTXMultVec(pppPObject->m_localMatrix.value, &particleData->m_position,
+                 &particleData->m_history[historyIndex]);
 
-    frameIndex = *(u16*)(color + 0x1e);
+    frameIndex = particleData->m_shapeFrame;
     shapeAnim =
         static_cast<pppShapeAnimData*>(
         ppvEnv->m_shapeTablePtr[pYmMegaBirthShpTail2->m_shapeIndex]
             ->m_animData);
-    *(u16*)(color + 0x20) = frameIndex;
+    particleData->m_drawFrame = frameIndex;
 
     frameEntry = &shapeAnim->m_frames[frameIndex];
-    *(u16*)(color + 0x1c) =
-        *(u16*)(color + 0x1c) + pYmMegaBirthShpTail2->m_frameStep;
-    int elapsedFrame = *(u16*)(color + 0x1c);
+    particleData->m_frameTimer =
+        particleData->m_frameTimer + pYmMegaBirthShpTail2->m_frameStep;
+    int elapsedFrame = particleData->m_frameTimer;
     int frameDuration = frameEntry->m_duration;
     if ((int)elapsedFrame < frameDuration) {
         return;
     }
 
-    *(u16*)(color + 0x1c) = (u16)(elapsedFrame - frameDuration);
-    *(u16*)(color + 0x1e) = *(u16*)(color + 0x1e) + 1;
-    if ((int)*(u16*)(color + 0x1e) >= shapeAnim->m_frameCount) {
+    particleData->m_frameTimer = (u16)(elapsedFrame - frameDuration);
+    particleData->m_shapeFrame = particleData->m_shapeFrame + 1;
+    if ((int)particleData->m_shapeFrame >= shapeAnim->m_frameCount) {
         if ((frameEntry->m_flags & 0x80) != 0) {
-            *(u16*)(color + 0x1e) = 0;
-            *(u16*)(color + 0x1c) = 0;
+            particleData->m_shapeFrame = 0;
+            particleData->m_frameTimer = 0;
         } else {
-            *(u16*)(color + 0x1c) = 0;
-            *(u16*)(color + 0x1e) = *(u16*)(color + 0x1e) - 1;
+            particleData->m_frameTimer = 0;
+            particleData->m_shapeFrame = particleData->m_shapeFrame - 1;
         }
     }
 }
 
 static inline void calc_particle(_pppPObject* pObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpTail2* param, VColor* colorWork)
 {
-    u8* particleData;
+    _PARTICLE_DATA* particleData;
     _PARTICLE_WMAT* worldMat;
     _PARTICLE_COLOR* particleColor;
     int spawnCount;
     u32 i;
 
     spawnCount = 0;
-    particleData = (u8*)work->m_particles;
+    particleData = work->m_particles;
     worldMat = work->m_wmats;
     particleColor = work->m_colors;
 
@@ -633,12 +654,12 @@ static inline void calc_particle(_pppPObject* pObject, VYmMegaBirthShpTail2* wor
         work->m_emitTimer = work->m_emitTimer + 1;
 
         for (i = 0; i < work->m_maxParticles; i++) {
-            if (*(u16*)(particleData + 0x22) != 0) {
-                calc(pObject, work, param, (_PARTICLE_DATA*)particleData, colorWork, particleColor);
+            if (particleData->m_life != 0) {
+                calc(pObject, work, param, particleData, colorWork, particleColor);
             } else {
                 if ((param->m_emitInterval <= work->m_emitTimer) &&
                     (spawnCount < param->m_emitCount)) {
-                    birth(pObject, work, param, colorWork, (_PARTICLE_DATA*)particleData, worldMat,
+                    birth(pObject, work, param, colorWork, particleData, worldMat,
                         particleColor);
                     spawnCount = spawnCount + 1;
                 }
@@ -650,7 +671,7 @@ static inline void calc_particle(_pppPObject* pObject, VYmMegaBirthShpTail2* wor
             if (particleColor != 0) {
                 particleColor = particleColor + 1;
             }
-            particleData = particleData + 0x1b8;
+            particleData++;
         }
 
         if (spawnCount > 0) {
@@ -681,9 +702,9 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
     if (work->m_particles == 0) {
         work->m_maxParticles = param->m_maxParticles;
         work->m_particles = (_PARTICLE_DATA*)pppMemAlloc(
-            work->m_maxParticles * 0x1b8, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMegaBirthShpTail2_cpp), 0x30e);
+            work->m_maxParticles * sizeof(_PARTICLE_DATA), ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMegaBirthShpTail2_cpp), 0x30e);
         if (work->m_particles != 0) {
-            memset(work->m_particles, 0, work->m_maxParticles * 0x1b8);
+            memset(work->m_particles, 0, work->m_maxParticles * sizeof(_PARTICLE_DATA));
         }
 
         work->m_wmats = (_PARTICLE_WMAT*)pppMemAlloc(
@@ -768,7 +789,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthSh
 {
     VYmMegaBirthShpTail2* work;
     VColor* colorWork;
-    u8* particle;
+    _PARTICLE_DATA* particle;
     _PARTICLE_WMAT* wmats;
     _PARTICLE_COLOR* colors;
     tagOAN3_SHAPE* shape;
@@ -827,7 +848,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthSh
     particlesBase = work->m_particles;
     wmatsBase = work->m_wmats;
     colorsBase = work->m_colors;
-    particle = (u8*)particlesBase;
+    particle = particlesBase;
     wmats = wmatsBase;
     colors = colorsBase;
 
@@ -849,7 +870,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthSh
     pppSetBlendMode(step->m_blendMode);
 
     for (i = 0; i < work->m_maxParticles; i++) {
-        if (*(u16*)(particle + 0x22) != 0) {
+        if (particle->m_life != 0) {
             segCursor = 0.0f;
             count = step->m_drawCount;
             countMinusOne = (float)(count - 1);
@@ -862,10 +883,10 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthSh
             diffR = colorStart.x - colorEnd.x;
             diffG = colorStart.y - colorEnd.y;
             diffB = colorStart.z - colorEnd.z;
-            lastIndex = *(u8*)(particle + 0x37) - 1;
-            nextIndex = *(u8*)(particle + 0x38);
+            lastIndex = particle->m_historyCount - 1;
+            nextIndex = particle->m_historyIndex;
             shape = reinterpret_cast<tagOAN3_SHAPE*>(reinterpret_cast<u8*>(shapeAnim) +
-                                                     shapeAnim->m_frames[*(u16*)(particle + 0x20)].m_shapeOffset);
+                                                     shapeAnim->m_frames[particle->m_drawFrame].m_shapeOffset);
             if (countMinusOne != segCursor) {
                 colorStepR = diffR / countMinusOne;
                 colorStepG = diffG / countMinusOne;
@@ -882,8 +903,8 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthSh
             drawScale = step->m_drawScaleStart;
             scaleStep = (drawScale - step->m_drawScaleEnd) / countMinusOne;
 
-            history = (Vec*)(particle + 0x40);
-            startIndex = *(u8*)(particle + 0x38);
+            history = particle->m_history;
+            startIndex = particle->m_historyIndex;
             curX = history[nextIndex].x;
             curY = history[nextIndex].y;
             curZ = history[nextIndex].z;
@@ -913,9 +934,9 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthSh
             }
 
             for (count = step->m_drawCount; count > 0; count--) {
-                if ((0.0f != ((Vec*)(particle + 0x40))[nextIndex].x) ||
-                    (0.0f != ((Vec*)(particle + 0x40))[nextIndex].y) ||
-                    (0.0f != ((Vec*)(particle + 0x40))[nextIndex].z)) {
+                if ((0.0f != particle->m_history[nextIndex].x) ||
+                    (0.0f != particle->m_history[nextIndex].y) ||
+                    (0.0f != particle->m_history[nextIndex].z)) {
                     pppUnitMatrix(drawMtx);
                     drawMtx.value[0][0] = drawScale * ppvMng->m_scale.x;
                     drawMtx.value[1][1] = drawScale * ppvMng->m_scale.y;
@@ -942,7 +963,7 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthSh
                     amb.r = (u8)colorStart.x;
                     amb.g = (u8)colorStart.y;
                     amb.b = (u8)colorStart.z;
-                    amb.a = (u8)(colorStart.w * (0.00787f * (127.0f - *(float*)(particle + 0x30))));
+                    amb.a = (u8)(colorStart.w * (0.00787f * (127.0f - particle->m_alphaFade)));
                     GXSetChanAmbColor(GX_COLOR0A0, amb);
                     pppDrawShp(shape, ppvEnv->m_materialSetPtr, step->m_blendMode);
 
@@ -1002,6 +1023,6 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthSh
         if (colors != 0) {
             colors = colors + 1;
         }
-        particle += 0x1B8;
+        particle++;
     }
 }

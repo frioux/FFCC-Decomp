@@ -181,19 +181,7 @@ struct _PARTICLE_COLOR
     float m_colorFrameDeltas[4]; // 0x10
 };
 
-struct _PARTICLE_DATA
-{
-    Mtx m_matrix;          // 0x0 - 0x30
-    Vec m_velocity;        // 0x30 - 0x3c
-    Vec m_directionTail;   // 0x3c - 0x48
-    float m_colorDeltaAdd[4]; // 0x48 - 0x58
-    float m_sizeStart;     // 0x58 - 0x5c
-    float m_sizeEnd;       // 0x5c - 0x60
-    float m_sizeVal;       // 0x60 - 0x64
-    int m_lifeTime;        // 0x64 - 0x68
-    int m_age;             // 0x68 - 0x6c
-    char m_padding[0x140 - 0x6c]; // Pad to 0x140 bytes total
-};
+struct _PARTICLE_DATA;
 struct _pppPDataVal;
 struct _pppCtrlTable;
 
@@ -558,11 +546,35 @@ public:
     unsigned char m_unk24[4];
     int m_editorCursorX;                // 0x28
     int m_editorCursorY;                // 0x2C
-    unsigned char m_unk30[0x174 - 0x30];
+    unsigned char m_unk30[0x40 - 0x30];
+    Mtx m_editCameraMatrix;             // 0x40
+    float m_editCameraDepthScale;       // 0x70
+    float m_unk74;                      // 0x74
+    unsigned char m_editEnvBlock[0xE0]; // 0x78
+    unsigned char m_editClearColor[4];  // 0x158
+    unsigned char m_editFogEnable;      // 0x15C
+    unsigned char m_editFogColor[3];    // 0x15D
+    float m_editFogNear;                // 0x160
+    float m_editFogFar;                 // 0x164
+    long m_editDeltaTime;               // 0x168
+    int m_unk16C;                       // 0x16C
+    int m_unk170;                       // 0x170
     int m_editDrawMode;                 // 0x174
-    unsigned char m_unk178[0x1C8 - 0x178];
-    unsigned char* m_editNodeNameBuffer;  // 0x1C8
-    unsigned char* m_editReceiveCursor; // 0x1CC
+    short m_editCursorX;                // 0x178
+    short m_editCursorY;                // 0x17A
+    short m_editCursorPacket[2];        // 0x17C
+    unsigned char m_editCmd16Args[8];   // 0x180
+    int m_editStageNo;                  // 0x188
+    int m_editMapNo;                    // 0x18C
+    int m_editCharaKind;                // 0x190
+    unsigned long m_editCharaNo;        // 0x194
+    unsigned long m_editTextureVariant; // 0x198
+    char m_editAnimName[0x20];          // 0x19C
+    unsigned int m_editMapDrawEnabled;  // 0x1BC
+    int m_editModelFlag;                // 0x1C0
+    unsigned int m_editFpId;            // 0x1C4
+    _pppFieldParticleData* m_editFieldParticles; // 0x1C8
+    _pppFieldParticleData* m_editFieldParticleCursor; // 0x1CC
     unsigned char m_unk1D0[4];
     void* m_editDataBuffers[0x80];       // 0x1D4
     unsigned char m_unk3D4[4];
@@ -577,8 +589,9 @@ public:
     pppModelSt** m_editModelSlots;       // 0x7F4
     pppShapeSt** m_editShapeSlots;       // 0x7F8
     pppShapeGroupRaw* m_editShapeGroups; // 0x7FC
-    unsigned char m_unk800[8];
-    unsigned char m_editorFlags[3];     // 0x808
+    int m_unk800;                       // 0x800
+    int m_unk804;                       // 0x804
+    char m_editorFlags[3];              // 0x808
     unsigned char m_unk80B;
     CGObject* m_editorObject;           // 0x80C
     unsigned char m_unk810[0x2A18 - 0x810];

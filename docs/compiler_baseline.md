@@ -1,7 +1,7 @@
 # Regional game compiler baseline
 
-The Game library uses GC/2.5 for PAL and USA, and GC/2.0p1i for Japan.
-GC/2.0p1i is derived during the build from the bundled GC/2.0p1 (see below).
+The Game library uses GC/2.5 for PAL and USA, and GC/2.0p1j for Japan.
+GC/2.0p1j is derived during the build from the bundled GC/2.0p1 (see below).
 SDK and middleware selections are independent. These are compatibility
 baselines, not identification of the original retail compiler binaries.
 
@@ -143,3 +143,28 @@ unaffected. On a frozen BFBB checkout the three parts together are +4 / -0
 (game +3, RenderWare +1) with no partial losses. The accompanying source fix
 declares `gPppDefaultValueBuffer[0x40]` with its real size; the incomplete
 array type had made 2.0p1a's clause S treat its halves as aliasing.
+
+## GC/2.0p1j: dsl limited to small-data stores (dsls)
+
+`tools/patch_compiler_ffcc3.py` derives GC/2.0p1j from GC/2.0p1i
+(`58c5e3ccd07f5ce533695ecedd1a2a7f1eca1d13` to
+`c900a720e9981e7e470b0a0c5558b81ac6f1bb43`) with two edits: a 52-byte wrapper
+in free `.sbpatch` space and the redirected call to it.
+
+`dsl` recovers the retail `__sinit_*` order for the small-data Pcs singletons
+(`SystemPcs`, `McPcs` and `GbaPcs` are in `.sbss`, stored through `@sda21`),
+but it also fired for the large `.bss` object `MapPcs`, whose vtables are stored
+through a base register. Retail `__sinit_p_map_cpp` does not order those stores
+before the PTMF constant loads, and stock GC/2.0p1, GC/2.0p1g and GC/2.5 all
+produce the retail shape; only the `dsl` step broke it (97.73 to 85.34 in
+isolation).
+
+- `dsls`: `dsl` answers may-alias only when the stored static's type size
+  (Object `+0xE`, Type `+0x2`) is at most 8 bytes, the `-sdata` threshold.
+
+Rebuilding every Japanese unit against GC/2.0p1i: one function changes,
+`__sinit_p_map_cpp` 89.08 to 100.00 (+976 exact bytes, +1 exact function); no
+other function or section moves, and `p_system`, `p_mc` and `p_gba` keep their
+`dsl` scores. Checking only the store's object size distinguishes the cases
+without a BFBB probe; the type-size offset was confirmed by that measurement
+(offsets 4 and 8 lose the `dsl` gains). PAL and USA are unaffected.

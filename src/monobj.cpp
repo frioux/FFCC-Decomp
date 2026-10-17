@@ -71,7 +71,7 @@ static inline unsigned char* CGMonObj_GetAiData(CGMonObj* monObj)
 	if (monObj->m_aiState == 0) {
 		return reinterpret_cast<unsigned char*>(monObj->m_scriptHandle->m_romWork);
 	}
-	return reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+	return reinterpret_cast<unsigned char*>(Game.m_enemyRomTable) +
 		(monObj->m_aiState + monObj->m_scriptHandle->m_romWork[0x80]) * 0x1D0 + 0x10;
 }
 
@@ -200,7 +200,7 @@ void CGMonObj::onFramePreCalc()
 		if (aiState == 0) {
 			aiData = reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork);
 		} else {
-			aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+			aiData = reinterpret_cast<unsigned char*>(Game.m_enemyRomTable) +
 				(aiState + *reinterpret_cast<unsigned short*>(
 					reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork) + 0x100)) * 0x1D0 + 0x10;
 		}
@@ -365,7 +365,7 @@ void CGMonObj::rotTarget(int targetPartyIndex, float rotLimit)
  */
 void CGMonObj::onStatAttack(int state)
 {
-	SCharaItemRow* attackData = &reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2])[m_itemId];
+	SCharaItemRow* attackData = &reinterpret_cast<SCharaItemRow*>(Game.m_itemTable)[m_itemId];
 	int attackType = attackData->m_actionType;
 	unsigned short attackFlags = attackData->m_flags32;
 
@@ -397,7 +397,7 @@ void CGMonObj::onStatAttack(int state)
 			if (m_subFrame == 0) {
 				reqAnim(m_unk554, 1, 0);
 			}
-			SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+			SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 			if (m_subFrame == rows[m_itemId].m_power) {
 				addSubStat();
 			}
@@ -431,7 +431,7 @@ void CGMonObj::onStatAttack(int state)
  */
 void CGMonObj::setAttackAfter(int attackKind)
 {
-	SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+	SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 	int delay = rows[attackKind].m_status;
 	if (delay == 0xFFFF) {
 		delay = 0;
@@ -587,17 +587,17 @@ void CGMonObj::setActionParam(int state)
 	m_unk558 = m_unk554 + 1;
 	m_unk55C = m_unk558 + 1;
 
-	const SCharaItemRow* items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
+	const SCharaItemRow* items = reinterpret_cast<const SCharaItemRow*>(Game.m_itemTable);
 	int actionType = items[m_itemId].m_actionType;
 	switch (actionType) {
 	case 0:
 	case 1:
 	case 3:
-		items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
+		items = reinterpret_cast<const SCharaItemRow*>(Game.m_itemTable);
 		m_castFrameStart = items[m_itemId].m_attackStartFrame;
-		items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
+		items = reinterpret_cast<const SCharaItemRow*>(Game.m_itemTable);
 		m_castFrameEnd = items[m_itemId].m_attackEndFrame;
-		items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
+		items = reinterpret_cast<const SCharaItemRow*>(Game.m_itemTable);
 		m_castFrameCurrent = items[m_itemId].m_attackEndFrame;
 		break;
 	case 2:
@@ -789,7 +789,7 @@ void CGMonObj::onFrameStat()
 					if (m_aiState == 0) {
 						aiData2 = reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork);
 					} else {
-						aiData2 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+						aiData2 = reinterpret_cast<unsigned char*>(Game.m_enemyRomTable) +
 							(m_aiState + m_scriptHandle->m_romWork[0x80]) * 0x1D0 + 0x10;
 					}
 					if ((*reinterpret_cast<unsigned short*>(aiData2 + 0x102) & 0x10) != 0) {
@@ -1088,7 +1088,7 @@ void CGMonObj::onStatMagic()
 				CGPartyObj* target = Game.m_partyObjArr[targetPartyIndex];
 				m_comboCenter = reinterpret_cast<CGObject*>(target)->m_worldPosition;
 
-				SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+				SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 				if ((rows[m_itemId].m_flags32 & 2) == 0) {
 					rotTarget(m_targetPartyIndex, 0.017453292f * static_cast<float>(m_scriptHandle->m_romWork[0xCE]));
 				}
@@ -1180,7 +1180,7 @@ void CGMonObj::enableAttackCol(int enabled, int, int)
 {
 	if (enabled != 0) {
 		int attackKind = m_itemId;
-		const SCharaItemRow* attackData = &reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[attackKind];
+		const SCharaItemRow* attackData = &reinterpret_cast<const SCharaItemRow*>(Game.m_itemTable)[attackKind];
 		int colMask = attackData->m_particleFlags;
 		int colValue = (attackKind >= 0x1F5) ? attackData->m_kind : 1;
 
@@ -1247,7 +1247,7 @@ int CGMonObj::getReplaceStat(int state)
 			CMonWork* work = SAFE_CAST_MON_WORK(m_scriptHandle);
 			int index = state + 0xE;
 			int action = work->m_actionItems[index];
-			const SCharaItemRow* items = reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2]);
+			const SCharaItemRow* items = reinterpret_cast<const SCharaItemRow*>(Game.m_itemTable);
 			switch (items[action].m_actionType) {
 			case 0:
 			case 1:
@@ -1284,7 +1284,7 @@ int CGMonObj::getReplaceStat(int state)
 void CGMonObj::onStatShield()
 {
 	if (m_subState == 1) {
-		SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.unkCFlatData0[2]);
+		SCharaItemRow* rows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 		if (m_subFrame == rows[m_itemId].m_power) {
 			changeSubStat(3);
 		}
@@ -1476,7 +1476,7 @@ void CGMonObj::onDamaged(CGPrgObj* prgObj)
 		if (m_aiState == 0) {
 			aiData = reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork);
 		} else {
-			aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+			aiData = reinterpret_cast<unsigned char*>(Game.m_enemyRomTable) +
 				(m_aiState +
 					m_scriptHandle->m_romWork[0x80]) * 0x1D0 + 0x10;
 		}
@@ -1846,7 +1846,7 @@ void CGMonObj::mlEscape()
 	if (aiState == 0) {
 		aiData = (reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork));
 	} else {
-		aiData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+		aiData = reinterpret_cast<unsigned char*>(Game.m_enemyRomTable) +
 		         (aiState + m_scriptHandle->m_romWork[0x80]) *
 		             0x1D0 +
 		         0x10;
@@ -1977,7 +1977,7 @@ body:
 					if (aiState == 0) {
 						aiScript = scriptB;
 					} else {
-						aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+						aiScript = reinterpret_cast<unsigned char*>(Game.m_enemyRomTable) +
 							(static_cast<int>(aiState) + *reinterpret_cast<unsigned short*>(scriptB + 0x100)) * 0x1D0 + 0x10;
 					}
 					unsigned short aiFlags = *reinterpret_cast<unsigned short*>(aiScript + 0x102);
@@ -1997,7 +1997,7 @@ body:
 						if (aiState2 == 0) {
 							aiScript = (reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork));
 						} else {
-							aiScript = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+							aiScript = reinterpret_cast<unsigned char*>(Game.m_enemyRomTable) +
 								(static_cast<int>(aiState2) + m_scriptHandle->m_romWork[0x80]) * 0x1D0 + 0x10;
 						}
 						if ((*reinterpret_cast<unsigned short*>(aiScript + 0x102) & 0x40) != 0) {
@@ -2043,7 +2043,7 @@ body:
 					if (aiState == 0) {
 						aiScript3 = reinterpret_cast<unsigned char*>(SAFE_CAST_MON_WORK(handleB)->m_romWork);
 					} else {
-						aiScript3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+						aiScript3 = reinterpret_cast<unsigned char*>(Game.m_enemyRomTable) +
 							(aiState + SAFE_CAST_MON_WORK(handleB)->m_romWork[0x80]) * 0x1D0 + 0x10;
 					}
 					float actionRange = static_cast<float>(reinterpret_cast<CMonAiAction*>(aiScript3 + 0x110)[nextAction].m_range);
@@ -2051,7 +2051,7 @@ body:
 					if (aiState == 0) {
 						aiScript4 = reinterpret_cast<unsigned char*>(SAFE_CAST_MON_WORK(handleB)->m_romWork);
 					} else {
-						aiScript4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+						aiScript4 = reinterpret_cast<unsigned char*>(Game.m_enemyRomTable) +
 							(aiState + SAFE_CAST_MON_WORK(handleB)->m_romWork[0x80]) * 0x1D0 + 0x10;
 					}
 					int actionParam = static_cast<short>(reinterpret_cast<CMonAiAction*>(aiScript4 + 0x110)[nextAction].m_changeStat);
@@ -2320,9 +2320,9 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 #define baseScript (reinterpret_cast<unsigned char*>(m_scriptHandle->m_romWork))
 #define aiScript (m_aiState == 0 \
 		? baseScript \
-		: reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + \
+		: reinterpret_cast<unsigned char*>(Game.m_enemyRomTable) + \
 			(m_aiState + m_scriptHandle->m_romWork[0x80]) * 0x1D0 + 0x10)
-#define aiScriptW (m_aiState == 0 		? reinterpret_cast<unsigned char*>(SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork) 		: reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) + 			(m_aiState + SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork[0x80]) * 0x1D0 + 0x10)
+#define aiScriptW (m_aiState == 0 		? reinterpret_cast<unsigned char*>(SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork) 		: reinterpret_cast<unsigned char*>(Game.m_enemyRomTable) + 			(m_aiState + SAFE_CAST_MON_WORK(m_scriptHandle)->m_romWork[0x80]) * 0x1D0 + 0x10)
 	int selectedAction = -1;
 	if (m_funcs->attackCheck != 0) {
 		int result = (this->*m_funcs->attackCheck)(partyIndex);
@@ -2642,7 +2642,7 @@ void CGMonObj::mlAttack()
 					if (aiState == 0) {
 						aiData3 = reinterpret_cast<unsigned char*>(SAFE_CAST_MON_WORK(handle)->m_romWork);
 					} else {
-						aiData3 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+						aiData3 = reinterpret_cast<unsigned char*>(Game.m_enemyRomTable) +
 							(aiState + SAFE_CAST_MON_WORK(handle)->m_romWork[0x80]) * 0x1D0 + 0x10;
 					}
 					float range = static_cast<float>(reinterpret_cast<CMonAiAction*>(aiData3 + 0x110)[attackResult].m_range);
@@ -2650,7 +2650,7 @@ void CGMonObj::mlAttack()
 					if (aiState == 0) {
 						aiData4 = reinterpret_cast<unsigned char*>(SAFE_CAST_MON_WORK(handle)->m_romWork);
 					} else {
-						aiData4 = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[1]) +
+						aiData4 = reinterpret_cast<unsigned char*>(Game.m_enemyRomTable) +
 							(aiState + SAFE_CAST_MON_WORK(handle)->m_romWork[0x80]) * 0x1D0 + 0x10;
 					}
 					int changeStat = static_cast<short>(reinterpret_cast<CMonAiAction*>(aiData4 + 0x110)[attackResult].m_changeStat);
@@ -3056,7 +3056,7 @@ void CGMonObj::initFinishedFuncDefault()
 	for (int forcedAction = 0; forcedAction < 8; forcedAction++) {
 		int attackId = SAFE_CAST_MON_WORK(m_scriptHandle)->m_actionItems[forcedAction];
 		if ((attackId != 0xFFFF) &&
-			(static_cast<int>(reinterpret_cast<const SCharaItemRow*>(Game.unkCFlatData0[2])[attackId].m_actionType) == 4)) {
+			(static_cast<int>(reinterpret_cast<const SCharaItemRow*>(Game.m_itemTable)[attackId].m_actionType) == 4)) {
 			m_forcedAction = forcedAction;
 			break;
 		}

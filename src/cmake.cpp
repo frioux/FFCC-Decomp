@@ -622,7 +622,7 @@ void CMenuPcs::CalcSingCMake()
                                 static_cast<int>(caravanWork->m_tribeId) * 2;
                             caravanWork->Init(
                                 baseDataIndex,
-                                reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + baseDataIndex * 0x1D0),
+                                &Game.m_charaRomTable[baseDataIndex],
                                 static_cast<int>(caravanWork->m_appearanceVariant));
                             caravanWork->LoadFinished();
                             CallWorldParam(0, slot, 0);
@@ -3381,7 +3381,7 @@ inline void CMenuPcs::SetSingMakeChara()
         static_cast<int>(caravanWork->m_tribeId) * 2;
     caravanWork->Init(
         baseDataIndex,
-        reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + baseDataIndex * 0x1D0),
+        &Game.m_charaRomTable[baseDataIndex],
         static_cast<int>(caravanWork->m_appearanceVariant));
     caravanWork->LoadFinished();
     CallWorldParam(0, slot, 0);

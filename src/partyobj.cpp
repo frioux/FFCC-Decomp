@@ -140,7 +140,7 @@ inline void CGPartyObj::changeWeapon(int weaponIndex, int itemId, int immediate)
 		if (itemId <= 0) {
 			LoadWeapon(-1, 0);
 		} else {
-			SItemFlatRow* rows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+			SItemFlatRow* rows = reinterpret_cast<SItemFlatRow*>(Game.m_itemTable);
 			unsigned short model = rows[itemId].m_model;
 			LoadWeapon(model & 0xFFF, model >> 12);
 		}
@@ -176,11 +176,11 @@ static bool isMenuPcsCommandBusy()
 
 static unsigned short getItemKindFromCfd(int itemId)
 {
-	if (itemId <= 0 || Game.unkCFlatData0[2] == 0) {
+	if (itemId <= 0 || Game.m_itemTable == 0) {
 		return 0;
 	}
 
-	return *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
+	return *reinterpret_cast<unsigned short*>(Game.m_itemTable + itemId * 0x48);
 }
 
 static bool isBossArtifactStage()
@@ -215,24 +215,24 @@ static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
 	if (carryType == 0) {
 		if (CFlatItemCarryMode() == 1) {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			anim = rows[work->m_genderFlag +
 			            work->m_tribeId * 2].m_carryAnim2;
 		} else {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			anim = rows[work->m_genderFlag +
 			            work->m_tribeId * 2].m_carryAnim0;
 		}
 	} else {
 		if (CFlatItemCarryMode() == 1) {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			anim = rows[work->m_genderFlag +
 			            work->m_tribeId * 2].m_carryAnim3;
 		} else {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			anim = rows[work->m_genderFlag +
 			            work->m_tribeId * 2].m_carryAnim1;
 		}
@@ -379,21 +379,21 @@ void CGPartyObj::onChangeStat(int state)
 		int attackSel = party.attackSel;
 		m_attackAnimId = (attackSel == 0) ? 5 : ((attackSel == 1) ? 7 : 8);
 		{
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			m_castFrameStart =
 			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
 			         reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
 			        .m_attacks[attackSel].m_attackStartFrame;
 		}
 		{
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			m_castFrameEnd =
 			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
 			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
 			        .m_attacks[attackSel].m_attackEndFrame;
 		}
 		{
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			m_castFrameCurrent =
 			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
 			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
@@ -422,13 +422,13 @@ void CGPartyObj::onChangeStat(int state)
 	case 6:
 		System.Printf("\x83`\x83\x83\x81[\x83W\x83" "A\x83" "C\x83" "e\x83\x80\x94\xD4\x8D\x86\x95\xCF\x8A\xB7%d->", m_itemId);
 		{
-			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 			m_itemId = rows[m_itemId].m_fieldA;
 		}
 		System.Printf("%d\n", m_itemId);
 		m_attackAnimId = 0x12;
 		m_unk554 = 0x13;
-		SCfdItemRow* kindRows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+		SCfdItemRow* kindRows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 		unsigned short itemKind = kindRows[m_itemId].m_fieldA;
 		int itemHigh = itemKind >> 8;
 		int itemLow = itemKind & 0xFF;
@@ -436,14 +436,14 @@ void CGPartyObj::onChangeStat(int state)
 		System.Printf("\x83`\x83\x83\x81[\x83W\x83^\x83" "C\x83v=%d\n", itemLow);
 		m_unk558 = itemHigh + 0x2A;
 		{
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			m_castFrameStart =
 			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
 			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
 			        .m_chargeAttacks[itemLow].m_phases[0].m_attackStartFrame;
 		}
 		{
-			SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+			SPartyAnimRow* rows = Game.m_partyAnimTable;
 			m_castFrameEnd =
 			    rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
 			        reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
@@ -710,10 +710,10 @@ traceJoin:
 		int itemId;
 		do {
 			itemId = Math.Rand(0x155) + 0x9F;
-			unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.unkCFlatData0[2] + itemId * 0x48);
-		} while ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48) == 0) ||
-		         ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 2) & 0x0FFF) == 0) ||
-		         ((*reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48 + 2) & 0x0FFF) == 0xFFFF) ||
+			unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.m_itemTable + itemId * 0x48);
+		} while ((*reinterpret_cast<unsigned short*>(Game.m_itemTable + itemId * 0x48) == 0) ||
+		         ((*reinterpret_cast<unsigned short*>(Game.m_itemTable + itemId * 0x48 + 2) & 0x0FFF) == 0) ||
+		         ((*reinterpret_cast<unsigned short*>(Game.m_itemTable + itemId * 0x48 + 2) & 0x0FFF) == 0xFFFF) ||
 		         (itemId == 400));
 
 		if (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId == 0) {
@@ -773,8 +773,8 @@ void CGPartyObj::onFramePreCalc()
 
 	CGCharaObj::onFramePreCalc();
 
-	if (Game.unk_flat3_0xc7d0 != 0) {
-		const Vec* chalicePos = &reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)->m_worldPosition;
+	if (Game.m_chaliceObject != 0) {
+		const Vec* chalicePos = &Game.m_chaliceObject->m_worldPosition;
 		m_targetDist = PSVECDistance(&m_worldPosition, chalicePos);
 	}
 
@@ -909,7 +909,7 @@ void CGPartyObj::command()
 		} else {
 			CCaravanWork* delCaravan = caravan;
 			const int itemId = delCaravan->GetCmdListItem(delCaravan->GetIdxCmdList());
-			const int itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
+			const int itemKind = *reinterpret_cast<unsigned short*>(Game.m_itemTable + itemId * 0x48);
 			switch (itemKind) {
 			case 1:
 			case 0xDF:
@@ -1144,7 +1144,7 @@ void CGPartyObj::command()
 			}
 
 			const int itemId = caravan->GetCmdListItem(cmdIdx);
-			const unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
+			const unsigned short itemKind = *reinterpret_cast<unsigned short*>(Game.m_itemTable + itemId * 0x48);
 			switch (itemKind) {
 			case 0x100:
 				if (itemId == 0x103) {
@@ -1159,7 +1159,7 @@ void CGPartyObj::command()
 					return;
 				}
 				{
-					SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+					SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 					m_itemId = rows[itemId].m_fieldA;
 				}
 				changeStat(2, 0, 0);
@@ -1191,7 +1191,7 @@ void CGPartyObj::command()
 				}
 				return;
 			case 0xDF: {
-				SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+				SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 				m_itemId = rows[itemId].m_fieldA;
 				changeStat(2, 0, 0);
 				break;
@@ -1227,7 +1227,7 @@ void CGPartyObj::command()
 		reinterpret_cast<CGPrgObj*>(party.target)->changeStat(0x0E, 0, 0);
 
 		int itemIdx = party.target->m_worldParamB;
-		int kind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemIdx * 0x48);
+		int kind = *reinterpret_cast<unsigned short*>(Game.m_itemTable + itemIdx * 0x48);
 		int kindClass;
 		switch (kind) {
 		case 1:
@@ -1346,14 +1346,14 @@ void CGPartyObj::shouki()
 	     CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 != 0) &&
 	    m_weaponNodeFlagAll.m_bits1.m_shield != 0) {
 
-		const Vec* chalicePos = &reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)->m_worldPosition;
+		const Vec* chalicePos = &Game.m_chaliceObject->m_worldPosition;
 		float chaliceDist = PSVECDistance(&m_worldPosition, chalicePos);
 		if (1.1f * Game.unkFloat_0xca10 < chaliceDist ||
 		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 != 0) {
 			if (m_unk688 != 2) {
 				deletePSlotBit(0x200);
 				CFlat.ResetParticleWork(1, m_particleSlots[9]);
-				CFlat.SetParticleWorkTrace(reinterpret_cast<CFlatRuntime::CObject*>(Game.unk_flat3_0xc7d0));
+				CFlat.SetParticleWorkTrace(reinterpret_cast<CFlatRuntime::CObject*>(Game.m_chaliceObject));
 				CFlat.SetParticleWorkBind(this);
 				CFlat.PutParticleWork();
 			}
@@ -1366,7 +1366,7 @@ void CGPartyObj::shouki()
 					playSe3D(0x1E, 0x32, 0x96, 0, 0);
 					CFlat.ResetParticleWork(2, 0);
 					CFlat.SetParticleWorkPos(m_worldPosition, m_rotBaseY);
-					CFlat.SetParticleWorkTrace(reinterpret_cast<CFlatRuntime::CObject*>(Game.unk_flat3_0xc7d0));
+					CFlat.SetParticleWorkTrace(reinterpret_cast<CFlatRuntime::CObject*>(Game.m_chaliceObject));
 					CFlat.SetParticleWorkBind(this);
 					CFlat.PutParticleWork();
 				}
@@ -1379,7 +1379,7 @@ void CGPartyObj::shouki()
 		if (m_unk688 == 0 &&
 		    CFlatRuntime2Storage().m_gameFlagBits.m_flagBit4 == 0) {
 			int healCount = 0;
-			if (m_partyData.carryObject == reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)) {
+			if (m_partyData.carryObject == Game.m_chaliceObject) {
 				if (isFrameInterval(m_updateCounter, *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 4))) {
 					healCount = 1;
 				}
@@ -1452,7 +1452,7 @@ void CGPartyObj::onFrameStat()
 			m_unk63CBits.m_bit80 = 1;
 		}
 		if (((DbgMenuPcs.GetDbgFlag() & 8) != 0) ||
-		    ((Game.unk_flat3_0xc7d0 != 0) &&
+		    ((Game.m_chaliceObject != 0) &&
 		     (Joybus.GetCtrlMode(m_animStateMisc) == 1) &&
 		     (m_unk63CBits.m_bit80 != 0) &&
 		     (m_weaponNodeFlagAll.m_bits1.m_shield != 0) &&
@@ -1464,7 +1464,7 @@ void CGPartyObj::onFrameStat()
 			    (m_scriptHandle->m_statusTimers[3] == 0) &&
 			    (Game.m_gameWork.m_bossArtifactStageIndex != 0x17)) {
 				Vec moveVec;
-				CVector diff = CVector(reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)->m_worldPosition) - CVector(m_worldPosition);
+				CVector diff = CVector(Game.m_chaliceObject->m_worldPosition) - CVector(m_worldPosition);
 				moveVec.x = diff.x;
 				moveVec.y = diff.y;
 				moveVec.z = diff.z;
@@ -1475,7 +1475,7 @@ void CGPartyObj::onFrameStat()
 		    Game.m_gameWork.m_menuStageMode != 0 &&
 		    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId == 0) {
 			CGPartyObj* gbaParty = Game.m_partyObjArr[1];
-			CGObject* chaliceObj = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
+			CGObject* chaliceObj = Game.m_chaliceObject;
 			if (gbaParty != nullptr && gbaParty->m_lastStateId == 0) {
 				unsigned short held = Pad.GetButton(m_animStateMisc);
 				int heldMask = held & 0x400;
@@ -1839,7 +1839,7 @@ void CGPartyObj::statCharge()
 		}
 
 		int phase = (m_comboItemState != -1) ? m_subFrame - 0x10 : m_subFrame;
-		SCfdItemRow* cfdRows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+		SCfdItemRow* cfdRows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 		int itemType = cfdRows[m_itemId].m_fieldA & 0xFF;
 
 		if (phase == 0) {
@@ -1871,13 +1871,13 @@ void CGPartyObj::statCharge()
 			}
 		}
 
-		SCfdItemRow* phaseRows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+		SCfdItemRow* phaseRows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 		if (phase == phaseRows[m_itemId].m_field20) {
 			putParticleFromItem(m_itemId, 3, m_particleSlots[0], static_cast<Vec*>(0));
 		}
 
-		SPartyAnimRow* animRows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
-		SCfdItemRow* rowRows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+		SPartyAnimRow* animRows = Game.m_partyAnimTable;
+		SCfdItemRow* rowRows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 		SChargeRec* table = &animRows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
 		                            reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
 		                        .m_chargeAttacks[rowRows[m_itemId].m_fieldA >> 8];
@@ -1891,7 +1891,7 @@ void CGPartyObj::statCharge()
 					PSVECSubtract(&m_comboCenter, &m_worldPosition, &delta);
 					float mag = PSVECMag(&delta);
 					CVector dest(m_comboCenter);
-					SCfdItemRow* flagRows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+					SCfdItemRow* flagRows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 					if ((flagRows[m_itemId].m_field32 & 0x10) != 0) {
 						unsigned int maxReach = *reinterpret_cast<unsigned short*>(Game.unk_flat3_field_8_0xc7dc + 0x70);
 						if (static_cast<float>(maxReach) < mag) {
@@ -2069,7 +2069,7 @@ void CGPartyObj::onStatAttack(int chargeType)
 	}
 
 	const int chain = party.unk6CC;
-	SPartyAnimRow* rows = reinterpret_cast<SPartyAnimRow*>(Game.unk_flat3_field_30_0xc7e0);
+	SPartyAnimRow* rows = Game.m_partyAnimTable;
 	SAtkRec* attackEntry = &rows[reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_genderFlag +
 	                           reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_tribeId * 2]
 	                       .m_attacks[chain];
@@ -2332,7 +2332,7 @@ void CGPartyObj::checkTargetParticle()
 		if (m_lastStateId == 2) {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 			unsigned int vNode = work->m_romWork[0xCD];
-			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 			unsigned int vItem = rows[m_itemId].m_field30;
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
 			int vFlag;
@@ -2345,7 +2345,7 @@ void CGPartyObj::checkTargetParticle()
 		} else {
 			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(m_scriptHandle);
 			unsigned int vNode = work->m_romWork[0xCE];
-			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 			unsigned int vItem = rows[m_itemId].m_field30;
 			float base = static_cast<float>(vItem) + static_cast<float>(vNode);
 			int vFlag;
@@ -2749,7 +2749,7 @@ void CGPartyObj::statCarry()
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		static float d;
 		static float h;
-		CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
+		CGObject* chalice = Game.m_chaliceObject;
 		if (m_stateFrame == 0) {
 			CancelMove(1);
 			d = m_targetDist - 6.0f;
@@ -2792,7 +2792,7 @@ void CGPartyObj::statPut()
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		static float d;
 		static float h;
-		CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
+		CGObject* chalice = Game.m_chaliceObject;
 		if (m_stateFrame == 0) {
 			CancelMove(1);
 			d = 3.0f;
@@ -2923,7 +2923,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	case 4:
 	case 6:
 		if (kind == 4) {
-			int item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48);
+			int item = *reinterpret_cast<unsigned short*>(Game.m_itemTable + value * 0x48);
 			if ((bonusSlot == 4 && item == 0x100) || (bonusSlot == 6 && item == 400)) {
 				addValue = stageAdd;
 			} else if (bonusSlot == 2) {
@@ -2952,7 +2952,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 	case 3:
 	case 0xE:
 		if (kind == 5) {
-			int item = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + value * 0x48);
+			int item = *reinterpret_cast<unsigned short*>(Game.m_itemTable + value * 0x48);
 			if ((bonusSlot == 0xE && (item == 0x17D || item == 0x186)) ||
 			    (bonusSlot == 3 && item != 0x17D && item != 0x186)) {
 				addValue = stageAdd;
@@ -2994,7 +2994,7 @@ void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 		break;
 	case 0x0D:
 		if (kind == 0x12) {
-			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 			int item = rows[value].m_field8;
 			if (item < 0x69) {
 				if (item >= 0x26 || item < 0x24) {
@@ -3133,7 +3133,7 @@ int CGPartyObj::useItem(int itemId)
 	if (!canPlayerUseItem()) {
 		result = 0;
 	} else {
-		int itemKind = *reinterpret_cast<unsigned short*>(Game.unkCFlatData0[2] + itemId * 0x48);
+		int itemKind = *reinterpret_cast<unsigned short*>(Game.m_itemTable + itemId * 0x48);
 		if (((itemId == 0x17D) || (itemId == 0x186)) &&
 		    (m_scriptHandle->m_hp == 0)) {
 			result = 0;
@@ -3617,7 +3617,7 @@ inline void CGPartyObj::checkAndSetWeapon()
 			shieldItem = 0;
 		}
 		if (shieldItem > 0) {
-			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.unkCFlatData0[2]);
+			SCfdItemRow* rows = reinterpret_cast<SCfdItemRow*>(Game.m_itemTable);
 			int shieldModel = rows[shieldItem].m_model & 0xFFF;
 			if (m_shieldModelHandle == nullptr || static_cast<unsigned int>(m_shieldModelHandle->m_charaNo) != static_cast<unsigned int>(shieldModel)) {
 				LoadShield(shieldModel);
@@ -4184,7 +4184,7 @@ void CGPartyObj::gpmMove()
 {
 	int pressureLimit;
 	CGPartyObj* leader = Game.m_partyObjArr[0];
-	CGObject* chalice = reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0);
+	CGObject* chalice = Game.m_chaliceObject;
 
 	if (leader->m_lastStateId == 0 &&
 	    leader->m_animSlotSel == 0x0C &&

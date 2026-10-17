@@ -2295,7 +2295,7 @@ bool CMenuPcs::ChkEquipPossible(int itemNo)
 {
     unsigned int genderMask;
     CCaravanWork* caravanWork = SingleCaravanWork();
-    int flags = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_equipFlags;
+    int flags = reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable)[itemNo].m_equipFlags;
     int raceBits = flags & 0xF;
     int genderBits = flags & 0x30;
     unsigned int raceMask = 1 << (caravanWork->m_tribeId & 3);
@@ -2332,7 +2332,7 @@ bool CMenuPcs::ChkEquipPossible(int itemNo)
  */
 int CMenuPcs::GetEquipType(int itemNo)
 {
-    u16 flags = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_equipFlags;
+    u16 flags = reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable)[itemNo].m_equipFlags;
     int equipType;
 
     if (flags & 0x100) {
@@ -2369,7 +2369,7 @@ int CMenuPcs::GetSmithItem(int itemNo)
     GetItemType(itemNo, 1);
     u16 race = caravanWork->m_tribeId;
     int raceType = race & 3;
-    SItemFlatRow* rec = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo];
+    SItemFlatRow* rec = &reinterpret_cast<SItemFlatRow*>(Game.m_itemTable)[itemNo];
     int smithItem = rec->m_smithResults[race & 3];
     if (smithItem > 0 && ChkEquipPossible(smithItem)) {
         return smithItem;
@@ -2399,7 +2399,7 @@ void CMenuPcs::GetRecipeMaterial(int itemNo, CMenuPcs::MaterialInfo* materialInf
 {
     GetItemType(itemNo, 1);
 
-    const SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo];
+    const SItemFlatRow* itemBase = &reinterpret_cast<SItemFlatRow*>(Game.m_itemTable)[itemNo];
 
     materialInfo->m_itemNo[0] = itemBase->m_smithMaterials[0];
     materialInfo->m_count[0] = itemBase->m_smithMaterialCounts[0];
@@ -2425,7 +2425,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
     int raceType;
 
     GetItemType(itemNo, 1);
-    raceBits = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_equipFlags;
+    raceBits = reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable)[itemNo].m_equipFlags;
     int raceLow = raceBits & 0xF;
     int genderMask = raceBits & 0x30;
     outText[0] = '\0';
@@ -2460,7 +2460,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
     char* suffix;
 
     GetItemType(itemNo, 1);
-    raceBits = reinterpret_cast<const SItemFlatRow*>(Game.unkCFlatData0[2])[itemNo].m_equipFlags;
+    raceBits = reinterpret_cast<const SItemFlatRow*>(Game.m_itemTable)[itemNo].m_equipFlags;
     int raceLow = raceBits & 0xF;
     int genderMask = raceBits & 0x30;
     outText[0] = '\0';

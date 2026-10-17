@@ -206,7 +206,7 @@ void CGItemObj::onFrame()
 				pdtNo = -1;
 			}
 
-			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.m_itemTable);
 			float particleScale = 0.01f * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + 1.0e-7f;
 			putParticle((pdtNo << 8) | ownerData->m_joybusCaravanId, m_particleSlot, this, particleScale, 0x12909);
 
@@ -255,8 +255,8 @@ void CGItemObj::onFrameStat()
 		    m_stateFlags0Bits.unk4 != 0) {
 			float distance = 0.0f;
 
-			if (Game.unk_flat3_0xc7d0 != 0) {
-				distance = PSVECDistance(&m_worldPosition, &reinterpret_cast<CGObject*>(Game.unk_flat3_0xc7d0)->m_worldPosition);
+			if (Game.m_chaliceObject != 0) {
+				distance = PSVECDistance(&m_worldPosition, &Game.m_chaliceObject->m_worldPosition);
 			} else {
 				if (static_cast<int>(CFlatCenterState()) == 1) {
 					Vec partyCenter;
@@ -439,7 +439,7 @@ void CGItemObj::onFrameStat()
 
 			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtId();
 
-			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.m_itemTable);
 			float particleScale = 0.01f * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + 1.0e-7f;
 			putParticle((pdtNo << 8) | 0x13, m_particleSlot, this, particleScale, 0x12903);
 		} else if (m_stateFrame == kItemObjCapsuleUseFrame) {
@@ -471,7 +471,7 @@ void CGItemObj::onFrameStat()
 
 			pdtNo = reinterpret_cast<LastBossWork*>(CGMonObj::m_boss)->m_boss->m_charaModelHandle->GetPdtId();
 
-			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+			SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.m_itemTable);
 			float particleScale = 0.01f * static_cast<float>(static_cast<unsigned int>(itemRows[m_worldParamB].m_fineValue)) + 1.0e-7f;
 			putParticle((pdtNo << 8) | 4, m_particleSlot, this, particleScale, 0x12908);
 		} else if (m_stateFrame == kItemObjCapsuleUseFrame) {
@@ -894,7 +894,7 @@ void CGItemObj::onFrameAlways()
 void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* hitParam)
 {
 	int worldParamA = m_worldParamA;
-	SItemFlatRow* particleRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+	SItemFlatRow* particleRows = reinterpret_cast<SItemFlatRow*>(Game.m_itemTable);
 	int particleAttr = particleRows[hitParam->m_particleIndex].m_attribute;
 
 	if (worldParamA == 0xD || worldParamA == 0xE) {
@@ -998,7 +998,7 @@ void CGItemObj::loadModel()
 	case 0x20:
 	case 0x21:
 	case 0x24: {
-		const SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+		const SItemFlatRow* itemRows = reinterpret_cast<SItemFlatRow*>(Game.m_itemTable);
 		int itemEntry = itemRows[m_worldParamB].m_model;
 
 		m_ownerSlot = 1;
@@ -1030,7 +1030,7 @@ void CGItemObj::loadModel()
 	if (useParticleTable != 0) {
 		for (int i = 0; i < 3; i++) {
 			if (i != 0 || m_createFlags != 1) {
-				const SItemFlatRow* itemRow = &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[m_worldParamB];
+				const SItemFlatRow* itemRow = &reinterpret_cast<SItemFlatRow*>(Game.m_itemTable)[m_worldParamB];
 				int particleNo = itemRow->m_particles[i];
 
 				if (particleNo != 0xFFFF) {

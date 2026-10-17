@@ -25,6 +25,7 @@ class CCombi2;
 class CGObjWork;
 class CMapLightHolder;
 class PPPIFPARAM;
+struct SPartyAnimRow;
 
 class CGame : public CManager
 {
@@ -219,17 +220,19 @@ public:
     CGameWork m_gameWork;                   // 0x08 size 0x13E8
     CCaravanWork m_caravanWorkArr[9];       // 0x13F0 size 0x6DB0
     CMonWork m_monWorkArr[64];              // 0x81A0 size 0x4400
-    unsigned int unkCFlatData0[3];          // 0xC5A0
-    unsigned int m_romLetterWorkBase;       // 0xC5AC
+    CRomWork* m_charaRomTable;              // 0xC5A0
+    CRomWork* m_enemyRomTable;              // 0xC5A4
+    unsigned int m_itemTable;               // 0xC5A8
+    CRomLetterWork* m_romLetterWork;        // 0xC5AC
     CGPartyObj* m_partyObjArr[4];           // 0xC5B0
     CCaravanWork* m_scriptFoodBase[4];       // 0xC5C0
     CGObject* m_monObjects[64];             // 0xC5D0
     CMonWork* m_monWorkRefs[64];             // 0xC6D0
-    unsigned int unk_flat3_0xc7d0;          // 0xC7D0
+    CGObject* m_chaliceObject;              // 0xC7D0
     unsigned int m_combiCount;             // 0xC7D4
     CCombi2* m_combiTable;                 // 0xC7D8
     unsigned int unk_flat3_field_8_0xc7dc;  // 0xC7DC
-    unsigned int unk_flat3_field_30_0xc7e0; // 0xC7E0
+    SPartyAnimRow* m_partyAnimTable;        // 0xC7E0
     CBossArtifactStage* m_bossArtifactBase; // 0xC7E4
     unsigned int m_currentMapId;            // 0xC7E8
     unsigned int m_currentMapVariantId;     // 0xC7EC

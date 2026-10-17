@@ -17,16 +17,16 @@ struct PRyjMegaBirth
     u16 m_maxParticles;           // 0x20
     u16 m_emitCount;              // 0x22
     u16 m_emitInterval;           // 0x24
-    s16 m_life;                   // 0x26
-    u8 _pad28;
+    u16 m_life;                   // 0x26
+    u8 m_fadeInFrames;            // 0x28
     u8 m_fadeOutFrames;           // 0x29
     u8 m_spawnMode;               // 0x2a
     u8 m_spread;                  // 0x2b
     float m_colorFrameDeltas[4];  // 0x2c
     float m_colorDeltaAdds[4];    // 0x3c
-    u8 _pad4C[0x04];
-    float m_sizeStart;            // 0x50
-    float m_sizeEnd;              // 0x54
+    u8 m_colorOffsetRange[4];     // 0x4c
+    float m_sizeX;                // 0x50
+    float m_sizeY;                // 0x54
     u8 m_colorRandom[4];          // 0x58
     u8 _pad5C[0x04];
     float m_sizeVelocityX;        // 0x60

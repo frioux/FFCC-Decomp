@@ -25,7 +25,7 @@ inline int CSystem::GetErrorLevel()
 namespace {
 static inline SItemFlatRow* GetItemDataPtr(int itemIdx)
 {
-	return &reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2])[itemIdx];
+	return &reinterpret_cast<SItemFlatRow*>(Game.m_itemTable)[itemIdx];
 }
 
 static inline float GetStatusMultiplier(int offset)
@@ -260,7 +260,7 @@ void CCaravanWork::LoadFinished()
 	}
 
 	m_baseDataIndex = (m_id / 100) - 1;
-	m_romWork = reinterpret_cast<unsigned short*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0) + 0x10);
+	m_romWork = Game.m_charaRomTable[m_baseDataIndex].m_data;
 }
 
 /*
@@ -899,7 +899,7 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 		romLetterWork[i] = 0;
 	}
 
-	CRomLetterWork* curLetter = reinterpret_cast<CRomLetterWork*>(Game.m_romLetterWorkBase);
+	CRomLetterWork* curLetter = Game.m_romLetterWork;
 	for (letterIdx = 0; letterIdx < 0x200; letterIdx++, curLetter++) {
 		unsigned short condBits = curLetter->m_personalConditions;
 
@@ -1740,7 +1740,7 @@ void CCaravanWork::CalcStatus()
 {
 	int itemIdx;
 	int itemType;
-	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
+	CRomWork* baseData = &Game.m_charaRomTable[m_baseDataIndex];
 
 	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 
@@ -2058,7 +2058,7 @@ int CCaravanWork::GetMagicCharge(int cmdListIdx, int& firstCmdIdx, int& itemCmdL
 		short cmdId = m_commandListExtra[cmdListIdx];
 		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
 			firstCmdIdx = cmdListIdx;
-			SItemFlatRow* items = reinterpret_cast<SItemFlatRow*>(Game.unkCFlatData0[2]);
+			SItemFlatRow* items = reinterpret_cast<SItemFlatRow*>(Game.m_itemTable);
 			int i = 0;
 			for (; groupedCount > 0; groupedCount--) {
 				short invSlot = (short)m_commandListInventorySlotRef[cmdListIdx + i];
@@ -2670,7 +2670,7 @@ void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
  */
 void CMonWork::CalcStatus()
 {
-	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[1] + (m_baseDataIndex * 0x1D0));
+	CRomWork* baseData = &Game.m_enemyRomTable[m_baseDataIndex];
 
 	memcpy(RomStatusBlock(), (m_romWork + CRomWork::ElementResistanceOffset), RomStatusBlockHalfwordCount * sizeof(unsigned short));
 
@@ -2709,7 +2709,7 @@ void CMonWork::CalcStatus()
  */
 int CCaravanWork::GetArtifactIncludeHpMax()
 {
-	CRomWork* baseData = reinterpret_cast<CRomWork*>(Game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
+	CRomWork* baseData = &Game.m_charaRomTable[m_baseDataIndex];
 	int hpMax;
 	int cmdSlots;
 	int strength;
