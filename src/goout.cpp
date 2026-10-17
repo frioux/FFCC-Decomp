@@ -2353,7 +2353,7 @@ inline void CGoOutMenu::Draw()
  * Address:	TODO
  * Size:	TODO
  */
-void CGoOutMenu::InitMemCardProc()
+inline void CGoOutMenu::InitMemCardProc()
 {
     McCtrl& mcCtrl = *MenuPcs.GetMcCtrl();
 

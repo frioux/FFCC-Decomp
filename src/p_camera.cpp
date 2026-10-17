@@ -1813,7 +1813,7 @@ inline void CCameraPcs::addWorldMap()
  * Address:	TODO
  * Size:	TODO
  */
-void CCameraPcs::SetIsAbsolute(int)
+inline void CCameraPcs::SetIsAbsolute(int)
 {
 	// TODO
 }
@@ -1823,7 +1823,7 @@ void CCameraPcs::SetIsAbsolute(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCameraPcs::GetWorldMapInverseMatrix(float (*) [4])
+inline void CCameraPcs::GetWorldMapInverseMatrix(float (*) [4])
 {
 	// TODO
 }
