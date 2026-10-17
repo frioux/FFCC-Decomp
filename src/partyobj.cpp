@@ -179,52 +179,29 @@ static inline bool isFrameInterval(int frame, int interval)
 	return frame % interval == 0;
 }
 
+#define PARTY_GHOST_TARGET_MODE(self) \
+	(Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F && \
+	 (self)->IsKindOf(0x6D) && reinterpret_cast<CCaravanWork*>((self)->m_scriptHandle)->m_joybusCaravanId != 0)
+
 static inline bool isGhostPartyTargetMode(CGPartyObj* self)
 {
-	return Game.m_gameWork.m_menuStageMode != 0 &&
-	       Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
-	       self->IsKindOf(0x6D) &&
-	       reinterpret_cast<CCaravanWork*>(self->m_scriptHandle)->m_joybusCaravanId != 0;
+	return PARTY_GHOST_TARGET_MODE(self);
 }
 
-static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
-{
-	if (isGhostPartyTargetMode(self)) {
 #ifdef VERSION_GCCP01
-		return 5;
+#define PARTY_GHOST_CARRY_ANIM 5
 #else
-		return 7;
+#define PARTY_GHOST_CARRY_ANIM 7
 #endif
-	}
 
-	unsigned short anim;
-	if (carryType == 0) {
-		if (CFlatItemCarryMode() == 1) {
-			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = Game.m_partyAnimTable;
-			anim = rows[work->m_genderFlag +
-			            work->m_tribeId * 2].m_carryAnim2;
-		} else {
-			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = Game.m_partyAnimTable;
-			anim = rows[work->m_genderFlag +
-			            work->m_tribeId * 2].m_carryAnim0;
-		}
-	} else {
-		if (CFlatItemCarryMode() == 1) {
-			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = Game.m_partyAnimTable;
-			anim = rows[work->m_genderFlag +
-			            work->m_tribeId * 2].m_carryAnim3;
-		} else {
-			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = Game.m_partyAnimTable;
-			anim = rows[work->m_genderFlag +
-			            work->m_tribeId * 2].m_carryAnim1;
-		}
-	}
-	return anim;
-}
+#define PARTY_ANIM_ROW(self) \
+	Game.m_partyAnimTable[reinterpret_cast<CCaravanWork*>((self)->m_scriptHandle)->m_genderFlag + \
+	                      reinterpret_cast<CCaravanWork*>((self)->m_scriptHandle)->m_tribeId * 2]
+
+#define PARTY_CARRY_ANIM(self, heldAnim, plainAnim) \
+	(PARTY_GHOST_TARGET_MODE(self) ? PARTY_GHOST_CARRY_ANIM \
+	                              : (CFlatItemCarryMode() == 1 ? PARTY_ANIM_ROW(self).heldAnim \
+	                                                           : PARTY_ANIM_ROW(self).plainAnim))
 
 inline void CMapPcs::CalcHitPosition(Vec* hitPosition)
 {
@@ -2704,7 +2681,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 			m_partyData.carryObject = object;
 			rotTarget(reinterpret_cast<CGPrgObj*>(m_partyData.carryObject));
 			changeStat(0x0B, 0, 0);
-			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, 0, getCarryAnimNo(this, 0));
+			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, 0, PARTY_CARRY_ANIM(this, m_carryAnim2, m_carryAnim0));
 		}
 	} else if ((carryType == 1 || carryType == 2) && m_partyData.carryObject != nullptr) {
 		if (forceMode != 0) {
@@ -2716,7 +2693,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 			setIdleMotion();
 		} else {
 			changeStat((carryType == 1) ? 0x0C : 0x0D, 0, 0);
-			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, carryType, getCarryAnimNo(this, 1));
+			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, carryType, PARTY_CARRY_ANIM(this, m_carryAnim3, m_carryAnim1));
 			m_partyData.carryObject = (CGObject*)0;
 		}
 	}
