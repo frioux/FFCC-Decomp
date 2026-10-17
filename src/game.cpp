@@ -1163,6 +1163,7 @@ CGPartyObj* CGame::GetPartyObj(int index)
     return m_partyObjArr[index];
 }
 
+#ifndef VERSION_GCCJGC
 /*
  * --INFO--
  * PAL Address: 0x800141E0
@@ -1328,6 +1329,7 @@ char* CGame::MakeNumMonName(char* out, int monIndex, int count)
     sprintf(out, "%d %s", count, GetMonName(monIndex, count));
     return out;
 }
+#endif
 
 /*
  * --INFO--
