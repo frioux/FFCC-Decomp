@@ -490,6 +490,25 @@ CMenuPcs::EffectInfo::EffectInfo()
 
 /*
  * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline void CMenuPcs::BindCrystalCageEffect()
+{
+	PPPCREATEPARAM param;
+	EffectInfo* effect = &m_effectWork[7];
+	effect->m_effectNo = 9;
+	CGObject* object = &effect->m_object;
+	effect->m_slotNo = 7;
+	object->Create();
+	object->m_charaModelHandle = m_wm.m_handles[7];
+	param.m_lookTargetPtr = object;
+	param.m_bindObject = object;
+	effect->m_partNo = PartMng.pppCreate(0, 9, &param, 1);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8010172C
  * PAL Size: 6000b
  * EN Address: 0x80100AF0
@@ -745,8 +764,7 @@ void CMenuPcs::loadData()
 	m_crystalAttr = -1;
 	SetCrystalCageAttr();
 
-	// Crystal cage effect (effect slot 7, effect no 9).
-	BindEffect(7, 9, -1);
+	BindCrystalCageEffect();
 
 	for (i = 0; i < 4; i++) {
 		BindEffect(i + 8, i + 5, -1);
@@ -781,7 +799,8 @@ void CMenuPcs::loadData()
 				    static_cast<unsigned int>(m_wm.m_handles[slot]->m_charaNo) /
 				    100;
 				const int modelNo = charaBase * 100;
-				int anim = (charaBase - 1) * 6;
+				int anim = charaBase - 1;
+				anim *= 6;
 				m_wm.m_handles[slot]->LoadAnim(
 				    const_cast<char*>(s_wmCharaAnimStand), anim++, 1, 0, modelNo, -1, 0);
 				m_wm.m_handles[slot]->LoadAnim(

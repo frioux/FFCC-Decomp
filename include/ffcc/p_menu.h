@@ -848,6 +848,7 @@ public:
     void SetMcList(int, struct McListInfo*);
     void ClrMcList();
     unsigned int BindEffect(int, int, int);
+    void BindCrystalCageEffect();
     void SetLight(int);
     void DrawPageMark();
     void DrawRect2(unsigned long, float, float, float, float, float, float, float, float, float (*)[4]);
