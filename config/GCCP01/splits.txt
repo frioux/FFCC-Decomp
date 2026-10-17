@@ -2839,35 +2839,8 @@ thp/THPDec.c:
 thp/THPAudio.c:
 	.text       start:0x801D4E5C end:0x801D538C
 
-auto_07_80216C12_data:
-	.data start:0x80216C12 end:0x80216C18 align:2
-
-auto_10_8032EFA4_sbss:
-	.sbss start:0x8032EFA4 end:0x8032EFA8 align:4
-
-auto_10_8032F0DC_sbss:
-	.sbss start:0x8032F0DC end:0x8032F0E0 align:4
-
-auto_07_8021C035_data:
-	.data start:0x8021C035 end:0x8021C038 align:1
-
-auto_07_8021CB75_data:
-	.data start:0x8021CB75 end:0x8021CB78 align:1
-
-auto_801D6F89_rodata:
-	.rodata start:0x801D6F89 end:0x801D6F90 align:1
-
 graphic_dbgfont.cpp:
 	.data start:0x801FD480 end:0x801FE080 align:32
-
-auto_801FD470_data:
-	.data start:0x801FD470 end:0x801FD480 align:1
-
-auto_8032EC94_sbss:
-	.sbss start:0x8032EC94 end:0x8032EC98
-
-auto_8032ECB4_sbss:
-	.sbss start:0x8032ECB4 end:0x8032ECB8
 
 astar_padding_801DD6F6:
 	.rodata start:0x801DD6F6 end:0x801DD6F8 align:1
