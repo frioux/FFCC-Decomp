@@ -1,4 +1,5 @@
 #include "ffcc/p_graphic.h"
+#include "ffcc/joybusconst.h"
 #include "ffcc/color.h"
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/graphic.h"

@@ -1,4 +1,6 @@
 #include "ffcc/menu.h"
+#include "ffcc/joybusconst.h"
+#include "ffcc/cardconst.h"
 
 /*
  * --INFO--
