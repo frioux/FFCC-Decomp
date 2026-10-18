@@ -468,7 +468,7 @@ void CAStar::check(int current, int goal, CATemp& temp)
 	{
 		if (pos->IsExist(current) != 0)
 		{
-			int next = pos->GetOthers(current);
+			u32 next = pos->GetOthers(current);
 
 			if (temp.m_visited[next] == 0)
 			{
