@@ -9614,8 +9614,8 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase + 1 : kMcWindowTextureBase + 2));
-	const double innerHeightD = static_cast<double>(sh) - 64.0;
 	const float innerY = 32.0f + sy;
+	const double innerHeightD = static_cast<double>(sh) - 64.0;
 	const float innerHeightF = static_cast<float>(innerHeightD);
 	float x = sx;
 	for (rectIdx = 0; rectIdx < 2; rectIdx++) {

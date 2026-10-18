@@ -682,8 +682,8 @@ void CMenuPcs::CalcResultOpenAnim()
 			int backOffset = idx;
 			int y = 0x28;
 			for (; i < activePartyCount; i++) {
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				int partySlot = s_Rinfo->m_party[i].m_partySlot;
+				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
 				spr->kind = kBonusPlayerTexture;
 				spr->x = ((1 <= i) && (i <= 2)) ? 0x30 : 0x48;
 				spr->y = (short)y;
@@ -801,8 +801,8 @@ void CMenuPcs::CalcResultOpenAnim()
 
 		{
 			CMenuPcs::Sprt2* count = &m_bonusAnim->sprites[idx];
-			count->kind = kBonusCountTexture;
 			count->y = 0x10;
+			count->kind = kBonusCountTexture;
 #ifdef VERSION_GCCJGC
 			count->w = 0xB0;
 #else
