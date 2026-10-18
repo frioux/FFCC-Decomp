@@ -26,15 +26,6 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 #include <math.h>
 
-const char* CCharaPcs::m_modelTable[6][3] = {
-    {"pc", "c", "_root"},
-    {"mon", "m", "_root"},
-    {"npc", "n", "_root"},
-    {"fa", "f", "_root"},
-    {"wep", "w", "_root"},
-    {"loc", "l", "_root"},
-};
-
 CCharaPcs CharaPcs;
 
 inline int CSystem::GetErrorLevel()
@@ -2641,5 +2632,14 @@ CProcessCallbackTable CCharaPcs::m_table[3] = {
             {static_cast<CProcessCallback>(&CCharaPcs::calcAfter), 0x4D, 0},
         },
     },
+};
+
+const char* CCharaPcs::m_modelTable[6][3] = {
+    {"pc", "c", "_root"},
+    {"mon", "m", "_root"},
+    {"npc", "n", "_root"},
+    {"fa", "f", "_root"},
+    {"wep", "w", "_root"},
+    {"loc", "l", "_root"},
 };
 
