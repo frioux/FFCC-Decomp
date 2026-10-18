@@ -730,7 +730,7 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 				a = (a - reduce < 0) ? 0 : a - reduce;
 			} else {
 				float k = (float)(distance / 4) + (float)(7 - targetColor.a) / 7.0f;
-				k = (k > 1.0f) ? 1.0f : k;
+				k = (1.0f < k) ? 1.0f : k;
 				{
 					float inv = 1.0f - k;
 					r = (int)((float)r * k + (float)targetColor.r * inv);
