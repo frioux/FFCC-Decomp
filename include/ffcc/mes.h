@@ -120,7 +120,11 @@ public:
     static unsigned long GetTagStringWidth(CFont* font, char* text) { return drawTagString(font, text, 0, 0, 0); }
     static unsigned long DrawTagString(CFont* font, char* text) { return drawTagString(font, text, 1, 0, 0); }
     static void SetTempValue(int index, int value) { m_tempVar[index] = value; }
+#ifdef VERSION_GCCJGC
+    static int m_tempVar[0x10];
+#else
     static int m_tempVar[0x14];
+#endif
 
 private:
     void advanceLine(CFont* font);

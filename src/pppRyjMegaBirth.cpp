@@ -73,9 +73,14 @@ static inline unsigned char clamp_u8(float value)
 	return (unsigned char)ivalue;
 }
 
-static inline signed char random_signed_byte_span(u8 span)
+static inline float get_rand()
 {
-	return (signed char)((s32)((float)((u8)span * 2) * Math.RandF() - (float)((u8)span / 2)));
+	return Math.RandF();
+}
+
+static inline signed char get_noise(u8 span)
+{
+	return (signed char)((float)(span * 2) * get_rand() - (float)(span >> 1));
 }
 
 static inline void apply_signed_randomization_2(float* x, float* y, u8 flags)
@@ -1071,10 +1076,10 @@ static void birth(
 
 
 
-	particle->m_colorOffset[0] = random_signed_byte_span(param->m_colorOffsetRange[0]);
-	particle->m_colorOffset[1] = random_signed_byte_span(param->m_colorOffsetRange[1]);
-	particle->m_colorOffset[2] = random_signed_byte_span(param->m_colorOffsetRange[2]);
-	particle->m_colorOffset[3] = random_signed_byte_span(param->m_colorOffsetRange[3]);
+	particle->m_colorOffset[0] = get_noise(param->m_colorOffsetRange[0]);
+	particle->m_colorOffset[1] = get_noise(param->m_colorOffsetRange[1]);
+	particle->m_colorOffset[2] = get_noise(param->m_colorOffsetRange[2]);
+	particle->m_colorOffset[3] = get_noise(param->m_colorOffsetRange[3]);
 
 	if (param->m_fadeInFrames != 0) {
 		particle->m_alphaFade = (float)color->m_color.rgba[3];

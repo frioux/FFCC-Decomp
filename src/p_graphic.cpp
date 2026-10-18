@@ -23,12 +23,9 @@ inline CGraphicPcs::CGraphicPcs()
 }
 
 CGraphicPcs GraphicPcs;
-static const char s_CGraphicPcs[] = "CGraphicPcs";
-static const char sGraphicPcsManagerClassName[] = "CManager";
-static const char sGraphicPcsProcessClassName[] = "CProcess";
 
 CProcessCallbackTable CGraphicPcs::m_table = {
-    const_cast<char*>(s_CGraphicPcs),
+    "CGraphicPcs",
     static_cast<CProcessCallback>(&CGraphicPcs::create),
     static_cast<CProcessCallback>(&CGraphicPcs::destroy),
     {
@@ -43,13 +40,6 @@ CProcessCallbackTable CGraphicPcs::m_table = {
     },
 };
 
-static const char s_scenegraph_step_none[] = "";
-static const char s_scenegraph_step_x8[] = "x8";
-static const char s_scenegraph_step_x0[] = "x0";
-static const char s_scenegraph_step_x1_8[] = "x1/8";
-static const char s_scenegraph_step_x1_4[] = "x1/4";
-static const char s_scenegraph_step_x1_2[] = "x1/2";
-#ifdef VERSION_GCCJGC
 static const float kGraphicZero = 0.0f;
 static const float kGraphicScreenHeight = 448.0f;
 static const float kGraphicScreenWidth = 640.0f;
@@ -66,40 +56,8 @@ static const float kDebugIndicatorFrameRight = 32.0f;
 static const float kDebugIndicatorBottom = 424.0f;
 static const float kDebugIndicatorFifoLeft = 40.0f;
 static const float kDebugIndicatorFifoRight = 56.0f;
-#else
-extern const float kGraphicZero;
-extern const float kGraphicScreenHeight;
-extern const float kGraphicScreenWidth;
-extern const float kGraphicScreenCenterX;
-extern const float kGraphicScreenCenterY;
-extern const float kGraphicHalf;
-extern const float kDebugBarLeft;
-extern const float kDebugBarTop;
-extern const float kDebugBarRight;
-extern const float kDebugBarBottom;
-extern const float kDebugBarMoveBottom;
-extern const float kDebugIndicatorTop;
-extern const float kDebugIndicatorFrameRight;
-extern const float kDebugIndicatorBottom;
-extern const float kDebugIndicatorFifoLeft;
-extern const float kDebugIndicatorFifoRight;
-#endif
 static const int kDebugBarLineStep = 8;
-static const char s_debug_pad_port_fmt[] = "%dP";
-static const char s_debug_frame_fmt[] = "%d";
 
-static const char s_graphic_order_debug_fmt[] = "%s(%d) %.3f%%";
-static const char s_graphic_move_debug_fmt[] = " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%";
-static const char s_graphic_pad_input_fmt[] = "%c%c%c%c%c%c%c%c%c%c";
-static const char s_p_graphic_cpp[] = "p_graphic.cpp";
-static const char* s_scenegraph_step_labels[] = {
-    s_scenegraph_step_none,
-    s_scenegraph_step_x8,
-    s_scenegraph_step_x0,
-    s_scenegraph_step_x1_8,
-    s_scenegraph_step_x1_4,
-    s_scenegraph_step_x1_2,
-};
 
 STATIC_ASSERT(offsetof(CGraphicPcs, m_screenFade) == 0x04);
 STATIC_ASSERT(sizeof(CGraphicPcs::ScreenFadeSlot) == 0x2C);
@@ -270,7 +228,7 @@ void CGraphicPcs::drawBegin()
  */
 void CGraphicPcs::drawWait()
 {
-	Graphic._WaitDrawDone(const_cast<char*>(s_p_graphic_cpp), 0xDA);
+	Graphic._WaitDrawDone("p_graphic.cpp", 0xDA);
 }
 
 /*
@@ -299,6 +257,14 @@ void CGraphicPcs::drawFlip()
  */
 void CGraphicPcs::drawEnd()
 {
+	static const char* pTable[] = {
+		"",
+		"x8",
+		"x0",
+		"x1/8",
+		"x1/4",
+		"x1/2",
+	};
 	char debugPadString[256];
 	char debugInputString[256];
 
@@ -314,11 +280,11 @@ void CGraphicPcs::drawEnd()
 		Graphic.InitDebugString();
 
 		if (System.m_scenegraphStepMode != 0) {
-			Graphic.DrawDebugStringDirect(0x10, 0x10, const_cast<char*>(s_scenegraph_step_labels[System.m_scenegraphStepMode]), 0xC);
+			Graphic.DrawDebugStringDirect(0x10, 0x10, const_cast<char*>(pTable[System.m_scenegraphStepMode]), 0xC);
 		}
 
 		if (Pad.GetPortEmulation() != -1) {
-			sprintf(debugPadString, s_debug_pad_port_fmt, Pad.GetPortEmulation() + 1);
+			sprintf(debugPadString, "%dP", Pad.GetPortEmulation() + 1);
 			Graphic.DrawDebugStringDirect(0x10, 0x11, debugPadString, 0xC);
 		}
 
@@ -339,12 +305,12 @@ void CGraphicPcs::drawEnd()
 			const char left = ((buttons & 4) != 0) ? 'D' : ' ';
 			const char down = ((buttons & 8) != 0) ? 'U' : ' ';
 
-			sprintf(debugInputString, s_graphic_pad_input_fmt, down, left, l, r, b, a, start, s, z, c);
+			sprintf(debugInputString, "%c%c%c%c%c%c%c%c%c%c", down, left, l, r, b, a, start, s, z, c);
 			Graphic.DrawDebugStringDirect(x, 0x1A8, debugInputString, 8);
 			x += 0x60;
 		}
 
-		sprintf(debugInputString, s_debug_frame_fmt, System.GetCounter());
+		sprintf(debugInputString, "%d", System.GetCounter());
 		Graphic.DrawDebugStringDirect(port * 0x60 + 0x10, 0x1A8, debugInputString, 8);
 	}
 
@@ -468,11 +434,11 @@ void CGraphicPcs::drawBar()
 
             if (priority != 0x27) {
                 char debugString[260];
-                sprintf(debugString, const_cast<char*>(s_graphic_order_debug_fmt), order->m_debugName, order->m_insertIndex, order->m_lastTime);
+                sprintf(debugString, "%s(%d) %.3f%%", order->m_debugName, order->m_insertIndex, order->m_lastTime);
 
                 if (priority == 0x17) {
                     char extraString[256];
-                    sprintf(extraString, const_cast<char*>(s_graphic_move_debug_fmt),
+                    sprintf(extraString, " MOVE=%.1f%% BG=%.1f%% OBJ=%.1f%% UP=%.1f%% HIT=%.1f%% SCR=%.1f%%",
                             CFlatMoveTime(), CFlatBgCollisionTime(),
                             CFlatObjectCollisionTime(), CFlatUpdateTime(),
                             CFlatHitTime(), CFlatPerformanceTotalTime());

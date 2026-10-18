@@ -972,7 +972,7 @@ void CMenuPcs::CmdDraw()
 				text = GetMenuStr(displayIdx + 0x0B);
 			} else if (!(displayIdx >= itemCount)) {
 				const s16 slot = letterBuf[displayIdx - 1];
-				const s16 skillId = caravan->m_inventoryItems[slot];
+				const int skillId = caravan->m_inventoryItems[slot];
 				text = Game.GetShortItemName(skillId);
 
 				s32 selDisp = m_cmdState->selected[1] + m_cmdState->scrollTop;
@@ -1147,8 +1147,8 @@ void CMenuPcs::CmdDraw()
 	}
 
 	CFont* helpFont = GetFont22();
-	int helpAlpha = static_cast<int>(
-	    255.0f * m_cmdList->entries[m_cmdList->count].alpha);
+	entry = &m_cmdList->entries[m_cmdList->count];
+	int helpAlpha = static_cast<int>(255.0f * entry->alpha);
 	if (!hasItemHelp) {
 		helpId = -1;
 	}
@@ -1963,6 +1963,7 @@ inline void CMenuPcs::CmdDismantle(int selected)
  */
 void CMenuPcs::DrawUniteList()
 {
+	const char* text;
 	float panelAlpha;
 	CFont* helpFont;
 	float panelX;
@@ -2059,7 +2060,6 @@ void CMenuPcs::DrawUniteList()
 		const float alpha = (GetCmdStateView(this)->mode == 3) ? 1.0f : entry->alpha;
 		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha)).color);
 
-		const char* text;
 		if (i < 2) {
 			text = GetMenuStr(i + 9);
 		} else {
@@ -2191,7 +2191,6 @@ void CMenuPcs::DrawUniteList()
 		font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * alpha)).color);
 
 		const int itemId = caravan->m_commandListExtra[s_UniteTop[i]];
-		const char* text;
 		if (itemId == 0x207) {
 			text = GetSkillStr(0);
 		} else if (itemId == 0x20B) {

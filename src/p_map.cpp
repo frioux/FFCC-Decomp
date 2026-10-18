@@ -100,8 +100,6 @@ CRelProfile g_hit_prof ATTRIBUTE_ALIGN(4);
 CRelProfile g_map_calc_prof ATTRIBUTE_ALIGN(4);
 CRelProfile g_map_draw_prof ATTRIBUTE_ALIGN(4);
 
-static char oldMapFileName[0x100] = "";
-
 /*
  * --INFO--
  * PAL Address: 0x80036254
@@ -220,6 +218,39 @@ void CMapPcs::createViewer()
     m_viewerMode = 1;
 }
 
+static inline void SetViewerStartPos(int viewerMode, char* mapName)
+{
+    static char oldMapFileName[0x100] = "";
+    Vec cameraPos;
+
+    if ((viewerMode != 0) && (strcmp(oldMapFileName, mapName) != 0)) {
+        strcpy(oldMapFileName, mapName);
+        if (g_MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
+            COctNode* rootNode = g_MapMng.GetOctTreeArray()->GetRootNode();
+            if (rootNode != 0) {
+                float center = rootNode->m_bound.m_min.x + rootNode->m_bound.m_max.x;
+                center *= 0.5f;
+                cameraPos.x = center;
+                center = rootNode->m_bound.m_min.y + rootNode->m_bound.m_max.y;
+                center *= 0.5f;
+                cameraPos.y = center;
+                center = rootNode->m_bound.m_min.z + rootNode->m_bound.m_max.z;
+                center *= 0.5f;
+                cameraPos.z = center;
+            } else {
+                CMapObj* mapObj = g_MapMng.GetMapObj(1);
+                cameraPos.x = mapObj->m_localPosition.x;
+                cameraPos.y = mapObj->m_localPosition.y;
+                cameraPos.z = mapObj->m_localPosition.z;
+            }
+        }
+        cameraPos.y += 1.0f;
+        CameraPcs.m_positionX = cameraPos.x;
+        CameraPcs.m_positionY = cameraPos.y;
+        CameraPcs.m_positionZ = cameraPos.z;
+    }
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80035A84
@@ -233,7 +264,6 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
 {
     unsigned int prevStageNo = g_mapStage;
     unsigned int prevMapNo = g_mapSection;
-    Vec cameraPos;
     char mapPath[0x104];
 
     g_mapStage = stageNo;
@@ -273,32 +303,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
     g_MapMng.ReadMid(mapPath);
 
     if (static_cast<unsigned char>(mode - 1) > 1) {
-        if ((m_viewerMode != 0) && (strcmp(oldMapFileName, mapPath) != 0)) {
-            strcpy(oldMapFileName, mapPath);
-            if (g_MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
-                COctNode* rootNode = g_MapMng.GetOctTreeArray()->GetRootNode();
-                if (rootNode != 0) {
-                    float center = rootNode->m_bound.m_min.x + rootNode->m_bound.m_max.x;
-                    center *= 0.5f;
-                    cameraPos.x = center;
-                    center = rootNode->m_bound.m_min.y + rootNode->m_bound.m_max.y;
-                    center *= 0.5f;
-                    cameraPos.y = center;
-                    center = rootNode->m_bound.m_min.z + rootNode->m_bound.m_max.z;
-                    center *= 0.5f;
-                    cameraPos.z = center;
-                } else {
-                    CMapObj* mapObj = g_MapMng.GetMapObj(1);
-                    cameraPos.x = mapObj->m_localPosition.x;
-                    cameraPos.y = mapObj->m_localPosition.y;
-                    cameraPos.z = mapObj->m_localPosition.z;
-                }
-            }
-            cameraPos.y += 1.0f;
-            CameraPcs.m_positionX = cameraPos.x;
-            CameraPcs.m_positionY = cameraPos.y;
-            CameraPcs.m_positionZ = cameraPos.z;
-        }
+        SetViewerStartPos(m_viewerMode, mapPath);
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
             System.Printf(
@@ -381,7 +386,6 @@ void CMapPcs::calcInit()
  */
 void CMapPcs::calc()
 {
-    Vec cameraPos;
     Mtx cameraMtx;
     Mtx44 screenMtx;
 
@@ -414,33 +418,7 @@ void CMapPcs::calc()
         g_MapMng.ReadMpl(m_mapName);
         g_MapMng.ReadOtm(m_mapName);
         g_MapMng.ReadMid(m_mapName);
-        if ((m_viewerMode != 0) &&
-            (strcmp(oldMapFileName, m_mapName) != 0)) {
-            strcpy(oldMapFileName, m_mapName);
-            if (g_MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
-                COctNode* rootNode = g_MapMng.GetOctTreeArray()->GetRootNode();
-                if (rootNode != 0) {
-                    float center = rootNode->m_bound.m_min.x + rootNode->m_bound.m_max.x;
-                    center *= 0.5f;
-                    cameraPos.x = center;
-                    center = rootNode->m_bound.m_min.y + rootNode->m_bound.m_max.y;
-                    center *= 0.5f;
-                    cameraPos.y = center;
-                    center = rootNode->m_bound.m_min.z + rootNode->m_bound.m_max.z;
-                    center *= 0.5f;
-                    cameraPos.z = center;
-                } else {
-                    CMapObj* mapObj = g_MapMng.GetMapObj(1);
-                    cameraPos.x = mapObj->m_localPosition.x;
-                    cameraPos.y = mapObj->m_localPosition.y;
-                    cameraPos.z = mapObj->m_localPosition.z;
-                }
-            }
-            cameraPos.y += 1.0f;
-            CameraPcs.m_positionX = cameraPos.x;
-            CameraPcs.m_positionY = cameraPos.y;
-            CameraPcs.m_positionZ = cameraPos.z;
-        }
+        SetViewerStartPos(m_viewerMode, m_mapName);
 
         if (static_cast<unsigned int>(System.m_execParam) >= 3U) {
             System.Printf(

@@ -318,7 +318,7 @@ static void InitPieceData(CChara::CModel* model, PScreenBreak* step, VScreenBrea
         piece = &pieceBase[i];
         ScreenBreakMeshData* meshData = mesh->m_data;
         CChara::CNode* node = &model->m_nodes[ScreenBreakMeshNodeIndex(meshData)];
-        node->m_flagsBits.m_flag_80 = 0;
+        node->SetCalcLocal(0);
         PSMTXIdentity(node->m_localRuntimeMtx);
 
         u32 vertexCount = meshData->m_vertexCount;

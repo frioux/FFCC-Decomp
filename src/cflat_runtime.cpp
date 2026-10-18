@@ -901,7 +901,7 @@ inline void CFlatRuntime::callSetup(CFlatRuntime::CObject* object, CFlatRuntime:
 
 	int clearCount = func->m_localCount - func->m_argCount;
 	if (clearCount != 0) {
-		initVal(clearCount, 0, reinterpret_cast<CStack*>(object->m_localBase + func->m_argCount), 1);
+		initVal(func->m_localCount - func->m_argCount, 0, reinterpret_cast<CStack*>(object->m_localBase + func->m_argCount), 1);
 	}
 }
 

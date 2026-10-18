@@ -812,6 +812,14 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     }
 }
 
+inline void S4ToF32(pppFVECTOR4* dest, s16* src)
+{
+    dest->x = src[0] >> 7;
+    dest->y = src[1] >> 7;
+    dest->z = src[2] >> 7;
+    dest->w = src[3] >> 7;
+}
+
 /*
  * --INFO--
  * PAL Address: 8008ca98
@@ -913,14 +921,8 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthSh
             countMinusOne = (float)(count - 1);
             alphaMul = (float)colorWork->m_alpha / 16384.0f;
             lastIndex = particle->m_historyCount - 1;
-            colorStart.x = (float)(work->m_colorStart[0] >> 7);
-            colorStart.y = (float)(work->m_colorStart[1] >> 7);
-            colorStart.z = (float)(work->m_colorStart[2] >> 7);
-            colorStart.w = (float)(work->m_colorStart[3] >> 7);
-            colorEnd.x = (float)(work->m_colorEnd[0] >> 7);
-            colorEnd.y = (float)(work->m_colorEnd[1] >> 7);
-            colorEnd.z = (float)(work->m_colorEnd[2] >> 7);
-            colorEnd.w = (float)(work->m_colorEnd[3] >> 7);
+            S4ToF32(&colorStart, work->m_colorStart);
+            S4ToF32(&colorEnd, work->m_colorEnd);
             colorStart.w *= alphaMul;
             colorEnd.w *= alphaMul;
             diffA = colorStart.w - colorEnd.w;

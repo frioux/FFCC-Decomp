@@ -55,7 +55,7 @@ static inline void ReleaseRefNonNull(CRef* object)
     object->Release();
 }
 
-static inline int HighestSetBit(unsigned int value)
+static inline int getHsb(unsigned int value)
 {
     for (int bit = 31; bit >= 0; bit--) {
         if ((value & (1u << bit)) != 0) {
@@ -879,10 +879,6 @@ void CMaterialMan::SetUnderWaterTex()
  */
 void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int setVtxDesc, _GXTevScale tevScale)
 {
-    static int bTest;
-    static char init;
-    static int bTest2;
-    static char init2;
 
     CMaterial* material;
     int isStd1000 = 0;
@@ -1518,14 +1514,8 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             IncNumTevStage();
         }
         if ((tevBit & 0x2000) != 0 && m_manaParaboloidTexObj0 != 0 && m_manaParaboloidTexObj1 != 0) {
-            if (init == 0) {
-                bTest = 0;
-                init = 1;
-            }
-            if (init2 == 0) {
-                bTest2 = 0;
-                init2 = 1;
-            }
+            static int bTest = 0;
+            static int bTest2 = 0;
             unsigned int buttons = Pad.GetButtonDown(0);
             if ((buttons & 0x100) != 0) {
                 bTest = 0;
@@ -3534,7 +3524,7 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
                             } else if (format == 1) {
                                 material->SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x400));
                             }
-                            if (static_cast<int>(material->m_textureData.m_textures[i]->m_isAlphaLut) != 0) {
+                            if (material->m_textureData.m_textures[i]->IsAlphaDxt()) {
                                 material->SetTevBit(static_cast<CMaterialMan::TEV_BIT>(0x800));
                             }
                         }
@@ -3547,14 +3537,14 @@ void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
                     (material->GetNumTexture() >= 2) &&
                     (material->m_textureData.m_textures[0] != 0) &&
                     (material->m_textureData.m_textures[1] != 0)) {
-                    material->m_texShiftU = static_cast<char>(HighestSetBit(
+                    material->m_texShiftU = static_cast<char>(getHsb(
                         material->m_textureData.m_textures[0]->GetWidth() /
                         material->m_textureData.m_textures[1]->GetWidth()));
                     if (static_cast<unsigned char>(material->m_texShiftU) == 0xFF) {
                         material->m_texShiftU = 0;
                     }
 
-                    material->m_texShiftV = static_cast<char>(HighestSetBit(
+                    material->m_texShiftV = static_cast<char>(getHsb(
                         material->m_textureData.m_textures[0]->GetHeight() /
                         material->m_textureData.m_textures[1]->GetHeight()));
                     if (static_cast<unsigned char>(material->m_texShiftV) == 0xFF) {

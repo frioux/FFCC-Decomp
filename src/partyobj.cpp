@@ -169,76 +169,39 @@ static inline void UpdateGhostPartyDamageCounters(CGPrgObj* attacker)
 	}
 }
 
-static bool isMenuPcsCommandBusy()
+static inline bool isMenuPcsCommandBusy()
 {
 	return MenuPcs.m_mode != 0;
 }
 
-static unsigned short getItemKindFromCfd(int itemId)
-{
-	if (itemId <= 0 || Game.m_itemTable == 0) {
-		return 0;
-	}
-
-	return *reinterpret_cast<unsigned short*>(Game.m_itemTable + itemId * 0x48);
-}
-
-static bool isBossArtifactStage()
-{
-	return Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.m_bossArtifactStageIndex < 0x0F;
-}
-
-static bool isFrameInterval(int frame, int interval)
+static inline bool isFrameInterval(int frame, int interval)
 {
 	return frame % interval == 0;
 }
 
+#define PARTY_GHOST_TARGET_MODE(self) \
+	(Game.m_gameWork.m_menuStageMode != 0 && Game.m_gameWork.IsBattleStage() && \
+	 (self)->IsKindOf(0x6D) && reinterpret_cast<CCaravanWork*>((self)->m_scriptHandle)->m_joybusCaravanId != 0)
+
 static inline bool isGhostPartyTargetMode(CGPartyObj* self)
 {
-	return Game.m_gameWork.m_menuStageMode != 0 &&
-	       Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
-	       self->IsKindOf(0x6D) &&
-	       reinterpret_cast<CCaravanWork*>(self->m_scriptHandle)->m_joybusCaravanId != 0;
+	return PARTY_GHOST_TARGET_MODE(self);
 }
 
-static inline int getCarryAnimNo(CGPartyObj* self, int carryType)
-{
-	if (isGhostPartyTargetMode(self)) {
 #ifdef VERSION_GCCP01
-		return 5;
+#define PARTY_GHOST_CARRY_ANIM 5
 #else
-		return 7;
+#define PARTY_GHOST_CARRY_ANIM 7
 #endif
-	}
 
-	unsigned short anim;
-	if (carryType == 0) {
-		if (CFlatItemCarryMode() == 1) {
-			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = Game.m_partyAnimTable;
-			anim = rows[work->m_genderFlag +
-			            work->m_tribeId * 2].m_carryAnim2;
-		} else {
-			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = Game.m_partyAnimTable;
-			anim = rows[work->m_genderFlag +
-			            work->m_tribeId * 2].m_carryAnim0;
-		}
-	} else {
-		if (CFlatItemCarryMode() == 1) {
-			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = Game.m_partyAnimTable;
-			anim = rows[work->m_genderFlag +
-			            work->m_tribeId * 2].m_carryAnim3;
-		} else {
-			CCaravanWork* work = reinterpret_cast<CCaravanWork*>(self->m_scriptHandle);
-			SPartyAnimRow* rows = Game.m_partyAnimTable;
-			anim = rows[work->m_genderFlag +
-			            work->m_tribeId * 2].m_carryAnim1;
-		}
-	}
-	return anim;
-}
+#define PARTY_ANIM_ROW(self) \
+	Game.m_partyAnimTable[reinterpret_cast<CCaravanWork*>((self)->m_scriptHandle)->m_genderFlag + \
+	                      reinterpret_cast<CCaravanWork*>((self)->m_scriptHandle)->m_tribeId * 2]
+
+#define PARTY_CARRY_ANIM(self, heldAnim, plainAnim) \
+	(PARTY_GHOST_TARGET_MODE(self) ? PARTY_GHOST_CARRY_ANIM \
+	                               : (static_cast<int>(CFlat.m_centerState) == 1 ? PARTY_ANIM_ROW(self).heldAnim \
+	                                                                             : PARTY_ANIM_ROW(self).plainAnim))
 
 inline void CMapPcs::CalcHitPosition(Vec* hitPosition)
 {
@@ -275,7 +238,7 @@ extern "C" void sendCombiToScript__10CGCharaObjFP10CGCharaObjii(CGCharaObj* self
  * Address:	TODO
  * Size:	TODO
  */
-int CATEGOLY2TYPE(int value)
+inline int CATEGOLY2TYPE(int value)
 {
 	switch (value) {
 	case 0:
@@ -682,7 +645,7 @@ void CGPartyObj::onFrameAlways()
 	}
 	if ((Game.m_gameWork.m_menuStageMode != 0) &&
 	    (Game.m_gameWork.m_menuStageMode != 0) &&
-	    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
+	    Game.m_gameWork.IsBattleStage() &&
 	    IsKindOf(0x6D) &&
 	    (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0)) {
 		showTraceParticle = 0;
@@ -840,7 +803,7 @@ void CGPartyObj::onFramePostCalc()
 	}
 
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
-	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	    Game.m_gameWork.IsBattleStage() &&
 	    IsKindOf(0x6D) &&
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		ghostPartyMog();
@@ -1739,7 +1702,7 @@ void CGPartyObj::enableDamageCol(int onOff)
 
 	if (onOff != 0 &&
 	    (Game.m_gameWork.m_menuStageMode == 0 ||
-	     Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F ||
+	     !Game.m_gameWork.IsBattleStage() ||
 	     !IsKindOf(0x6D) ||
 	     reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId == 0)) {
 		m_damageColliders[0].m_hitMask = hitMask;
@@ -2268,7 +2231,7 @@ void CGPartyObj::checkTargetParticle()
 	input.Identity();
 
 	if ((Game.m_gameWork.m_menuStageMode == 0) ||
-	    (Game.m_gameWork.m_bossArtifactStageIndex >= 0x0F) ||
+	    !Game.m_gameWork.IsBattleStage() ||
 	    !IsKindOf(0x6D) ||
 	    (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId == 0)) {
 		if ((DbgMenuPcs.GetDbgFlag() & 0x100) != 0) {
@@ -2718,7 +2681,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 			m_partyData.carryObject = object;
 			rotTarget(reinterpret_cast<CGPrgObj*>(m_partyData.carryObject));
 			changeStat(0x0B, 0, 0);
-			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, 0, getCarryAnimNo(this, 0));
+			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, 0, PARTY_CARRY_ANIM(this, m_carryAnim2, m_carryAnim0));
 		}
 	} else if ((carryType == 1 || carryType == 2) && m_partyData.carryObject != nullptr) {
 		if (forceMode != 0) {
@@ -2730,7 +2693,7 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 			setIdleMotion();
 		} else {
 			changeStat((carryType == 1) ? 0x0C : 0x0D, 0, 0);
-			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, carryType, getCarryAnimNo(this, 1));
+			reinterpret_cast<CGItemObj*>(m_partyData.carryObject)->carry(this, carryType, PARTY_CARRY_ANIM(this, m_carryAnim3, m_carryAnim1));
 			m_partyData.carryObject = (CGObject*)0;
 		}
 	}
@@ -2741,10 +2704,10 @@ void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::statCarry()
+inline void CGPartyObj::statCarry()
 {
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
-	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	    Game.m_gameWork.IsBattleStage() &&
 	    IsKindOf(0x6D) &&
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		static float d;
@@ -2787,7 +2750,7 @@ void CGPartyObj::statCarry()
 void CGPartyObj::statPut()
 {
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
-	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	    Game.m_gameWork.IsBattleStage() &&
 	    IsKindOf(0x6D) &&
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		static float d;
@@ -3104,7 +3067,7 @@ canUse:
  * Address:	TODO
  * Size:	TODO
  */
-int CGPartyObj::canPlayerGoMenu()
+inline int CGPartyObj::canPlayerGoMenu()
 {
 	if ((m_weaponNodeFlagBits.m_prg != 0) &&
 	    ((m_weaponNodeFlagAll.m_bits1.m_shield != 0) ||
@@ -3412,7 +3375,7 @@ void CGPartyObj::CheckGameOver()
 			continue;
 		}
 
-		if ((Game.m_gameWork.m_menuStageMode != 0) && (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
+		if ((Game.m_gameWork.m_menuStageMode != 0) && Game.m_gameWork.IsBattleStage() &&
 		    party->IsKindOf(0x6D) &&
 		    (reinterpret_cast<CCaravanWork*>(party->m_scriptHandle)->m_joybusCaravanId != 0)) {
 			continue;
@@ -3532,7 +3495,7 @@ void CGPartyObj::InitFinished()
 #endif
 	if (Game.m_gameWork.m_menuStageMode != 0 &&
 	    Game.m_gameWork.m_menuStageMode != 0 &&
-	    Game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	    Game.m_gameWork.IsBattleStage() &&
 	    IsKindOf(0x6D) &&
 	    reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0) {
 		m_pushParamA = 0;
@@ -4424,7 +4387,7 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 	    ((DbgMenuPcs.GetDbgFlag() & 0x80) != 0)) {
 		char text[256];
 		if ((Game.m_gameWork.m_menuStageMode != 0) &&
-		    (Game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
+		    Game.m_gameWork.IsBattleStage() &&
 		    IsKindOf(0x6D) && (reinterpret_cast<CCaravanWork*>(m_scriptHandle)->m_joybusCaravanId != 0)) {
 			int weightMax = calcWeightMax();
 

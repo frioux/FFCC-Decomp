@@ -2138,7 +2138,7 @@ void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse,
  * Address:	TODO
  * Size:	TODO
  */
-void CAmemCache::Init()
+inline void CAmemCache::Init()
 {
 	// TODO
 }
@@ -2148,7 +2148,7 @@ void CAmemCache::Init()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::CStage::GetTail()
+inline void CMemory::CStage::GetTail()
 {
 	// TODO
 }

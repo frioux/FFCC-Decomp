@@ -58,6 +58,7 @@ public:
      * JP Size: TODO
      */
     unsigned int GetFormat() { return m_format; }
+    int IsAlphaDxt() { return m_isAlphaLut; }
     int GetNumTlut()
     {
         if (m_format == GX_TF_C8) {

@@ -256,6 +256,10 @@ static CMenuPcs::FCV s_MenuObjZRot = {4, s_MenuObjZRotSpl};
 static CMenuPcs::FCV s_MenuObjYTrs = {5, s_MenuObjYTrsSpl};
 static CMenuPcs::FCV s_MenuObjScl = {7, s_MenuObjSclSpl};
 
+#ifdef VERSION_GCCJGC
+#include "src/wmm_str_status_jp.inc"
+#endif
+
 static float s_MaxAnimWait;
 static unsigned char s_LoadCancelFlg;
 static char s_McSavePos[2];
@@ -486,6 +490,25 @@ void CMenuPcs::createWorld()
  */
 CMenuPcs::EffectInfo::EffectInfo()
 {
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+inline void CMenuPcs::BindCrystalCageEffect()
+{
+	PPPCREATEPARAM param;
+	EffectInfo* effect = &m_effectWork[7];
+	effect->m_effectNo = 9;
+	CGObject* object = &effect->m_object;
+	effect->m_slotNo = 7;
+	object->Create();
+	object->m_charaModelHandle = m_wm.m_handles[7];
+	param.m_lookTargetPtr = object;
+	param.m_bindObject = object;
+	effect->m_partNo = PartMng.pppCreate(0, 9, &param, 1);
 }
 
 /*
@@ -745,8 +768,7 @@ void CMenuPcs::loadData()
 	m_crystalAttr = -1;
 	SetCrystalCageAttr();
 
-	// Crystal cage effect (effect slot 7, effect no 9).
-	BindEffect(7, 9, -1);
+	BindCrystalCageEffect();
 
 	for (i = 0; i < 4; i++) {
 		BindEffect(i + 8, i + 5, -1);
@@ -781,7 +803,8 @@ void CMenuPcs::loadData()
 				    static_cast<unsigned int>(m_wm.m_handles[slot]->m_charaNo) /
 				    100;
 				const int modelNo = charaBase * 100;
-				int anim = (charaBase - 1) * 6;
+				int anim = charaBase - 1;
+				anim *= 6;
 				m_wm.m_handles[slot]->LoadAnim(
 				    const_cast<char*>(s_wmCharaAnimStand), anim++, 1, 0, modelNo, -1, 0);
 				m_wm.m_handles[slot]->LoadAnim(
@@ -3760,7 +3783,7 @@ void CMenuPcs::DrawMoveMenu()
 		{
 			m_effectWork[5].m_object.m_currentAlpha = m_wm.m_handles[5]->m_model->m_lightAlpha;
 			m_wm.m_handles[5]->Draw(5);
-			pppFVECTOR4 color;
+			pppFVECTOR4 color ATTRIBUTE_ALIGN(8);
 			const short partColorIndex = m_crystalPart;
 			PartPcs.GetParColIdx(partColorIndex, color);
 			color.w = m_wm.m_handles[5]->m_model->m_lightAlpha;

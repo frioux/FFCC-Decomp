@@ -1,4 +1,6 @@
 #include "ffcc/p_tina.h"
+#include "ffcc/joybusconst.h"
+#include "ffcc/cardconst.h"
 #include "ffcc/graphic.h"
 #include "ffcc/partMng.h"
 #include "ffcc/game.h"
@@ -44,27 +46,6 @@ inline void MTXConcatVec(Mtx src, Vec* trans, Mtx dst)
 extern "C" unsigned char g_IsDrawHeapSize = 1;
 
 
-#ifdef VERSION_GCCJGC
-extern const char sTinaGbaResourceStrings[] =
-    "dvd/gba/\0\0\0\0"
-    "ffcc_cli.bin\0\0\0\0"
-    "objdat.spt\0\0"
-    "dvd/menu/icon.dat\0\0\0"
-    "\xCC\xA7\xB2\xC5\xD9\xCC\xA7\xDD\xC0\xBC\xDE\xB0\xA5\xB8\xD8\xBD\xC0\xD9\xB8\xDB\xC6\xB8\xD9";
-#else
-extern const char sTinaGbaResourceStrings[] = {
-    (char)0x64, (char)0x76, (char)0x64, (char)0x2F, (char)0x67, (char)0x62, (char)0x61, (char)0x2F,
-    (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x66, (char)0x66, (char)0x63, (char)0x63,
-    (char)0x5F, (char)0x63, (char)0x6C, (char)0x69, (char)0x2E, (char)0x62, (char)0x69, (char)0x6E,
-    (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x6F, (char)0x62, (char)0x6A, (char)0x64,
-    (char)0x61, (char)0x74, (char)0x2E, (char)0x73, (char)0x70, (char)0x74, (char)0x00, (char)0x00,
-    (char)0x69, (char)0x63, (char)0x6F, (char)0x6E, (char)0x2E, (char)0x64, (char)0x61, (char)0x74,
-    (char)0x00, (char)0x00, (char)0x00, (char)0x00, (char)0x46, (char)0x46, (char)0x20, (char)0x43,
-    (char)0x72, (char)0x79, (char)0x73, (char)0x74, (char)0x61, (char)0x6C, (char)0x20, (char)0x43,
-    (char)0x68, (char)0x72, (char)0x6F, (char)0x6E, (char)0x69, (char)0x63, (char)0x6C, (char)0x65,
-    (char)0x73, (char)0x00, (char)0x00, (char)0x00,
-};
-#endif
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -130,16 +111,6 @@ char g_MsgFlashy[0x36] =
     "\x81\x9A\x81\x99\x0A";
 int g_MaxDataSize;
 int g_MaxHeapSize;
-extern "C" {
-const char* sDebugSpinnerTextPtr;
-signed char sDebugSpinnerTextPtrInit;
-int s_debugSpinnerFrameCounter;
-signed char s_debugSpinnerFrameCounterInit;
-unsigned char g_IsCheckDrawDone;
-signed char s_debugSpinnerFrameCounterPad0;
-signed char s_debugSpinnerFrameCounterPad1;
-signed char s_debugSpinnerFrameCounterPad2;
-}
 
 static const int kPppFieldParticleNoAutoCreate = -0x1000;
 
@@ -997,18 +968,11 @@ void CPartPcs::drawAfterViewer()
 	PartMng.pppGet2Dpos();
 	pppClearDrawEnv();
 
-	if (sDebugSpinnerTextPtrInit == 0) {
-		sDebugSpinnerTextPtr = "|/-\\";
-		sDebugSpinnerTextPtrInit = 1;
-	}
-	if (s_debugSpinnerFrameCounterInit == 0) {
-		s_debugSpinnerFrameCounter = 0;
-		s_debugSpinnerFrameCounterInit = 1;
-	}
+	static char* pFan = "|/-\\";
+	static int alive = 0;
 
-	s_debugSpinnerFrameCounter++;
-	Graphic.Printf(
-		"Tina [%c]", sDebugSpinnerTextPtr[(s_debugSpinnerFrameCounter >> 4) % 4]);
+	alive++;
+	Graphic.Printf("Tina [%c]", pFan[(alive >> 4) % 4]);
 
 	g_par_calc_prof.ProfEnd();
 	g_par_draw_prof.ProfEnd();
@@ -1025,6 +989,8 @@ void CPartPcs::drawAfterViewer()
 		(double)((float)gPppHeapUseRateWords[0] / 100.0f),
 		(double)((float)gPppHeapUseRateWords[1] / 100.0f));
 }
+
+unsigned char g_IsCheckDrawDone;
 
 /*
  * --INFO--

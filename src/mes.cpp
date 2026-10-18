@@ -12,7 +12,11 @@
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h>
 
 // PAL map: CMes::m_tempVar in mes.o, .bss size 0x50.
+#ifdef VERSION_GCCJGC
+int CMes::m_tempVar[0x10];
+#else
 int CMes::m_tempVar[0x14];
+#endif
 
 static const char s_This_TAG_is_not_created_pct02x_801D9E10[] = "This TAG is not created.[%02x]\n";
 static const char s_Not_corresponding_TAG_is_used_pct02x_801D9E30[] = "Not corresponding TAG is used.[%02x]\n";

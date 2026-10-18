@@ -215,6 +215,7 @@ public:
 		void Create(CChunkFile&, CChara::CModel*, CChara::CNode::TYPE, CMemory::CStage*);
 		void Duplicate(CChara::CNode*, CMemory::CStage*);
 		void CalcBind(CChara::CModel*);
+		void SetCalcLocal(int calcLocal) { m_flagsBits.m_flag_80 = calcLocal; }
 		float (*GetWorldMatrix())[4] { return m_mtx; }
 		void GetWorldMatrix(float (*mtx)[4]) { PSMTXCopy(m_mtx, mtx); }
 		float (*GetLocalMatrix())[4] { return m_localRuntimeMtx; }

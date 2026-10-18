@@ -928,12 +928,12 @@ void CGMonObj::initFinishedFuncMeteoParasite()
 		int nodeIndex = m_charaModelHandle->m_model->SearchNode("to_a_obj");
 		CChara::CNode* node = m_charaModelHandle->m_model->m_nodes + nodeIndex;
 		reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_nodes[0] = node;
-		node->m_flagsBits.m_flag_80 = 0;
+		node->SetCalcLocal(0);
 
 		nodeIndex = m_charaModelHandle->m_model->SearchNode("to_b_obj");
 		CChara::CNode** nodes = reinterpret_cast<MeteoParasiteCBossWork*>(CGMonObj::m_boss)->m_nodes;
 		nodes[1] = m_charaModelHandle->m_model->m_nodes + nodeIndex;
-		nodes[1]->m_flagsBits.m_flag_80 = 0;
+		nodes[1]->SetCalcLocal(0);
 
 		char nodeName[256];
 		for (int i = 0; i < 12; i++) {
