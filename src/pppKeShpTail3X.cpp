@@ -242,11 +242,11 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
         nextIndex = 0;
     }
     nextBaseX = history[nextIndex].x;
+    nextBaseY = history[nextIndex].y;
     nextBaseZ = history[nextIndex].z;
     segDx = nextBaseX - posX;
-    nextBaseY = history[nextIndex].y;
-    segDz = nextBaseZ - posZ;
     segDy = nextBaseY - posY;
+    segDz = nextBaseZ - posZ;
     zeroVecA.z = 0.0f;
     zeroVecA.y = 0.0f;
     zeroVecA.x = 0.0f;
