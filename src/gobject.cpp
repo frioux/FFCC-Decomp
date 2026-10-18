@@ -1855,8 +1855,8 @@ void CGObject::update()
                 m_swayTarget.z += 0.2f * m_groundHitOffset.z;
             }
 
-            const float swayDx = m_swayTarget.z - m_swayDirection.z;
             const float swayDz = m_swayTarget.x - m_swayDirection.x;
+            const float swayDx = m_swayTarget.z - m_swayDirection.z;
             GObjSqrtf(swayDz * swayDz + swayDx * swayDx);
             m_swayDirection.x += 0.5f * swayDz;
             m_swayDirection.z += 0.5f * swayDx;
@@ -1882,9 +1882,9 @@ void CGObject::update()
                 PSMTXConcat(rotScratch, modelMtx, modelMtx);
                 const float swayTan = tan(negSwayAngle);
                 const float swayTanScaled = 2.0f * swayTan;
+                mtx1 -= swayTanScaled;
                 modelMtx[0][3] = mtx0;
                 modelMtx[2][3] = mtx2;
-                mtx1 -= swayTanScaled;
                 modelMtx[1][3] = mtx1;
             }
 

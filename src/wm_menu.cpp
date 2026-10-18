@@ -2401,8 +2401,8 @@ void CMenuPcs::CalcLoadMenu()
 					s_McOdekakeLoadPos[1] = (unsigned char)m_mcCtrl.GetDno();
 				}
 				for (int charaIdx = 0; charaIdx < kWmMenuPlayerCount; charaIdx++) {
-					WmCharaModelInfo* modelInfo = &m_wm.m_charaModelData[charaIdx];
 					int tribe;
+					WmCharaModelInfo* modelInfo = &m_wm.m_charaModelData[charaIdx];
 					int variant;
 					int gender;
 					if (m_wmWorldState->m_menuMode == 8 && m_cmakeWork != 0) {
