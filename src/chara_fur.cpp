@@ -99,17 +99,17 @@ static inline int nearColor(CColor src, CColor ref)
 {
 	int hits = 0;
 
-	int dr = abs(static_cast<int>(src.color.r) - static_cast<int>(ref.color.r));
-	dr += 7 - static_cast<int>(src.color.a);
-	hits += dr <= 5 ? 1 : 0;
+	int d = abs(static_cast<int>(src.color.r) - static_cast<int>(ref.color.r));
+	d += 7 - static_cast<int>(src.color.a);
+	hits += d <= 5 ? 1 : 0;
 
-	int dg = abs(static_cast<int>(src.color.g) - static_cast<int>(ref.color.g));
-	dg += 7 - static_cast<int>(src.color.a);
-	hits += dg <= 5 ? 1 : 0;
+	d = abs(static_cast<int>(src.color.g) - static_cast<int>(ref.color.g));
+	d += 7 - static_cast<int>(src.color.a);
+	hits += d <= 5 ? 1 : 0;
 
-	int db = abs(static_cast<int>(src.color.b) - static_cast<int>(ref.color.b));
-	db += 7 - static_cast<int>(src.color.a);
-	hits += db <= 5 ? 1 : 0;
+	d = abs(static_cast<int>(src.color.b) - static_cast<int>(ref.color.b));
+	d += 7 - static_cast<int>(src.color.a);
+	hits += d <= 5 ? 1 : 0;
 
 	return hits == 3 ? 1 : 0;
 }
@@ -491,12 +491,10 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 			CMaterial* shadowMaterials[2] = {0, 0};
 			MtxPtr shadowMatrices[2] = {0, 0};
 			shadowCount = MaterialMan.GetCharaShadow(2, shadowMaterials, shadowMatrices, modelPos, 100.0f, 20.0f, 0);
-			int texMtxOffset = 0;
 			for (int shadowIndex = 0; shadowIndex < shadowCount; shadowIndex++) {
 				const int shadowTexMap = shadowIndex + 3;
-				const int shadowTexMtxId = texMtxOffset + 0x21;
+				const int shadowTexMtxId = GX_TEXMTX1 + shadowIndex * 3;
 				TextureMan.SetTexture(static_cast<GXTexMapID>(shadowTexMap), shadowMaterials[shadowIndex]->GetTexture(0));
-				texMtxOffset += 3;
 
 				Mtx shadowTexMtx;
 				PSMTXConcat(shadowMatrices[shadowIndex], meshMtx, shadowTexMtx);
@@ -519,8 +517,9 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		GXSetArray(GX_VA_NRM, mesh->m_workNormals, 6);
 		GXSetArray(GX_VA_TEX0, mesh->m_data->m_uvs, sizeof(S16Vec2d));
 
+		int normGqr;
 		unsigned int posGqr = m_data->m_posQuant;
-		int normGqr = m_data->m_normQuant;
+		normGqr = m_data->m_normQuant;
 		CChara::CMesh::CDisplayList* displayList = mesh->m_data->m_displayLists;
 		Chara.gqrInit(posGqr << 0x18 | 0x70000 | posGqr << 8 | 7, normGqr << 0x18 | 0x70000 | normGqr << 8 | 7,
 		              0xC070C07);
@@ -731,12 +730,9 @@ static void brush(unsigned short* pixels, int width, int height, float fx, float
 			} else {
 				float k = (float)(distance / 4) + (float)(7 - targetColor.a) / 7.0f;
 				k = (1.0f < k) ? 1.0f : k;
-				{
-					float inv = 1.0f - k;
-					r = (int)((float)r * k + (float)targetColor.r * inv);
-					g = (int)((float)g * k + (float)targetColor.g * inv);
-					b = (int)((float)b * k + (float)targetColor.b * inv);
-				}
+				r = (int)((float)r * k + (float)targetColor.r * (1.0f - k));
+				g = (int)((float)g * k + (float)targetColor.g * (1.0f - k));
+				b = (int)((float)b * k + (float)targetColor.b * (1.0f - k));
 				r = (r < 0) ? 0 : (r > 0x0f ? 0x0f : r);
 				g = (g < 0) ? 0 : (g > 0x0f ? 0x0f : g);
 				b = (b < 0) ? 0 : (b > 0x0f ? 0x0f : b);
@@ -838,7 +834,7 @@ int CChara::CModel::PickFur(
 					int count = *reinterpret_cast<const unsigned short*>(cursor + 1);
 					cursor += 3;
 					const int primitive = command & 0xF8;
-					remaining -= count * 8 + 3;
+					remaining -= (unsigned short)count * 8 + 3;
 					const unsigned short* indices = reinterpret_cast<const unsigned short*>(cursor);
 					int vertexIndex = 0;
 					if (primitive == GX_TRIANGLES || primitive == GX_TRIANGLESTRIP) {
@@ -1115,8 +1111,9 @@ inline void CChara::CModel::CopyFurTex(int loadFromTexture)
 		return;
 	}
 
-	int height = texture->m_height;
+	int height;
 	int width = texture->m_width;
+	height = texture->m_height;
 	void* image = texture->m_imageData;
 	if (loadFromTexture != 0) {
 		memcpy(Chara.MogFur().m_texels, image, 0x2000);
@@ -1224,10 +1221,8 @@ void CChara::CModel::MogFurFrame(CGObject* gObject)
 		}
 	}
 
-	Chara.MogFur().m_cursorX = static_cast<int>(10.0f * Pad.GetLeftStickX(0) +
-	                                     static_cast<float>(Chara.MogFur().m_cursorX));
-	Chara.MogFur().m_cursorY = static_cast<int>(-(10.0f * Pad.GetLeftStickY(0) -
-	                                     static_cast<float>(Chara.MogFur().m_cursorY)));
+	Chara.MogFur().m_cursorX += 10.0f * Pad.GetLeftStickX(0);
+	Chara.MogFur().m_cursorY -= 10.0f * Pad.GetLeftStickY(0);
 
 	const int cursorXv = Chara.MogFur().m_cursorX;
 	int cursorXc;
@@ -1496,8 +1491,7 @@ void CChara::CalcMogScore()
 			m_sharedState.m_mogFur.m_alphaScore += a;
 
 			const int ring = dist % 12;
-			int angle = static_cast<int>(MTXRadToDeg(std::atan2(dx, dy))) + 0x168;
-			angle %= 0x2D;
+			const int angle = (static_cast<int>(MTXRadToDeg(std::atan2(dx, dy))) + 0x168) % 0x2D;
 
 			for (int i = 0; i < 3; i++) {
 				if (ring >= i * 4 && ring < (i + 1) * 4) {
@@ -1533,14 +1527,7 @@ void CChara::CalcMogScore()
 		int level;
 
 		*scorePtr = (line + circle * 2 - bit * 2) / 3;
-		int sc;
-		if (*scorePtr < 0) {
-			sc = 0;
-		} else {
-			sc = 100;
-			if (*scorePtr <= 100) sc = *scorePtr;
-		}
-		*scorePtr = sc;
+		*scorePtr = *scorePtr < 0 ? 0 : (*scorePtr > 100 ? 100 : *scorePtr);
 
 		m_sharedState.m_mogFur.m_radarLevel[i] = (100 - *scorePtr) / 5;
 		const int lv = m_sharedState.m_mogFur.m_radarLevel[i];
