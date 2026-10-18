@@ -1674,8 +1674,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 	l_pHitCross = hitPos;
 	l_idxAttackCol = attackColIndex;
 
-	int damageAmount;
 	int staType;
+	int damageAmount;
 	int counterType;
 	int counterItem;
 	int counterSe;
@@ -1707,8 +1707,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		return;
 	}
 
-	int particleLife = itemRows[itemId].m_actionType;
 	int itemEffect = itemRows[itemId].m_effect;
+	int particleLife = itemRows[itemId].m_actionType;
 	int scriptDefense = m_scriptHandle->m_statusTimers[0];
 	int damageClamp;
 	calcRegist(staType, itemId, resistType, allowEffect, effectResult, 0);
