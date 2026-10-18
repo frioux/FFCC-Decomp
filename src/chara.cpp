@@ -1714,7 +1714,7 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 
 	const int cullFlag = flags & 1;
 	const int shadowDisabled = ((flags >> 1) & 1) ^ 1;
-	const int materialAlpha = (flags >> 2) & 1;
+	int materialAlpha = (flags >> 2) & 1;
 	const int shadowCullEnabled = (flags >> 3) & 1;
 	const int skipShadowPosition = ((flags >> 4) & 1) ^ 1;
 	BeforeDrawModelCallback beforeDrawModel = m_beforeDrawModelCallback;
@@ -1742,11 +1742,11 @@ void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 	GXSetCullMode(static_cast<GXCullMode>(cullMode));
 	LightPcs.SetAmbientAlpha(m_lightAlpha);
 
-	int lastZWrite = 0;
-	int lastLightEnable = 0;
 	CCharaMeshRaw* mesh = m_meshes;
+	int lastLightEnable = 0;
+	int lastZWrite = 0;
 
-	for (int meshIndex = 0; meshIndex < m_data->m_meshCount; meshIndex++, mesh++) {
+	for (s32 meshIndex = 0; meshIndex < m_data->m_meshCount; meshIndex++, mesh++) {
 		if (mesh->m_workPositions == 0) {
 			continue;
 		}
