@@ -61,7 +61,7 @@ public:
     void DrawItemInfo0();
     void DrawItemInfo(int, int, int, int, int, int, int, int);
     void DrawItemHelp(int, int, int);
-    void DrawDec(int, int, int, float, float, int, int, int);
+    int DrawDec(int, int, int, float, float, int, int, int);
     void DrawDecScale(int, int, int, float, float, float, int, int, int);
     void setFaceAlpha(int, int);
 
