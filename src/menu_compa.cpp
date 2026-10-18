@@ -28,8 +28,6 @@ enum {
 
 typedef unsigned char u8;
 
-static const char sCompaFamilyCountErrorFmt[] = "%s(%d):family cnt error!!(%d)\n";
-static const char s_menu_compa_cpp[] = "menu_compa.cpp";
 
 STATIC_ASSERT(sizeof(CompaOpenAnimList) == 0x1008);
 
@@ -171,7 +169,7 @@ void CMenuPcs::CompaDraw()
 		}
 	}
 	if (familyCount > 4 && static_cast<unsigned int>(System.m_execParam) >= 1) {
-		System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1BF,
+		System.Printf("%s(%d):family cnt error!!(%d)\n", "menu_compa.cpp", 0x1BF,
 		              familyCount);
 	}
 	if (familyCount > 4) {
@@ -213,7 +211,7 @@ void CMenuPcs::CompaDraw()
 
 		foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][1 + drawIndex];
 		if (*foodPtr == 0 && static_cast<unsigned int>(System.m_execParam) >= 1) {
-			System.Printf(const_cast<char*>(sCompaFamilyCountErrorFmt), s_menu_compa_cpp, 0x1E0,
+			System.Printf("%s(%d):family cnt error!!(%d)\n", "menu_compa.cpp", 0x1E0,
 			              shown);
 		}
 		unsigned int food = *foodPtr;
