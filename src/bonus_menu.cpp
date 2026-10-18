@@ -1272,8 +1272,8 @@ void CMenuPcs::CalcResultCountAnim()
 	CMenuPcs::Sprt2* sprite;
 	int frame;
 	int work;
-	int activePartyCount;
 	int i;
+	int activePartyCount;
 	int countTop;
 
 	activePartyCount = s_Rinfo->m_partyCount;
@@ -2659,8 +2659,8 @@ void CMenuPcs::DrawSelectOpenAnim()
 		font->DrawInit();
 		font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
 
-		float centerX = (float)((double)sprite->x + (double)(float)sprite->w / 2.0);
 		float centerY = (float)((double)sprite->y + (double)(float)sprite->h / 2.0);
+		float centerX = (float)((double)sprite->x + (double)(float)sprite->w / 2.0);
 		idx = (int)s_Rinfo->m_artifacts[this->m_bonusState->m_selection];
 		char* title = Game.GetShortItemName(idx);
 		font->SetPosX((float)(centerX - font->GetWidth(title) / 2.0));
@@ -2900,9 +2900,9 @@ void CMenuPcs::CalcSelectWait()
 		CMenuPcs::Sprt2* cursor = &m_bonusAnim->sprites[count2 - 1];
 		if (this->m_bonusState->m_currentRank < activePartyCount) {
 			CMenuPcs::Sprt2* partySprite = cursor - (activePartyCount * 2 - this->m_bonusState->m_currentRank);
-			int pulseFrame = abs(frame % 20 - 10);
 			cursor->x = (short)(partySprite->x - 3);
 			cursor->y = (short)(partySprite->y - 8);
+			int pulseFrame = abs(frame % 20 - 10);
 			cursor->alpha = (float)((double)pulseFrame / 10.0);
 		} else {
 			cursor->alpha = 0.0f;

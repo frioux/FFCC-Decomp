@@ -2354,6 +2354,7 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			continue;
 		}
 
+		int artifactLevel;
 		int actionType;
 		if (m_scriptHandle->m_romWork[0x86] == 1) {
 			actionType = actionFlags & 3;
@@ -2365,11 +2366,12 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 			continue;
 		}
 
-		int artifactLevel;
 		if (Game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
-			int idx = Game.m_gameWork.m_bossArtifactStageIndex;
-			int stage = Game.m_gameWork.m_bossArtifactStageTable[idx];
-			artifactLevel = stage < 2 ? stage : 2;
+			int stage = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
+			artifactLevel = 2;
+			if (stage < 2) {
+				artifactLevel = stage;
+			}
 		} else {
 			artifactLevel = 0;
 		}
@@ -2380,11 +2382,10 @@ int CGMonObj::mlAttackCheck(int partyIndex)
 		}
 
 		if ((actionFlags & 0x40) != 0) {
-			float targetRot = m_partyAngle[partyIndex];
 			float baseRot =
 				0.017453292f * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScriptW + actionOffset + 0x118)) +
 				m_rotBaseY;
-			float angleDelta = (float)__fabs(Math.DstRot(targetRot, baseRot));
+			float angleDelta = (float)__fabs(Math.DstRot(m_partyAngle[partyIndex], baseRot));
 			System.Printf("ACT_FLAG_ROT_CHECK 差分=%f度。\n", 57.29578f * angleDelta);
 			float angleLimit =
 				0.017453292f * static_cast<float>(*reinterpret_cast<unsigned short*>(aiScript + actionOffset + 0x11A));

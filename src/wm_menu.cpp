@@ -9662,8 +9662,8 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 {
 	CFont* font;
 	const char* const* msgTable;
-	int maxWidth;
 	int i;
+	int maxWidth;
 	const WinMessEntry* winMess;
 #ifdef VERSION_GCCJGC
 	int msgId;

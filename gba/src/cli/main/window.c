@@ -1092,6 +1092,15 @@ void Window_OpenStyle7(struct Window *win, s32 tile, s32 pal)
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x0200743C
+ * PAL Size: 616b
+ * EN Address: 0x020073CC
+ * EN Size: 616b
+ * JP Address: 0x02007600
+ * JP Size: 616b
+ */
 void Window_OpenStyle8(struct Window *win, s32 tile, s32 pal)
 {
     u16 buf[30];
@@ -1128,8 +1137,8 @@ void Window_OpenStyle8(struct Window *win, s32 tile, s32 pal)
                 k += 6;
             buf[i] = k | pal;
         }
-        tile = win->y + (win->anim >> 3);
-        map = Bg_GetMapPtr(win->bg, win->x, tile);
+        k = win->y + (win->anim >> 3);
+        map = Bg_GetMapPtr(win->bg, win->x, k);
         DmaCopy16(0, buf, map, win->width << 1);
     } else {
         s32 row = win->anim >> 3;
@@ -1138,14 +1147,16 @@ void Window_OpenStyle8(struct Window *win, s32 tile, s32 pal)
             attr = Window_GetItemPalette(1, win->slot);
             for (i = 0; i < win->width; i++) {
                 if (i <= 1 || i >= win->width - 2) {
-                    if (i <= 1)
+                    if (i <= 1) {
                         a = i + 12;
-                    else
+                        t = tile + a;
+                    } else {
                         a = i - win->width + 16;
-                    t = tile + a;
+                        t = tile + a;
+                    }
                     if (k)
                         t += 4;
-                    a = pal;
+                    buf[i] = t | pal;
                 } else {
                     if (!(i & 2))
                         t = tile - 4;
@@ -1153,9 +1164,8 @@ void Window_OpenStyle8(struct Window *win, s32 tile, s32 pal)
                         t = tile - 2;
                     if (k)
                         t += 1;
-                    a = attr;
+                    buf[i] = t | attr;
                 }
-                buf[i] = t | a;
             }
             map = Bg_GetMapPtr(win->bg, win->x, (py - 8) >> 3);
             DmaCopy16(0, buf, map, win->width << 1);

@@ -490,8 +490,8 @@ static int CreateWaterMesh(Vec* positions, Vec* normals, Vec2d* texCoords, unsig
     rowCount = 0;
     uvStep = 0.0625f;
     float half = 0.5f;
-    radius = waterScale * half;
     step = waterScale * uvStep;
+    radius = waterScale * half;
     for (z = radius; z >= -radius; z -= step) {
         colCount = 0;
         for (x = -radius; x <= radius; x += step) {

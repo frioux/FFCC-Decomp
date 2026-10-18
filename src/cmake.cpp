@@ -605,8 +605,8 @@ void CMenuPcs::CalcSingCMake()
                                 static_cast<int>(s_CmakeInfo.m_gender));
                             m_wm.m_charaModelData[slot].m_modelNo = modelNo;
 
-                            caravanWork = &Game.m_caravanWorkArr[slot];
                             m_wm.m_charaSelectData->m_confirmed = 1;
+                            caravanWork = &Game.m_caravanWorkArr[slot];
                             caravanWork->LoadInit();
                             caravanWork->m_shopState = 1;
                             caravanWork->unk_0x3a8 = 0x101;

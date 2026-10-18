@@ -1337,13 +1337,17 @@ void CMenuPcs::LetterMessDraw()
 	strcpy(srcText, Game.GetLetter((msgIndex & 0x7FC) >> 2));
 #ifdef VERSION_GCCJGC
 	CMes::MakeAgbString(workText, srcText);
-	int y = 0x60;
 #else
 	CMes::MakeAgbString(workText, srcText, caravanWork->m_genderFlag, 0);
-	int y = 0x58;
 #endif
 
+	int y;
 	int i = 0;
+#ifdef VERSION_GCCJGC
+	y = 0x60;
+#else
+	y = 0x58;
+#endif
 	char* curLine = workText;
 	for (; i < 7; ++i) {
 		char* newline = strchr(curLine, '\n');
@@ -1415,7 +1419,7 @@ void CMenuPcs::LetterMessDraw()
 				itemSel += s_Attach == 2 ? 3 : 4;
 			}
 			itemSel *= SingWinMessHeight();
-			y0 = static_cast<float>(m_menuWindowInfo->y + (itemSel + 0x20));
+			y0 = static_cast<float>(m_menuWindowInfo->y + 0x20 + itemSel);
 		} else if ((mode == 3) || (mode == 4)) {
 			x0 = static_cast<float>(m_menuWindowInfo->x - 8);
 			if (mode == 4) {
@@ -1423,7 +1427,7 @@ void CMenuPcs::LetterMessDraw()
 			}
 			int itemSel = m_letterMenuState->choiceCursor;
 			itemSel *= SingWinMessHeight();
-			y0 = static_cast<float>(m_menuWindowInfo->y + (itemSel + 0x20));
+			y0 = static_cast<float>(m_menuWindowInfo->y + 0x20 + itemSel);
 		}
 
 		int frameAnim = static_cast<int>(System.GetCounter()) % 8;

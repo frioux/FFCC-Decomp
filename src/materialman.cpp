@@ -3651,8 +3651,7 @@ unsigned int CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
  */
 void CMaterialSet::CacheLoadTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
 {
-    CMaterial* material =
-        m_materials[static_cast<unsigned long>(materialIndex)];
+    CMaterial* material = GetMaterial(materialIndex);
     if (material != 0) {
         material->CacheLoadTexture(amemCacheSet);
     }
@@ -3669,8 +3668,7 @@ void CMaterialSet::CacheLoadTexture(int materialIndex, CAmemCacheSet* amemCacheS
  */
 void CMaterialSet::CacheUnLoadTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
 {
-    CMaterial* material =
-        m_materials[static_cast<unsigned long>(materialIndex)];
+    CMaterial* material = GetMaterial(materialIndex);
     if (material != 0) {
         material->CacheUnLoadTexture(amemCacheSet);
     }
@@ -3687,8 +3685,7 @@ void CMaterialSet::CacheUnLoadTexture(int materialIndex, CAmemCacheSet* amemCach
  */
 inline void CMaterialSet::CacheRefCnt0UpTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
 {
-    CMaterial* material =
-        m_materials[static_cast<unsigned long>(materialIndex)];
+    CMaterial* material = GetMaterial(materialIndex);
     if (material != 0) {
         material->CacheRefCnt0UpTexture(amemCacheSet);
     }
