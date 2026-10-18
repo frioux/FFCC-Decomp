@@ -281,9 +281,10 @@ void CGItemObj::onFrameStat()
 	}
 	case 0xB:
 		if (m_stateFrame == m_carryFrame) {
-			Attach(m_owner,
-			       const_cast<char*>((Game.m_gameWork.m_menuStageMode != 0 && ItemIsGbaCaravan(m_owner)) ? "c_item3" : "l_item"),
-			       CVector(0.0f, 0.0f, 0.0f));
+			const CVector& attachOffset = CVector(0.0f, 0.0f, 0.0f);
+			Vec* attachOffsetPtr = reinterpret_cast<Vec*>(const_cast<CVector*>(&attachOffset));
+			bool useBossAttachName = Game.m_gameWork.m_menuStageMode != 0 && ItemIsGbaCaravan(m_owner);
+			Attach(m_owner, const_cast<char*>(useBossAttachName ? "c_item3" : "l_item"), attachOffsetPtr);
 			changeStat(0, 0, 0);
 			m_bodyEllipsoidRadius = 0.0f;
 		}
