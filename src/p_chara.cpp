@@ -1418,7 +1418,7 @@ void CCharaPcs::FreeMergeFile(int releaseMask)
  */
 inline int CCharaPcs::isCached(int mergeFileId, int)
 {
-    unsigned int i;
+    long i;
 
     for (i = 0; i < m_loadModels.GetSize(); i++) {
         CLoadModel* loadModel = m_loadModels[i];

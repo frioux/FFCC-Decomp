@@ -34,7 +34,7 @@ CPtrArray<T>::~CPtrArray()
 }
 
 template <class T>
-int CPtrArray<T>::GetSize()
+unsigned long CPtrArray<T>::GetSize()
 {
     return m_numItems;
 }

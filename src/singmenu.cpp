@@ -1967,7 +1967,7 @@ void CMenuPcs::DrawSingWin(short mode)
     MenuPcs.DrawRect(uvFlag, innerX, innerY, static_cast<float>(innerW), static_cast<float>(innerH), 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
     MenuWindowInfo* win = m_menuWindowInfo;
-    s16 state = win->state;
+    int state = win->state;
     if (state == 0) {
         win->frame = win->frame + 1;
         if (m_menuWindowInfo->frame >= SINGWIN_OPEN_FRAMES) {

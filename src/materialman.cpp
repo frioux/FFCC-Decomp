@@ -3412,7 +3412,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     while (chunkFile.GetNextChunk(chunk) != 0) {
                         switch (chunk.m_id) {
                         case CHUNK_TSDT: {
-                            unsigned int slot = chunkFile.Get2() & 0xFFFF;
+                            unsigned char slot = chunkFile.Get2();
                             chunkFile.Get2();
 
                             if (keyFrameU != 0) {

@@ -1842,8 +1842,8 @@ void CMapMng::Draw()
                         static_cast<GXTevStageID>(finalStage), GX_TEV_COMP_A8_GT, GX_TB_ZERO, GX_CS_SCALE_1, 0,
                         GX_TEVPREV);
 
-                    GXSetNumTexGens(static_cast<unsigned char>(batchCount));
                     GXSetNumTevStages(static_cast<unsigned char>(stage + 2));
+                    GXSetNumTexGens(static_cast<unsigned char>(batchCount));
 
                     shadowCount -= batchCount;
                     startIndex += batchCount;

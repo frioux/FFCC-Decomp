@@ -12,7 +12,7 @@ public:
 
     int Add(T item);
     void SetAt(unsigned long index, T item);
-    int GetSize();
+    unsigned long GetSize();
     void RemoveAll();
     void ReleaseAndRemoveAll();
     void DeleteAndRemoveAll();
