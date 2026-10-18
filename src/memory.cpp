@@ -1306,7 +1306,7 @@ void CMemory::CStage::drawHeapTitle(int y)
     int unuse = 0;
     int maxUnuse = 0;
     CBlock* prev = block->m_prev;
-    unsigned long top = m_heapTop;
+    int top = m_heapTop;
     char buf[0x108];
 
     while ((block->m_flags & 2) == 0) {

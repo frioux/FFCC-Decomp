@@ -6016,9 +6016,9 @@ void CMenuPcs::DrawWMFrame()
 			digitCnt = 3;
 		}
 #ifdef VERSION_GCCJGC
-		const int languageYOffset = 0;
+		const s32 languageYOffset = 0;
 #else
-		const int languageYOffset = language != 5 ? 0 : 0xE;
+		const s32 languageYOffset = language != 5 ? 0 : 0xE;
 #endif
 
 		if (digitCnt == 3) {
