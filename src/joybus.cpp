@@ -4655,23 +4655,24 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
             GbaQue.GetCaravanName((char*)body);
 
             GbaPInfo* player = playerInfo;
-            unsigned char lowBits = 0;
+            unsigned char lowBits;
             unsigned char* cf = classFlags;
+            int highBits;
 
-            for (int highBits = 0; highBits < 4; highBits++)
+            for (highBits = 0, lowBits = 0; highBits < 4; highBits++)
             {
                 if (player->m_maxHp != 0)
                 {
-                    int idx = (int)player->m_saveSlot >> 1;
-                    signed char v = cf[idx] & 0x0F;
+                    unsigned char c = cf[player->m_saveSlot >> 1];
+                    signed char v = c & 0x0F;
                     v |= lowBits;
 
                     if ((player->m_saveSlot & 1) != 0)
                     {
-                        v = (cf[idx] & 0xF0) | highBits;
+                        v = (c & 0xF0) | highBits;
                     }
 
-                    cf[idx] = v;
+                    cf[player->m_saveSlot >> 1] = v;
                 }
 
                 player++;
