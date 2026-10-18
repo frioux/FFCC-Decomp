@@ -2802,8 +2802,8 @@ void CMenuPcs::CalcSelectWait()
 	if (this->m_menuWindowInfo->state != 3) {
 		if (this->m_menuWindowInfo->state == 1) {
 			int padSlot = s_Rinfo->m_party[i].m_partySlot;
-			unsigned short repeat = Pad.GetButtonRepeat(padSlot);
 			unsigned short down = Pad.GetButtonDown(padSlot);
+			unsigned short repeat = Pad.GetButtonRepeat(padSlot);
 			if ((repeat & 3) != 0) {
 				this->m_bonusState->m_confirmSelection ^= 1;
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
@@ -3060,8 +3060,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 		i = 0;
 		{
 			sprite = &m_bonusAnim->sprites[idx++];
-			sprite->startFrame = i;
 			sprite->duration = kFadeFrames;
+			sprite->startFrame = i;
 			sprite->flags = 2;
 		}
 		{
@@ -3209,8 +3209,8 @@ void CMenuPcs::CalcSelectCloseAnim()
 			int centerY = (int)(float)((double)(float)((double)sprite->h / 2.0 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
 			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
 			m_wm.m_worldObjData[i].m_viewportY = (short)centerY;
-			m_wm.m_worldObjData[i].m_scissorX = (int)(12.0f + ((float)sprite->x + sprite->motionX));
 			m_wm.m_worldObjData[i].m_scissorY = (int)(((float)sprite->y + sprite->motionY) - 8.0f);
+			m_wm.m_worldObjData[i].m_scissorX = (int)(12.0f + ((float)sprite->x + sprite->motionX));
 			if ((double)m_wm.m_worldObjData[i].m_scissorX < 0.0) {
 				m_wm.m_worldObjData[i].m_scissorX = 0;
 			}

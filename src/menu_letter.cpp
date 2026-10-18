@@ -1874,8 +1874,8 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	for (i = 0; i < 2; ++i) {
 		flip = 0;
 		if (i != 0) {
-			flip |= 8;
 			x = x1;
+			flip |= 8;
 		}
 		MenuPcs.DrawRect(
 		    flip, x, innerY, 32.0f, innerHf,

@@ -5807,8 +5807,8 @@ void CMenuPcs::CalcWMFrame()
 		const double dV12 = 32.0;
 		const double dV11 = 360.0;
 		for (i = topDigitIdx; i >= 0; i--) {
-				int digit = digits[i];
 				m_wm.m_frameData->m_yearSprites[i].m_x = (short)digitX;
+				int digit = digits[i];
 				int digitW = s_YearWTbl[digit];
 				m_wm.m_frameData->m_yearSprites[i].m_y = kWorldYearDigitY;
 				m_wm.m_frameData->m_yearSprites[i].m_width = (short)digitW;
@@ -9549,8 +9549,8 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 		const float xAdd = (((centerX - static_cast<float>(m_menuWindowInfo->x)) - 32.0f) / static_cast<float>(kMcWindowFrames)) * static_cast<float>(m_menuWindowInfo->frame);
 		const float yAdd = (((centerY - static_cast<float>(m_menuWindowInfo->y)) - 32.0f) / static_cast<float>(kMcWindowFrames)) * static_cast<float>(m_menuWindowInfo->frame);
 		sx -= xAdd;
-		sy -= yAdd;
 		sw = static_cast<float>(2.0 * static_cast<double>(32.0f + xAdd));
+		sy -= yAdd;
 		sh = static_cast<float>(2.0 * static_cast<double>(32.0f + yAdd));
 	} else {
 		sx = static_cast<float>(m_menuWindowInfo->x);
@@ -9559,8 +9559,8 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 		sh = static_cast<float>(m_menuWindowInfo->height);
 	}
 
-	sx = static_cast<float>(static_cast<int>(static_cast<double>(sx) - DOUBLE_803313F8));
 	sw = static_cast<float>(static_cast<int>(static_cast<double>(sw) - DOUBLE_80331420));
+	sx = static_cast<float>(static_cast<int>(static_cast<double>(sx) - DOUBLE_803313F8));
 	sy = static_cast<float>(static_cast<int>(static_cast<double>(sy) - DOUBLE_803313F8));
 	sh = static_cast<float>(static_cast<int>(static_cast<double>(sh) - DOUBLE_80331420));
 
@@ -9600,10 +9600,10 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>((kind != 0) ? kAltWindowTextureBase + 2 : kMcWindowTextureBase + 1));
-	const double innerWidthD = static_cast<double>(sw) - 64.0;
 	const float innerX = 32.0f + sx;
-	const float innerWidthF = static_cast<float>(innerWidthD);
+	const double innerWidthD = static_cast<double>(sw) - 64.0;
 	float y = sy;
+	const float innerWidthF = static_cast<float>(innerWidthD);
 	for (rectIdx = 0; rectIdx < 2; rectIdx++) {
 		flags = 0;
 		if (rectIdx != 0) {
