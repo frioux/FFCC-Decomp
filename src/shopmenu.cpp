@@ -838,9 +838,14 @@ static void drawShapeSeqGrouad(int shapeNo, int groupNo, int x, int y, float sca
     MaterialMan.InitEnv();
     MaterialMan.LockEnv();
 
+#ifdef VERSION_GCCJGC
     _GXColor ambColor = {0xFF, 0xFF, 0xFF, 0xFF};
     _GXColor matColor = {0, 0, 0, 0};
     GXSetChanAmbColor(GX_COLOR0A0, ambColor);
+#else
+    _GXColor matColor = {0, 0, 0, 0};
+    GXSetChanAmbColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(const_cast<unsigned int*>(&DAT_80332D04)));
+#endif
     GXSetChanMatColor(GX_COLOR0A0, matColor);
 
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
@@ -2289,8 +2294,14 @@ inline void drawGrouadQuad(int x, int y, int width, int height, _GXColor colorA,
 {
     setOrtho(0x140, 0xE0, FLOAT_80332d78, FLOAT_80332DD0, FLOAT_80332D9C);
 
+#ifdef VERSION_GCCJGC
     _GXColor mat = {0xFF, 0xFF, 0xFF, 0xFF};
     GXSetChanAmbColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(const_cast<unsigned int*>(&DAT_80332D04)));
+#else
+    _GXColor amb = {0xFF, 0xFF, 0xFF, 0xFF};
+    _GXColor mat = {0xFF, 0xFF, 0xFF, 0xFF};
+    GXSetChanAmbColor(GX_COLOR0A0, amb);
+#endif
     GXSetChanMatColor(GX_COLOR0A0, mat);
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
     _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
