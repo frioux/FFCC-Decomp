@@ -539,6 +539,16 @@ void CGraphic::_WaitDrawDone(char* file, int line)
     m_drawDoneCounter += 1;
 }
 
+static inline const char* GetOrderName(CSystem::COrder* order)
+{
+    return order ? order->m_debugName : "---";
+}
+
+static inline int GetOrderIndex(CSystem::COrder* order)
+{
+    return order ? order->m_insertIndex : -1;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800193c8
@@ -578,15 +588,8 @@ void CGraphic::Thread()
 
                 CSystem::COrder* order = System.GetOrder(drawSyncPart >> 8);
                 char drawSyncByte = drawSyncPart & 0xFF;
-                int orderIndex;
-                const char* orderName;
-                if (order != nullptr) {
-                    orderIndex = order->m_insertIndex;
-                    orderName = order->m_debugName;
-                } else {
-                    orderName = "---";
-                    orderIndex = -1;
-                }
+                int orderIndex = GetOrderIndex(order);
+                const char* orderName = GetOrderName(order);
                 System.Printf("DrawDone(file = %s line = %d process = %s(%d) data = %d)が終了しません。\n", m_drawDoneFile, m_drawDoneLine, orderName, orderIndex,
                               drawSyncByte);
             }
@@ -1111,25 +1114,21 @@ void CGraphic::makeSphere()
     GXBeginDisplayList(m_sphereDisplayList, m_sphereDisplayListSize);
     GXBegin(GX_LINES, GX_VTXFMT0, 0xB0);
 
-    int ring = 0;
-    for (; ring < 5; ring++) {
+    for (int ring = 0; ring < 5; ring++) {
         for (int seg = 0; seg < 8; seg++) {
-            int current = ring * 8 + 1 + seg;
-            GXPosition3f32(vertices[current][1], vertices[current][0], vertices[current][2]);
-            int next = ring * 8 + 1 + (seg + 1) % 8;
-            GXPosition3f32(vertices[next][1], vertices[next][0], vertices[next][2]);
+            float* v = vertices[ring * 8 + 1 + seg];
+            GXPosition3f32(v[1], v[0], v[2]);
+            v = vertices[ring * 8 + 1 + (seg + 1) % 8];
+            GXPosition3f32(v[1], v[0], v[2]);
         }
     }
 
     for (int seg = 0; seg < 8; seg++) {
-        int ring = 0;
-        int ringBase = 1;
-        for (; ring < 6; ring++) {
-            int current = ring == 0 ? 0 : 1 + (ring - 1) * 8 + seg;
-            GXPosition3f32(vertices[current][1], vertices[current][0], vertices[current][2]);
-            int next = ring + 1 == 6 ? 41 : seg + ringBase;
-            GXPosition3f32(vertices[next][1], vertices[next][0], vertices[next][2]);
-            ringBase += 8;
+        for (int ring = 0; ring < 6; ring++) {
+            float* v = vertices[ring == 0 ? 0 : 1 + (ring - 1) * 8 + seg];
+            GXPosition3f32(v[1], v[0], v[2]);
+            v = vertices[ring + 1 == 6 ? 41 : 1 + ring * 8 + seg];
+            GXPosition3f32(v[1], v[0], v[2]);
         }
     }
 
