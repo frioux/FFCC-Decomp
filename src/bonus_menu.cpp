@@ -2827,7 +2827,7 @@ void CMenuPcs::CalcSelectWait()
 	} else {
 		if ((int)this->m_bonusState->m_selectionDelay == 0 && this->m_bonusState->m_currentRank < activePartyCount) {
 			int padSlot = s_Rinfo->m_party[i].m_partySlot;
-			unsigned short repeat = Pad.GetButtonRepeat(padSlot);
+			int repeat = Pad.GetButtonRepeat(padSlot);
 			unsigned short down = Pad.GetButtonDown(padSlot);
 			if ((repeat & 9) != 0) {
 				this->m_bonusState->m_selection++;
