@@ -2288,7 +2288,7 @@ int CCaravanWork::GetNumCombi(int cmdListIdx)
 int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int dir)
 {
 	while (true) {
-		int prev = cmdListIdx;
+		short prev = cmdListIdx;
 		cmdListIdx = prev + dir;
 
 		if (cmdListIdx < 0) {

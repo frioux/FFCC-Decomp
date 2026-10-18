@@ -1259,7 +1259,7 @@ void CChara::CModel::calcMatrix()
 	}
 
 	CNode* node = ModelNodes(this);
-	u32 nodeCount = ModelNodeCount(this);
+	int nodeCount = ModelNodeCount(this);
 	for (u32 i = 0; i < nodeCount; i++, node++) {
 		CChara::CNode::CRefData* ref = node->m_refData;
 		CNode* parentNode = (ref->m_parentIndex < 0) ? 0 : &m_nodes[ref->m_parentIndex];
