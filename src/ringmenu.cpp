@@ -87,24 +87,14 @@ void CRingMenu::Create()
 	m_stateFlag = -1;
 	m_transitionCounter = 0x10;
 	m_animDirection = 1;
-	m_battleButtons[0] = 0;
-	m_battleButtons[2] = -1;
-	m_battleButtons[3] = -1;
-	m_buttonTimers[0] = 0;
-	m_buttonTimers[1] = 0;
-	m_buttonTimers[2] = 0;
-	m_battleButtons[1] = 0;
-	m_battleButtons[4] = -1;
-	m_battleButtons[5] = -1;
-	m_buttonTimers[3] = 0;
-	m_buttonTimers[4] = 0;
-	m_buttonTimers[5] = 0;
-	m_battleButtons[2] = 0;
-	m_battleButtons[6] = -1;
-	m_battleButtons[7] = -1;
-	m_buttonTimers[6] = 0;
-	m_buttonTimers[7] = 0;
-	m_buttonTimers[8] = 0;
+	for (int group = 0; group < 3; group++) {
+		m_battleButtons[group] = 0;
+		m_battleCommands[group][0] = -1;
+		m_battleCommands[group][1] = -1;
+		m_buttonTimers[group][0] = 0;
+		m_buttonTimers[group][1] = 0;
+		m_buttonTimers[group][2] = 0;
+	}
 	m_ringRotation = -1;
 	m_rotationPhase = -1;
 	m_spinPhase = 0.0f;
@@ -172,15 +162,15 @@ void CRingMenu::onCalc()
 		m_commonFrameCounter = m_commonFrameCounter + 1;
 		m_timerB = (m_timerB - 1 < 0) ? 0 : m_timerB - 1;
 
-		for (int button = 0; button < 9; button++) {
-			m_buttonTimers[button] = (m_buttonTimers[button] - 1 < 0) ? 0 : m_buttonTimers[button] - 1;
+		for (int group = 0; group < 3; group++) {
+			for (int button = 0; button < 3; button++) {
+				m_buttonTimers[group][button] = (m_buttonTimers[group][button] - 1 < 0) ? 0 : m_buttonTimers[group][button] - 1;
+			}
 		}
-		for (int anim = 0; anim < 9; anim++) {
-			for (int component = 0; component < 3; component++) {
-				m_animFloat[anim][component] -= 0.1f;
-				if (m_animFloat[anim][component] < 0.0f) {
-					m_animFloat[anim][component] = 0.0f;
-				}
+		for (int anim = 0; anim < 27; anim++) {
+			m_animFloat[anim] -= 0.1f;
+			if (m_animFloat[anim] < 0.0f) {
+				m_animFloat[anim] = 0.0f;
 			}
 		}
 
@@ -219,8 +209,9 @@ void CRingMenu::onCalc()
 			                      ? &Chara.MogFur().m_trackedCommandIndex
 			                      : &m_currentCommandIndex;
 
-			int next = currentCmd;
+			int next;
 			int prev = currentCmd;
+			next = currentCmd;
 			if (*trackedCmd != currentCmd) {
 				for (int step = 1; step < 4; step++) {
 					next = (Game.m_gameWork.IsMogStage())
@@ -449,8 +440,8 @@ void CRingMenu::onDraw()
 			posY = 96.0f + (((m_menuIndex & 2) != 0) ? posMainY : posLeft);
 		}
 
-		float buttonAlpha = static_cast<float>(m_buttonTimers[group * 3 + 2]) / 8.0f;
-		if (m_battleButtons[group * 2 + 2] >= 0) {
+		float buttonAlpha = static_cast<float>(m_buttonTimers[group][2]) / 8.0f;
+		if (m_battleCommands[group][0] >= 0) {
 			buttonAlpha = 1.0f - buttonAlpha;
 		}
 
@@ -583,12 +574,12 @@ void CRingMenu::onDraw()
 		const float textY2 = 6.0f + drawY;
 		CFont* font = MenuPcs.GetFont23();
 		for (int button = 1; button >= 0; button--) {
-			const int buttonValue = (&m_battleButtons[group * 2 + 2])[button];
+			const int buttonValue = m_battleCommands[group][button];
 			if (buttonValue < 0) {
 				continue;
 			}
 
-			const int timer = (&m_buttonTimers[group * 3])[button];
+			const int timer = m_buttonTimers[group][button];
 			const char* label;
 			if ((buttonValue & 0x8000) != 0) {
 				label = Game.GetShortItemName(buttonValue & ~0x8000);
@@ -631,7 +622,7 @@ void CRingMenu::onDraw()
 			font->SetScaleY(textScale);
 
 			const float width = font->GetWidth(label);
-			if ((group == 2) && (m_battleButtons[2] >= 0)) {
+			if ((group == 2) && (m_battleCommands[0][0] >= 0)) {
 				font->SetColor(CColor(0xFF, 0xFF, 0xFF,
 					static_cast<unsigned char>(0.35f * (showScale * (255.0f * fade * transitionScale)))).color);
 			} else {
@@ -903,20 +894,20 @@ void CRingMenu::SetBattleCommand(int buttonGroupIndex, int newCommandId, int new
 		newCommandId = -1;
 	}
 
-	const int currentCommand = m_battleButtons[buttonGroupIndex * 2 + 2];
+	const int currentCommand = m_battleCommands[buttonGroupIndex][0];
 
 	if (currentCommand == newCommandId) {
 		return;
 	}
 
 	if (((currentCommand >= 0) && (newCommandId < 0)) || ((currentCommand < 0) && (newCommandId >= 0))) {
-		m_buttonTimers[buttonGroupIndex * 3 + 2] = 8 - m_buttonTimers[buttonGroupIndex * 3 + 2];
+		m_buttonTimers[buttonGroupIndex][2] = 8 - m_buttonTimers[buttonGroupIndex][2];
 	}
 
-	m_battleButtons[buttonGroupIndex * 2 + 3] = m_battleButtons[buttonGroupIndex * 2 + 2];
-	m_battleButtons[buttonGroupIndex * 2 + 2] = newCommandId;
-	m_buttonTimers[buttonGroupIndex * 3 + 1] = 8 - m_buttonTimers[buttonGroupIndex * 3];
-	m_buttonTimers[buttonGroupIndex * 3] = 8 - m_buttonTimers[buttonGroupIndex * 3];
+	m_battleCommands[buttonGroupIndex][1] = m_battleCommands[buttonGroupIndex][0];
+	m_battleCommands[buttonGroupIndex][0] = newCommandId;
+	m_buttonTimers[buttonGroupIndex][1] = 8 - m_buttonTimers[buttonGroupIndex][0];
+	m_buttonTimers[buttonGroupIndex][0] = 8 - m_buttonTimers[buttonGroupIndex][0];
 
 	if (buttonGroupIndex != 2) {
 		return;
