@@ -427,8 +427,8 @@ void CRingMenu::onDraw()
 	const float glowOffset = 32.0f * (1.0f - pulse);
 	alphaScaleBase = 255.0f * showScale * transitionScale;
 	iconAlphaScale = showScale * transitionScale;
-	posLeft = -glowOffset;
 	posAltX = 472.0f + glowOffset;
+	posLeft = -glowOffset;
 	posAltY = 256.0f + glowOffset;
 #ifdef VERSION_GCCJGC
 	posMainX = posAltX;
@@ -438,8 +438,8 @@ void CRingMenu::onDraw()
 	posMainY = 192.0f + glowOffset;
 
 	for (int group = 2; group >= 0; group--) {
-		float posX;
 		float posY;
+		float posX;
 
 		if (group == 2) {
 			posX = 16.0f + (((m_menuIndex & 1) != 0) ? posAltX : posLeft);
@@ -639,8 +639,8 @@ void CRingMenu::onDraw()
 					static_cast<unsigned char>(showScale * (255.0f * fade * transitionScale))).color);
 			}
 
-			float textX;
 			float textY;
+			float textX;
 			switch (group) {
 			case 0:
 				textX = -(0.5f * width - textX0);
@@ -673,8 +673,8 @@ void CRingMenu::onDraw()
 					    && (static_cast<signed char>(
 					            static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 30) & 0xC0000000) >> 31)
 					        == 0)) {
-						const float fullAlpha = showScale * (255.0f * fade * transitionScale);
 						const float dimAlpha = showScale * (128.0f * fade * transitionScale);
+						const float fullAlpha = showScale * (255.0f * fade * transitionScale);
 						const float barY = 20.0f + textY;
 
 						for (int i = 0; i < caravanWork->GetNumCmdList(); i++) {

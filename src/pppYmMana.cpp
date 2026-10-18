@@ -610,8 +610,8 @@ static int CreateWaterMesh(Vec* positionsOut, Vec* normalsOut, Vec2d* uvOut, uns
     rowCount = 0;
     uvStep = 0.0625f;
     float half = 0.5f;
-    radius = size * half;
     step = size * uvStep;
+    radius = size * half;
     for (z = radius; z >= -radius; z -= step) {
         colCount = 0;
         for (x = -radius; x <= radius; x += step) {
@@ -726,8 +726,8 @@ static void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, 
                          100000.0f);
         GXSetProjection(projectionMtx, (_GXProjectionType)0);
         GXTexObj* sourceIter = sourceTexObjs;
-        char* compareName = Game.m_currentScriptName;
         GXTexObj* captureIter = captureTexObjs;
+        char* compareName = Game.m_currentScriptName;
         i = 0;
 
         for (; i < 6; i++) {
@@ -772,10 +772,10 @@ static void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, 
                     cameraUp.z = -1.0f;
                     break;
                 case 5:
-                    cameraPos.y -= 1.0f;
                     cameraUp.z = 1.0f;
-                    cameraUp.x = 0.0f;
+                    cameraPos.y -= 1.0f;
                     cameraUp.y = 0.0f;
+                    cameraUp.x = 0.0f;
                     break;
                 }
             }

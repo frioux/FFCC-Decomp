@@ -584,8 +584,8 @@ void CGraphic::Thread()
                     orderIndex = order->m_insertIndex;
                     orderName = order->m_debugName;
                 } else {
-                    orderIndex = -1;
                     orderName = "---";
+                    orderIndex = -1;
                 }
                 System.Printf("DrawDone(file = %s line = %d process = %s(%d) data = %d)が終了しません。\n", m_drawDoneFile, m_drawDoneLine, orderName, orderIndex,
                               drawSyncByte);

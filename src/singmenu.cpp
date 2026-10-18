@@ -1876,8 +1876,8 @@ void CMenuPcs::DrawSingWin(short mode)
 
     float left = static_cast<float>(m_menuWindowInfo->x) + static_cast<float>(static_cast<double>(m_menuWindowInfo->width) / 2.0);
     float top = static_cast<float>(m_menuWindowInfo->y) + static_cast<float>(static_cast<double>(m_menuWindowInfo->height) / 2.0);
-    float width;
     float height;
+    float width;
 
     if (m_menuWindowInfo->state != 1) {
         float leftScale = (left - m_menuWindowInfo->x - 32.0f) / SINGWIN_OPEN_FRAMES;
@@ -1936,8 +1936,8 @@ void CMenuPcs::DrawSingWin(short mode)
     }
 
     MenuPcs.SetTexture(SingMenuTex(0x41));
-    double innerW = static_cast<double>(w) - 64.0;
     float innerX = 32.0f + x0;
+    double innerW = static_cast<double>(w) - 64.0;
     float yy = y0;
     float innerWf = static_cast<float>(innerW);
     for (i = 0; i < 2; i++) {
@@ -1950,8 +1950,8 @@ void CMenuPcs::DrawSingWin(short mode)
     }
 
     MenuPcs.SetTexture(SingMenuTex(0x40));
-    double innerH = static_cast<double>(h) - 64.0;
     float innerY = 32.0f + y0;
+    double innerH = static_cast<double>(h) - 64.0;
     float innerHf = static_cast<float>(innerH);
     float xx = x0;
     for (i = 0; i < 2; i++) {
