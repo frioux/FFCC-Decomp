@@ -578,8 +578,15 @@ void CGraphic::Thread()
 
                 CSystem::COrder* order = System.GetOrder(drawSyncPart >> 8);
                 char drawSyncByte = drawSyncPart & 0xFF;
-                int orderIndex = (order != nullptr) ? order->m_insertIndex : -1;
-                const char* orderName = (order != nullptr) ? order->m_debugName : "---";
+                int orderIndex;
+                const char* orderName;
+                if (order != nullptr) {
+                    orderIndex = order->m_insertIndex;
+                    orderName = order->m_debugName;
+                } else {
+                    orderIndex = -1;
+                    orderName = "---";
+                }
                 System.Printf("DrawDone(file = %s line = %d process = %s(%d) data = %d)が終了しません。\n", m_drawDoneFile, m_drawDoneLine, orderName, orderIndex,
                               drawSyncByte);
             }
