@@ -754,8 +754,8 @@ void CGraphicPcs::drawScreenFade()
                 PSMTX44MultVec(worldScreenMtx, &pos, &pos);
 
                 const float sx = pos.x * kGraphicScreenCenterX + kGraphicScreenCenterX;
-                const float sy = kGraphicScreenCenterY - kGraphicScreenCenterY * pos.y;
                 pos.x = sx;
+                const float sy = kGraphicScreenCenterY - kGraphicScreenCenterY * pos.y;
                 pos.y = sy;
                 float clampedX = 0.0f;
                 clampedX = (sx < clampedX) ? clampedX : ((kGraphicScreenWidth < sx) ? kGraphicScreenWidth : sx);

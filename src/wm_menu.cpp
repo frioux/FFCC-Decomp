@@ -3231,8 +3231,8 @@ void CMenuPcs::DrawMCardMenu()
 			if (winState == 1) {
 				DrawMcWinMess(0, 0);
 #ifdef VERSION_GCCJGC
-				float rectX = (float)(m_menuWindowInfo->x + 28) + (float)(m_wmWorldState->m_cardChannel * 124);
 				float rectY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
+				float rectX = (float)(m_menuWindowInfo->x + 28) + (float)(m_wmWorldState->m_cardChannel * 124);
 #else
 				float rectY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
 				float rectX = (float)GetSlotABXPos((int)m_wmWorldState->m_cardChannel);
@@ -3354,8 +3354,8 @@ void CMenuPcs::DrawMCardMenu()
 				else if (ss == 0x19) { msgId = 0x19; msgParam = 1; rectX = (float)(m_menuWindowInfo->x + 55); }
 				else { msgId = 0x12; rectX = (float)(m_menuWindowInfo->x + 77); }
 				DrawMcWinMess(msgId, msgParam);
-				rectX += (float)(m_wmWorldState->m_cardChannel * 80);
 				float rectY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
+				rectX += (float)(m_wmWorldState->m_cardChannel * 80);
 #else
 				int msgId;
 				short ss = m_wmWorldState->m_subState;
@@ -3926,8 +3926,8 @@ void CMenuPcs::DrawLoadMenu()
 			if (winState == 1) {
 				DrawMcWinMess(0, 0);
 #ifdef VERSION_GCCJGC
-				float slotX = (float)(m_menuWindowInfo->x + 28) + (float)(m_wmWorldState->m_cardChannel * 124);
 				float slotY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
+				float slotX = (float)(m_menuWindowInfo->x + 28) + (float)(m_wmWorldState->m_cardChannel * 124);
 #else
 				float slotY = (float)((int)m_menuWindowInfo->y + m_menuWindowInfo->height - 0x3e);
 				float slotX = (float)GetSlotABXPos(m_wmWorldState->m_cardChannel);
@@ -4056,8 +4056,8 @@ void CMenuPcs::DrawLoadMenu()
 				else if (ys == 0x19) { ymsgId = 0x19; ymsgParam = 1; ynX = (float)(m_menuWindowInfo->x + 55); }
 				else { ymsgId = 5; ynX = (float)(m_menuWindowInfo->x + 83); }
 				DrawMcWinMess(ymsgId, ymsgParam);
-				ynX += (float)(m_wmWorldState->m_cardChannel * 80);
 				float ynY = (float)(m_menuWindowInfo->y + m_menuWindowInfo->height - 54);
+				ynX += (float)(m_wmWorldState->m_cardChannel * 80);
 #else
 				short ys = m_wmWorldState->m_subState;
 				if (ys == 8) ymsgId = 4;
@@ -5235,8 +5235,8 @@ void CMenuPcs::CalcFukidashi()
 #endif
 
 	// Setup model viewport slots
-	int viewportX = m_wm.m_bubbleData->m_sprites[0].m_x - 0x28;
 	int viewportY = m_wm.m_bubbleData->m_sprites[0].m_y - 0x0E;
+	int viewportX = m_wm.m_bubbleData->m_sprites[0].m_x - 0x28;
 	for (i = 6; i <= 16; i++) {
 		WmWorldObjInfo* slot = &m_wm.m_worldObjData[i];
 		slot->m_active = 0;
@@ -6869,8 +6869,8 @@ void CMenuPcs::CalcCharaSelect()
 
 #endif
 
-		int connectedCount = 0;
 		int locallyConfirmedCount = 0;
+		int connectedCount = 0;
 		int readyMask;
 		for (i = readyMask = 0; i < 4; i++) {
 			WmCharaSelectEntry& entry = m_wm.m_charaSelectData[i];
@@ -7189,8 +7189,8 @@ void CMenuPcs::DrawCharaName()
 	}
 	int i;
 	int j;
-	unsigned int activeMask = 0;
 	unsigned int confirmedMask = 0;
+	unsigned int activeMask = 0;
 	unsigned int pendingMask = 0;
 	const WmCharaSelectEntry* entry = selectEntries;
 	for (i = 0; i < 4; i++) {
@@ -8366,8 +8366,8 @@ void CMenuPcs::DrawMainMenuSub()
 		Vec viewPos;
 		Vec4d clipPos;
 		viewPos.x = s_MMenuPos[i].x;
-		viewPos.z = s_MMenuPos[i].z;
 		viewPos.y = s_MMenuPos[i].y;
+		viewPos.z = s_MMenuPos[i].z;
 		viewPos.z = viewPos.z - 100.0f;
 		Math.MTX44MultVec4(screenMtx, &viewPos, &clipPos);
 
@@ -8542,8 +8542,8 @@ void CMenuPcs::DrawMCList()
 	short state = m_wmWorldState->m_mainState;
 
 	if ((state == 2 || state == 3) && m_wmWorldState->m_subState != 0) {
-		slotOff = 0;
 		slot = 0;
+		slotOff = 0;
 		do {
 			float yPos;
 			float alpha;
@@ -8572,10 +8572,10 @@ void CMenuPcs::DrawMCList()
 			if (!(alpha <= DOUBLE_803314F0)) {
 				float slotY = static_cast<float>(88.0 * static_cast<double>(slot) + 24.0);
 				MenuPcs.SetAttrFmt((FMT)0);
-				alpha = FLOAT_80331458 * alpha;
 				colors[0].r = 0xFF;
 				colors[0].g = 0xFF;
 				colors[0].b = 0xFF;
+				alpha = FLOAT_80331458 * alpha;
 				colors[0].a = static_cast<unsigned char>(static_cast<int>(alpha));
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
@@ -8660,8 +8660,8 @@ nextListEntry:
 		double rowSlope = 88.0;
 		float mapOffsetX = 496.0f;
 		double rowBaseD;
-		float slotY;
 		double mapX;
+		float slotY;
 		double rowSlopeD;
 		mapX = 8.0 + static_cast<double>(mapOffsetX);
 #ifndef VERSION_GCCJGC
@@ -8890,9 +8890,9 @@ nextListEntry:
 					playDigits[1] = -1;
 				}
 				playDigits[2] = hourRemainder % 10;
+				playWidth += static_cast<float>(s_TimeWTbl[playDigits[2]]);
 				playDigits[3] = playMinutes / 10;
 				playDigits[4] = playMinutes % 10;
-				playWidth += static_cast<float>(s_TimeWTbl[playDigits[2]]);
 				playWidth += static_cast<float>(s_TimeWTbl[10]);
 				playWidth += static_cast<float>(s_TimeWTbl[playDigits[3]]);
 				playWidth += static_cast<float>(s_TimeWTbl[playDigits[4]]);

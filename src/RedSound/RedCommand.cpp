@@ -904,8 +904,8 @@ static RedTrackDATA* _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* wav
 		track->m_reverbDepth = RedReverbDepthGetDepth(REDSOUND_REVERB_DEPTH_MUSIC);
 		track->m_volumeDelta = track->m_expressionDelta = track->m_panDelta =
 		    track->m_reverbDepthDelta = 0;
-		track->m_sweepDelta = track->m_sweepAdd = 0;
 		track->m_portamentTime = 0;
+		track->m_sweepDelta = track->m_sweepAdd = 0;
 		track->m_loopDepth = 0;
 		track->m_keyTranspose = 0;
 		track->m_pitchBendRange = REDSOUND_SE_DEFAULT_PITCH_BEND_RANGE;
