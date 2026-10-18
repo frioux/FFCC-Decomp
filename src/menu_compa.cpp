@@ -71,25 +71,24 @@ void CMenuPcs::CompaDraw()
 	int tex;
 	float x;
 	float y;
+	int shown;
+	int i;
+	const u8* foodPtr;
+	int drawIndex;
+	CompaOpenAnimList* compaList;
 	float w;
 	float h;
 	float u;
 	float v;
 	float alpha;
-	int drawIndex;
-	CompaOpenAnimList* compaList;
-	int shown;
 	CFont* font;
-	int i;
 	float iconX;
 	float iconY;
 	int scan;
-	const u8* foodPtr;
 	CompaOpenAnim* entry;
 	int icon;
 	const char* name;
 	const char* value;
-	const char* job;
 	float jobY;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
@@ -209,7 +208,7 @@ void CMenuPcs::CompaDraw()
 			drawIndex = i;
 		}
 
-		foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][1 + drawIndex];
+		foodPtr = &Game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][caravanWork->m_saveSlot][1] + drawIndex;
 		if (*foodPtr == 0 && static_cast<unsigned int>(System.m_execParam) >= 1) {
 			System.Printf("%s(%d):family cnt error!!(%d)\n", "menu_compa.cpp", 0x1E0,
 			              shown);
@@ -311,8 +310,8 @@ void CMenuPcs::CompaDraw()
 	compaList = this->m_compaList;
 	font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * compaList->entries[0].alpha)).color);
 
-	job = GetJobStr(caravanWork->m_jobType);
-	font->GetWidth(job);
+	name = GetJobStr(caravanWork->m_jobType);
+	font->GetWidth(name);
 	jobY = static_cast<float>(compaList->entries[0].y + 0x20);
 	font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x18));
 #ifdef VERSION_GCCJGC
@@ -320,7 +319,7 @@ void CMenuPcs::CompaDraw()
 #else
 	font->SetPosY(jobY - 4.0f - 2.0f);
 #endif
-	font->Draw(job);
+	font->Draw(name);
 
 	DrawInit();
 }
