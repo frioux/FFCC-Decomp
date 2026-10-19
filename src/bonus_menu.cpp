@@ -2086,15 +2086,15 @@ void CMenuPcs::CalcSelectOpenAnim()
 #else
 	enum { kFadeFrames = 10, kArtifactDuration = 40 };
 #endif
-	int activePartyCount = s_Rinfo->m_partyCount;
-	int frame;
-	int doneCount;
-	CMenuPcs::Sprt2* iconSprite;
+	CMenuPcs::Sprt2* sprite;
 	int i;
-	int twice;
 	int tribeId;
 	CCharaPcs::CHandle* handle;
-	int total;
+	int frame;
+	int doneCount;
+	int activePartyCount;
+
+	activePartyCount = s_Rinfo->m_partyCount;
 
 	if (this->m_bonusState->m_initialized == 0) {
 		int idx;
@@ -2105,17 +2105,17 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 		idx = 0;
 		{
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
-			spr->kind = kBonusBackgroundTexture;
-			spr->y = 0;
-			spr->x = 0;
-			spr->w = 0x280;
-			spr->h = 0x1c0;
-			spr->mulX = spr->mulY = 0.0f;
-			spr->startFrame = 0;
-			spr->duration = 0;
-			spr->depth = 1.0f;
-			spr->flags = 3;
+			sprite = &m_bonusAnim->sprites[idx++];
+			sprite->kind = kBonusBackgroundTexture;
+			sprite->y = 0;
+			sprite->x = 0;
+			sprite->w = 0x280;
+			sprite->h = 0x1c0;
+			sprite->mulX = sprite->mulY = 0.0f;
+			sprite->startFrame = 0;
+			sprite->duration = 0;
+			sprite->depth = 1.0f;
+			sprite->flags = 3;
 		}
 		{
 			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx++];
@@ -2188,85 +2188,81 @@ void CMenuPcs::CalcSelectOpenAnim()
 		idx += activePartyCount;
 		s_PlayerTop = idx;
 		for (i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-			spr->kind = -2;
-			spr->x = 0;
-			spr->y = 0;
-			spr->w = 0;
-			spr->h = 0;
-			spr->mulX = 0.0f;
-			spr->mulY = 0.0f;
-			spr->startFrame = (spr - activePartyCount)->startFrame;
-			spr->duration = kFadeFrames;
-			spr->depth = 1.0f;
-			spr->motionX = (-240.0f);
-			spr->motionY = 0.0f;
-			spr->targetX = (float)spr->x + spr->motionX;
-			spr->targetY = (float)spr->y + spr->motionY;
-			spr->flags = 1;
+			sprite = &m_bonusAnim->sprites[idx + i];
+			sprite->kind = -2;
+			sprite->x = 0;
+			sprite->y = 0;
+			sprite->w = 0;
+			sprite->h = 0;
+			sprite->mulX = 0.0f;
+			sprite->mulY = 0.0f;
+			sprite->startFrame = (sprite - activePartyCount)->startFrame;
+			sprite->duration = kFadeFrames;
+			sprite->depth = 1.0f;
+			sprite->motionX = (-240.0f);
+			sprite->motionY = 0.0f;
+			sprite->targetX = (float)sprite->x + sprite->motionX;
+			sprite->targetY = (float)sprite->y + sprite->motionY;
+			sprite->flags = 1;
 		}
 
 		idx += activePartyCount;
 		s_ArtiTop = idx;
 		{
-			int start = 10;
 			for (i = 0; i < 8; i++) {
-				CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-				spr->kind = -2;
-				spr->x = 0;
-				spr->y = 0;
-				spr->w = 0;
-				spr->h = 0;
-				spr->mulX = 0.0f;
-				spr->mulY = 0.0f;
-				spr->startFrame = start;
+				sprite = &m_bonusAnim->sprites[idx + i];
+				sprite->kind = -2;
+				sprite->x = 0;
+				sprite->y = 0;
+				sprite->w = 0;
+				sprite->h = 0;
+				sprite->mulX = 0.0f;
+				sprite->mulY = 0.0f;
+				sprite->startFrame = i * 5 + 10;
 #ifdef VERSION_GCCP01
-				spr->startFrame = (int)(0.8333333134651184f * (float)spr->startFrame);
+				sprite->startFrame = (int)(0.8333333134651184f * (float)sprite->startFrame);
 #endif
-				spr->duration = kArtifactDuration;
-				spr->depth = 1.0f;
-				spr->flags = 1;
-				start += 5;
+				sprite->duration = kArtifactDuration;
+				sprite->depth = 1.0f;
+				sprite->flags = 1;
 			}
 		}
 
 		int copyDelta = idx + 4;
 		idx += 8;
 		for (i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-			*spr = *(spr - copyDelta);
-			spr->y = (short)(spr->y + 0x20);
-			spr->w = 0xA8;
-			spr->h = 0x38;
-			spr->mulX = 0.0f;
-			spr->mulY = 176.0f;
-			spr->motionX = (-240.0f);
-			spr->motionY = 0.0f;
-			spr->targetX = (float)spr->x + spr->motionX;
-			spr->targetY = (float)spr->y + spr->motionY;
-			spr->flags = 1;
+			sprite = &m_bonusAnim->sprites[idx + i];
+			*sprite = *(sprite - copyDelta);
+			sprite->y = (short)(sprite->y + 0x20);
+			sprite->w = 0xA8;
+			sprite->h = 0x38;
+			sprite->mulX = 0.0f;
+			sprite->mulY = 176.0f;
+			sprite->motionX = (-240.0f);
+			sprite->motionY = 0.0f;
+			sprite->targetX = (float)sprite->x + sprite->motionX;
+			sprite->targetY = (float)sprite->y + sprite->motionY;
+			sprite->flags = 1;
 		}
 
 		idx += activePartyCount;
-		y = 0x28;
 		for (i = 0; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* spr = &m_bonusAnim->sprites[idx + i];
-			spr->kind = kBonusCountTexture;
-			spr->x = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
-			spr->y = y;
-			spr->w = 0x38;
-			spr->h = 0x28;
-			spr->mulX = (float)(i * spr->w);
-			spr->mulY = 0.0f;
-			spr->startFrame = 0;
-			spr->duration = kFadeFrames;
-			spr->depth = 1.0f;
-			spr->motionX = (-240.0f);
-			spr->motionY = 0.0f;
-			spr->targetX = (float)spr->x + spr->motionX;
-			spr->targetY = (float)spr->y + spr->motionY;
-			spr->flags = 1;
-			y += 0x60;
+			sprite = &m_bonusAnim->sprites[idx + i];
+			sprite->kind = kBonusCountTexture;
+			sprite->x = ((1 <= i) && (i <= 2)) ? 8 : 0x20;
+			sprite->y = i * 0x60 + 0x28;
+			sprite->w = 0x38;
+			sprite->h = 0x28;
+			sprite->mulX = (float)(i * sprite->w);
+			sprite->mulY = 0.0f;
+			sprite->startFrame = 0;
+			sprite->duration = kFadeFrames;
+			sprite->depth = 1.0f;
+			sprite->motionX = (-240.0f);
+			sprite->motionY = 0.0f;
+			sprite->targetX = (float)sprite->x + sprite->motionX;
+			sprite->targetY = (float)sprite->y + sprite->motionY;
+			sprite->flags = 1;
 		}
 
 		idx += activePartyCount;
@@ -2330,7 +2326,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 	doneCount = 0;
 
 	for (; i < (int)m_bonusAnim->header.count; i++) {
-		CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[i];
+		sprite = &m_bonusAnim->sprites[i];
 
 		if ((sprite->flags & 1) != 0) {
 			sprite->alpha = 1.0f;
@@ -2365,13 +2361,13 @@ void CMenuPcs::CalcSelectOpenAnim()
 	{
 		i = 0;
 		for (; i < activePartyCount; i++) {
-			CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[4 + i];
+			sprite = &m_bonusAnim->sprites[4 + i];
 			int centerX = (int)(float)((double)(float)(4.0 + ((double)sprite->w / 2.0 + (double)((float)sprite->x + sprite->motionX))) - 320.0);
 			int centerY = (int)(float)((double)(float)((double)sprite->h / 2.0 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
-			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
 			m_wm.m_worldObjData[i].m_viewportY = (short)centerY;
-			m_wm.m_worldObjData[i].m_scissorY = (int)(((float)sprite->y + sprite->motionY) - 8.0f);
+			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
 			m_wm.m_worldObjData[i].m_scissorX = (int)(12.0f + ((float)sprite->x + sprite->motionX));
+			m_wm.m_worldObjData[i].m_scissorY = (int)(((float)sprite->y + sprite->motionY) - 8.0f);
 			if ((double)m_wm.m_worldObjData[i].m_scissorX < 0.0) {
 				m_wm.m_worldObjData[i].m_scissorX = 0;
 			}
@@ -2389,17 +2385,15 @@ void CMenuPcs::CalcSelectOpenAnim()
 	Vec dstVec;
 	{
 		i = 0;
-		twice = activePartyCount * 2;
-		total = activePartyCount + 8;
-		for (; i < total; i++) {
-			iconSprite = &m_bonusAnim->sprites[s_PlayerTop + i];
+		for (; i < activePartyCount + 8; i++) {
+			sprite = &m_bonusAnim->sprites[s_PlayerTop + i];
 			if (i < activePartyCount) {
 				tribeId = s_Rinfo->m_party[i].m_tribeId;
 				handle = s_Rinfo->m_party[i].m_partyHandle;
 				float modelScale = s_PCScl[tribeId];
 				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 			} else {
-				tribeId = twice + (i - activePartyCount);
+				tribeId = activePartyCount * 2 + (i - activePartyCount);
 				handle = m_wm.m_handles[tribeId];
 				if (handle == 0) {
 					continue;
@@ -2411,27 +2405,27 @@ void CMenuPcs::CalcSelectOpenAnim()
 				scaleMtx[1][3] = s_PCYpos[tribeId];
 				scaleMtx[2][3] = 0.0f;
 			} else {
-				int duration = iconSprite->duration;
-				int artifactIndex = i - activePartyCount;
+				int duration = sprite->duration;
+				int phase;
 				int fcvIndex = duration / 5;
-				int rem = 8 - artifactIndex;
-				int phase = (int)(((double)duration / 10.0) * (double)(rem + 2));
+				tribeId = 8 - (i - activePartyCount);
+				phase = (int)(((double)duration / 10.0) * (double)(tribeId + 2));
 				float rate = (float)(450.0 / (double)(float)duration);
 
-				if (frame == iconSprite->startFrame && *(signed char*)&this->m_bonusCursorFlag == 0) {
+				if (frame == sprite->startFrame && *(signed char*)&this->m_bonusCursorFlag == 0) {
 					this->m_bonusCursorFlag = 1;
 					Sound.PlaySe(0x4d, 0x40, 0x7f, 0);
 				}
 
 				float angle;
-				if (frame < iconSprite->startFrame) {
+				if (frame < sprite->startFrame) {
 					srcVec.x = s_AnimX[2];
 					angle = (-90.0f);
-				} else if (iconSprite->timer >= phase) {
+				} else if (sprite->timer >= phase) {
 					srcVec.x = s_AnimX[0];
-					angle = (float)(45.0 * (double)rem);
+					angle = (float)(45.0 * (double)tribeId);
 				} else {
-					int last = iconSprite->timer - 1;
+					int last = sprite->timer - 1;
 					if (last <= fcvIndex) {
 						srcVec.x = s_AnimX[2] -
 						    (float)last * ((s_AnimX[2] - s_AnimX[1]) / (float)fcvIndex);
@@ -2468,7 +2462,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 			handle->m_model->SetMatrix(scaleMtx);
 			handle->m_model->CalcMatrix();
 			handle->m_model->CalcSkin();
-			handle->m_model->m_lightAlpha = iconSprite->alpha;
+			handle->m_model->m_lightAlpha = sprite->alpha;
 		}
 	}
 
@@ -3025,14 +3019,14 @@ void CMenuPcs::CalcSelectCloseAnim()
 	enum { kFadeFrames = 10 };
 #endif
 	CMenuPcs::Sprt2* sprite;
-	int twice;
 	int i;
 	CMenuPcs::Sprt2* alphaSprite;
 	int doneCount;
-	int activePartyCount = s_Rinfo->m_partyCount;
 	CCharaPcs::CHandle* handle;
-	int total;
 	int tribeId;
+	int activePartyCount;
+
+	activePartyCount = s_Rinfo->m_partyCount;
 
 	if (this->m_bonusState->m_initialized == 0) {
 		int idx;
@@ -3228,9 +3222,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 	Vec dstVec;
 	{
 		i = 0;
-		twice = activePartyCount * 2;
-		total = activePartyCount + 8;
-		for (; i < total; i++) {
+		for (; i < activePartyCount + 8; i++) {
 			alphaSprite = &m_bonusAnim->sprites[s_PlayerTop + i];
 			if (i < activePartyCount) {
 				tribeId = s_Rinfo->m_party[i].m_tribeId;
@@ -3238,7 +3230,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 				float modelScale = s_PCScl[tribeId];
 				PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
 			} else {
-				tribeId = twice + (i - activePartyCount);
+				tribeId = activePartyCount * 2 + (i - activePartyCount);
 				handle = m_wm.m_handles[tribeId];
 				if (handle == 0) {
 					continue;
