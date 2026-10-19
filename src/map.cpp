@@ -1772,7 +1772,7 @@ void CMapMng::Draw()
 
                     CharaPcs.GetTexShadow(startIndex, batchCount, texObjs, shadowPositions, shadowMatrices);
 
-                    int stage = 0;
+                    GXTevStageID stage = GX_TEVSTAGE0;
                     texMtx = 0x1E;
                     for (int i = 0; i < batchCount; i++) {
                         GXLoadTexMtxImm(shadowMatrices[i], texMtx, GX_MTX3x4);
@@ -1780,70 +1780,71 @@ void CMapMng::Draw()
                         GXSetTexCoordGen(
                             static_cast<GXTexCoordID>(i), GX_TG_MTX3x4, GX_TG_POS,
                             static_cast<GXTexMtx>(texMtx));
-                        GXSetTevDirect(static_cast<GXTevStageID>(stage));
+                        GXSetTevDirect(stage);
                         _GXSetTevOrder(
-                            static_cast<GXTevStageID>(stage), static_cast<GXTexCoordID>(i),
+                            stage, static_cast<GXTexCoordID>(i),
                             static_cast<GXTexMapID>(i), GX_COLOR0A0);
-                        _GXSetTevSwapMode(static_cast<GXTevStageID>(stage), GX_TEV_SWAP0, GX_TEV_SWAP1);
+                        _GXSetTevSwapMode(stage, GX_TEV_SWAP0, GX_TEV_SWAP1);
                         if (i == 0) {
                             _GXSetTevColorIn(
-                                static_cast<GXTevStageID>(stage), GX_CC_ZERO, GX_CC_RASC, GX_CC_ONE,
+                                stage, GX_CC_ZERO, GX_CC_RASC, GX_CC_ONE,
                                 GX_CC_ZERO);
                             _GXSetTevColorOp(
-                                static_cast<GXTevStageID>(stage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
+                                stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
                                 GX_TEVPREV);
                             _GXSetTevAlphaIn(
-                                static_cast<GXTevStageID>(stage), GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA,
+                                stage, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA,
                                 GX_CA_ZERO);
                             _GXSetTevAlphaOp(
-                                static_cast<GXTevStageID>(stage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
+                                stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
                                 GX_TEVPREV);
                         } else {
                             _GXSetTevColorIn(
-                                static_cast<GXTevStageID>(stage), GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO,
+                                stage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO,
                                 GX_CC_CPREV);
                             _GXSetTevColorOp(
-                                static_cast<GXTevStageID>(stage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
+                                stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
                                 GX_TEVPREV);
                             _GXSetTevAlphaIn(
-                                static_cast<GXTevStageID>(stage), GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA,
+                                stage, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA,
                                 GX_CA_APREV);
                             _GXSetTevAlphaOp(
-                                static_cast<GXTevStageID>(stage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
+                                stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
                                 GX_TEVPREV);
                         }
                         texMtx += 3;
-                        stage++;
+                        stage = static_cast<GXTevStageID>(stage + 1);
                     }
 
-                    GXSetTevDirect(static_cast<GXTevStageID>(stage));
-                    _GXSetTevOrder(static_cast<GXTevStageID>(stage), GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+                    GXSetTevDirect(stage);
+                    _GXSetTevOrder(stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
                     _GXSetTevColorIn(
-                        static_cast<GXTevStageID>(stage), GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
+                        stage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
                     _GXSetTevColorOp(
-                        static_cast<GXTevStageID>(stage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1, GX_TEVPREV);
+                        stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1, GX_TEVPREV);
                     _GXSetTevAlphaIn(
-                        static_cast<GXTevStageID>(stage), GX_CA_ZERO, GX_CA_KONST, GX_CA_APREV, GX_CA_RASA);
+                        stage, GX_CA_ZERO, GX_CA_KONST, GX_CA_APREV, GX_CA_RASA);
                     _GXSetTevAlphaOp(
-                        static_cast<GXTevStageID>(stage), GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, 0, GX_TEVREG1);
+                        stage, GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, 0, GX_TEVREG1);
 
-                    int finalStage = stage + 1;
-                    GXSetTevDirect(static_cast<GXTevStageID>(finalStage));
+                    stage = static_cast<GXTevStageID>(stage + 1);
+                    GXSetTevDirect(stage);
                     _GXSetTevOrder(
-                        static_cast<GXTevStageID>(finalStage), GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+                        stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
                     _GXSetTevColorIn(
-                        static_cast<GXTevStageID>(finalStage), GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
+                        stage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
                     _GXSetTevColorOp(
-                        static_cast<GXTevStageID>(finalStage), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
+                        stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, 1,
                         GX_TEVPREV);
                     _GXSetTevAlphaIn(
-                        static_cast<GXTevStageID>(finalStage), GX_CA_A1, GX_CA_RASA, GX_CA_A1, GX_CA_APREV);
+                        stage, GX_CA_A1, GX_CA_RASA, GX_CA_A1, GX_CA_APREV);
                     _GXSetTevAlphaOp(
-                        static_cast<GXTevStageID>(finalStage), GX_TEV_COMP_A8_GT, GX_TB_ZERO, GX_CS_SCALE_1, 0,
+                        stage, GX_TEV_COMP_A8_GT, GX_TB_ZERO, GX_CS_SCALE_1, 0,
                         GX_TEVPREV);
 
-                    GXSetNumTevStages(static_cast<unsigned char>(stage + 2));
+                    stage = static_cast<GXTevStageID>(stage + 1);
                     GXSetNumTexGens(static_cast<unsigned char>(batchCount));
+                    GXSetNumTevStages(static_cast<unsigned char>(stage));
 
                     shadowCount -= batchCount;
                     startIndex += batchCount;
