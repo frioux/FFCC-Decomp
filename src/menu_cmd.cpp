@@ -173,6 +173,11 @@ STATIC_ASSERT(offsetof(CmdState, prevMode) == 0x32);
 STATIC_ASSERT(offsetof(CmdState, scrollTop) == 0x34);
 STATIC_ASSERT(sizeof(CmdState) == 0x36);
 
+const int kIconClavatWeapon = 0;
+const int kIconLiltyWeapon = 1;
+const int kIconYukeWeapon = 2;
+const int kIconSelkieWeapon = 3;
+
 static inline CmdListStorage* GetCmdList(CMenuPcs* menu)
 {
 	return menu->m_cmdList;
@@ -193,6 +198,11 @@ static inline CmdState* GetCmdStateView(CMenuPcs* menu)
 	return menu->m_cmdState;
 }
 
+static inline s32 GetCmdMode(CMenuPcs* menu)
+{
+	return menu->m_cmdState->mode;
+}
+
 static inline s16* GetCmdStateSelections(CmdState* cmd)
 {
 	return cmd->selected;
@@ -205,16 +215,6 @@ static inline s16 GetCmdLayoutFlag(CMenuPcs* menu)
 #else
 	return menu->m_cmdLayoutFlag;
 #endif
-}
-
-static inline s16 GetUniteRecipeCmd(int recipe)
-{
-	return s_Unite[recipe].command;
-}
-
-static inline s16 GetUniteRecipeCount(int recipe)
-{
-	return s_Unite[recipe].count;
 }
 
 } // namespace
@@ -522,17 +522,16 @@ int CMenuPcs::CmdCtrl()
 	GetCmdStateView(this)->prevMode = GetCmdStateView(this)->mode;
 
 	s32 actionHandled = 0;
-	s32 mode = GetCmdStateView(this)->mode;
 
-	if ((mode == 0) || ((mode != 0) && (GetCmdStateView(this)->phase == 1))) {
+	if ((GetCmdMode(this) == 0) || ((GetCmdMode(this) != 0) && (GetCmdStateView(this)->phase == 1))) {
 		actionHandled = CmdCtrlCur();
-	} else if ((mode == 1) && (GetCmdStateView(this)->phase == 0)) {
+	} else if ((GetCmdMode(this) == 1) && (GetCmdStateView(this)->phase == 0)) {
 		actionHandled = CmdOpen0();
 		if (actionHandled != 0) {
 			actionHandled = 0;
 			GetCmdStateView(this)->phase = static_cast<s16>(GetCmdStateView(this)->phase + 1);
 		}
-	} else if ((mode == 1) && (GetCmdStateView(this)->phase == 2)) {
+	} else if ((GetCmdMode(this) == 1) && (GetCmdStateView(this)->phase == 2)) {
 		actionHandled = CmdClose0();
 		if (actionHandled != 0) {
 			if (GetCmdStateView(this)->commandResult != 0) {
@@ -546,7 +545,7 @@ int CMenuPcs::CmdCtrl()
 			}
 			actionHandled = 0;
 		}
-	} else if ((mode == 1) && (GetCmdStateView(this)->phase == 3)) {
+	} else if ((GetCmdMode(this) == 1) && (GetCmdStateView(this)->phase == 3)) {
 		actionHandled = UniteOpenAnim(-1);
 		if (actionHandled != 0) {
 			GetCmdStateView(this)->phase = 0;
@@ -555,13 +554,13 @@ int CMenuPcs::CmdCtrl()
 			CmdInit1();
 			actionHandled = 0;
 		}
-	} else if ((mode == 2) && (GetCmdStateView(this)->phase == 0)) {
+	} else if ((GetCmdMode(this) == 2) && (GetCmdStateView(this)->phase == 0)) {
 		actionHandled = CmdOpen1();
 		if (actionHandled != 0) {
 			actionHandled = 0;
 			GetCmdStateView(this)->phase = static_cast<s16>(GetCmdStateView(this)->phase + 1);
 		}
-	} else if ((mode == 2) && (GetCmdStateView(this)->phase == 2)) {
+	} else if ((GetCmdMode(this) == 2) && (GetCmdStateView(this)->phase == 2)) {
 		actionHandled = CmdClose1();
 		if (actionHandled != 0) {
 			if (GetCmdStateView(this)->commandResult != 0) {
@@ -574,13 +573,13 @@ int CMenuPcs::CmdCtrl()
 			GetCmdStateView(this)->phase = 0;
 			GetCmdStateView(this)->transitionTimer = 0;
 		}
-	} else if ((mode == 3) && (GetCmdStateView(this)->phase == 0)) {
+	} else if ((GetCmdMode(this) == 3) && (GetCmdStateView(this)->phase == 0)) {
 		actionHandled = CmdOpen2();
 		if (actionHandled != 0) {
 			actionHandled = 0;
 			GetCmdStateView(this)->phase = static_cast<s16>(GetCmdStateView(this)->phase + 1);
 		}
-	} else if ((mode == 3) && (GetCmdStateView(this)->phase == 2)) {
+	} else if ((GetCmdMode(this) == 3) && (GetCmdStateView(this)->phase == 2)) {
 		actionHandled = CmdClose2();
 		if (actionHandled != 0) {
 			actionHandled = 0;
@@ -657,8 +656,9 @@ int CMenuPcs::CmdClose()
 	}
 
 	s32 ret = 0;
-	if (doneCount == GetCmdListStorage(this)->count) {
-		CmdListEntry* p = GetCmdListStorage(this)->entries;
+	CmdListStorage* const list = GetCmdListStorage(this);
+	if (list->count == doneCount) {
+		CmdListEntry* p = list->entries;
 		for (s32 i = entryCount; i > 0; i--) {
 			p->startFrame = 0;
 			p->duration = 1;
@@ -684,6 +684,7 @@ void CMenuPcs::CmdDraw()
 {
 	float h;
 	s32 itemCount;
+	s32 idx;
 	s32 row;
 	s32 choice;
 	s32 hasItemHelp = false;
@@ -696,6 +697,7 @@ void CMenuPcs::CmdDraw()
 	float w;
 	GXColor colors[4];
 	CmdListEntry* entry;
+	s32 choices;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
@@ -704,15 +706,15 @@ void CMenuPcs::CmdDraw()
 	const s32 animState = m_cmdState->animState;
 	const s32 cmdMode = m_cmdState->mode;
 
-	CmdListEntry* cmdEntry = m_cmdList->entries;
-	for (s32 i = 0; i < m_cmdList->count; i++, cmdEntry++) {
-		const s32 tex = cmdEntry->tex;
+	entry = m_cmdList->entries;
+	for (s32 i = 0; i < m_cmdList->count; i++, entry++) {
+		const s32 tex = entry->tex;
 		if (tex >= 0) {
-			x = static_cast<float>(cmdEntry->x);
-			y = static_cast<float>(cmdEntry->y);
-			w = static_cast<float>(cmdEntry->width);
-			h = static_cast<float>(cmdEntry->height);
-			const float u = cmdEntry->u;
+			x = static_cast<float>(entry->x);
+			y = static_cast<float>(entry->y);
+			w = static_cast<float>(entry->width);
+			h = static_cast<float>(entry->height);
+			rowU = entry->u;
 
 			if ((i >= 8) || (caravan->m_commandListExtra[i] == 0)) {
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
@@ -732,11 +734,11 @@ void CMenuPcs::CmdDraw()
 				colors[0].r = 0xFF;
 				colors[0].g = 0xFF;
 				colors[0].b = 0xFF;
-				colors[0].a = static_cast<u8>(255.0f * cmdEntry->alpha);
+				colors[0].a = static_cast<u8>(255.0f * entry->alpha);
 				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
 				MenuPcs.DrawRect(
-				    0, x, y, w, h, u, t, cmdEntry->scale, cmdEntry->scale, 0.0f);
+				    0, x, y, w, h, rowU, t, entry->scale, entry->scale, 0.0f);
 			}
 		}
 	}
@@ -747,13 +749,13 @@ void CMenuPcs::CmdDraw()
 	nameFont->SetScale(0.9f);
 	nameFont->DrawInit();
 
-	CmdListEntry* nameEntry = m_cmdList->entries;
-	for (s32 i = 0; i < caravan->m_numCmdListSlots; i++, nameEntry++) {
+	entry = m_cmdList->entries;
+	for (s32 i = 0; i < caravan->m_numCmdListSlots; i++, entry++) {
 		if ((i >= 8) || (caravan->m_commandListExtra[i] == 0)) {
 			nameFont->SetColor(
 			    CColor(0xFF, 0xFF, 0xFF,
 			        static_cast<u8>(255.0f *
-			            static_cast<float>(cmdMode == 3 ? 1.0 : static_cast<double>(nameEntry->alpha))))
+			            static_cast<float>(cmdMode == 3 ? 1.0 : static_cast<double>(entry->alpha))))
 			        .color);
 
 			const char* text;
@@ -774,8 +776,8 @@ void CMenuPcs::CmdDraw()
 			}
 
 			const float textW = static_cast<float>(nameFont->GetWidth(text));
-			x = static_cast<double>(nameEntry->x) + ((static_cast<float>(nameEntry->width) - textW) / 2.0);
-			y = static_cast<float>(nameEntry->y + 3);
+			x = static_cast<double>(entry->x) + ((static_cast<float>(entry->width) - textW) / 2.0);
+			y = static_cast<float>(entry->y + 3);
 			nameFont->SetPosX(x);
 #ifdef VERSION_GCCJGC
 			nameFont->SetPosY(y);
@@ -811,7 +813,7 @@ void CMenuPcs::CmdDraw()
 		entry = &m_cmdList->entries[m_cmdList->count];
 		const s16* letterBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		itemCount = letterBuf[0];
-		for (s32 idx = m_cmdList->count; idx < m_cmdList->listEnd; idx++, entry++) {
+		for (idx = m_cmdList->count; idx < m_cmdList->listEnd; idx++, entry++) {
 			if (entry->tex >= 0) {
 				x = static_cast<float>(entry->x);
 				y = static_cast<float>(entry->y);
@@ -876,35 +878,18 @@ void CMenuPcs::CmdDraw()
 						}
 
 						if (sel < 2) {
-							const CCaravanWork* const caravan2 =
-							    Game.m_scriptFoodBase[0];
-							const s16* canBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-							const s16* canItems = canBuf + 1;
-							const s32 canCount = canBuf[0];
-							bool canUse;
-							if ((sel < 0) || (sel >= canCount)) {
-								canUse = false;
-							} else if (sel == 0) {
-								canUse = caravan2->m_commandListInventorySlotRef[m_cmdState->selected[0]] >= 0;
-							} else if (sel == 1) {
-								int combo[5][2];
-								canUse = ChkUnite(m_cmdState->selected[0], combo) != 0;
-							} else {
-								canUse = !EquipChk(static_cast<int>(canItems[sel - 2]));
-							}
-
-							if (!canUse) {
+							if (!ChkCmdActive(sel)) {
 								rowAlpha = 0.5 * entry->alpha;
 								rowTex = kCmdDisabledRowTexture;
 							}
 						} else {
-							s32 itemIdx = specialRow + m_cmdState->scrollTop - 2;
-							if ((itemCount >= 8) && (itemIdx >= itemCount)) {
-								itemIdx -= itemCount;
+							sel = specialRow + m_cmdState->scrollTop - 2;
+							if ((itemCount >= 8) && (sel >= itemCount)) {
+								sel -= itemCount;
 							}
 
-							if ((itemIdx + 2 >= itemCount) || EquipChk(static_cast<int>(letterBuf[itemIdx + 1]))) {
-								if (itemIdx + 2 < itemCount) {
+							if ((sel + 2 >= itemCount) || EquipChk(static_cast<int>(letterBuf[sel + 1]))) {
+								if (sel + 2 < itemCount) {
 									DrawEquipMark(static_cast<s32>(x - 12.0f),
 									    static_cast<s32>(((rowH - 24.0f) / 2.0) + y),
 									    entry->alpha);
@@ -945,15 +930,15 @@ void CMenuPcs::CmdDraw()
 
 		const s16* letterBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		itemCount = letterBuf[0];
-		for (s32 idx = m_cmdList->count; idx < m_cmdList->listEnd; idx++) {
+		for (idx = m_cmdList->count; idx < m_cmdList->listEnd; idx++) {
 			entry = &m_cmdList->entries[idx];
 			if (entry->tex == kCmdRowTexture) {
 				break;
 			}
 		}
 
-		CmdListEntry* textRow = entry;
-		for (row = 0; row < 8; row++, textRow++) {
+		CmdListEntry* rowEntry = entry;
+		for (row = 0; row < 8; row++, rowEntry++) {
 			if ((itemCount <= 8) && (row + m_cmdState->scrollTop >= itemCount)) {
 				break;
 			}
@@ -988,9 +973,9 @@ void CMenuPcs::CmdDraw()
 			}
 
 			listFont->GetWidth(text);
-			x = static_cast<float>(textRow->x + 0x1C);
-			y = static_cast<float>(textRow->y + 0x0B);
-			listFont->SetPosX(static_cast<float>(textRow->x + 0x1C));
+			x = static_cast<float>(rowEntry->x + 0x1C);
+			y = static_cast<float>(rowEntry->y + 0x0B);
+			listFont->SetPosX(static_cast<float>(rowEntry->x + 0x1C));
 #ifdef VERSION_GCCJGC
 			listFont->SetPosY(y);
 #else
@@ -1001,8 +986,8 @@ void CMenuPcs::CmdDraw()
 
 		DrawInit();
 
-		CmdListEntry* iconRow = entry;
-		for (row = 0; row < 8; row++, iconRow++) {
+		rowEntry = entry;
+		for (row = 0; row < 8; row++, rowEntry++) {
 			if ((itemCount <= 8) && (row + m_cmdState->scrollTop >= itemCount)) {
 				break;
 			}
@@ -1014,11 +999,11 @@ void CMenuPcs::CmdDraw()
 
 			if (displayIdx >= 2) {
 				const s16 slot = letterBuf[displayIdx - 1];
-				x = static_cast<float>(iconRow->x + iconRow->width - 0x10);
-				y = static_cast<float>(iconRow->y + 6);
+				x = static_cast<float>(rowEntry->x + rowEntry->width - 0x10);
+				y = static_cast<float>(rowEntry->y + 6);
 				DrawSingleIcon(
 				    caravan->m_inventoryItems[slot],
-				    static_cast<s32>(static_cast<float>(iconRow->x + iconRow->width - 0x10)),
+				    static_cast<s32>(static_cast<float>(rowEntry->x + rowEntry->width - 0x10)),
 				    static_cast<s32>(y - 1.0f),
 				    entry->alpha, 0, 1.0f);
 			}
@@ -1057,7 +1042,7 @@ void CMenuPcs::CmdDraw()
 		choiceFont->SetColor(
 		    CColor(0xFF, 0xFF, 0xFF, static_cast<u8>(255.0f * entry->alpha)).color);
 
-		const s32 choices = (1.0 == static_cast<double>(entry->scale)) ? 2 : 3;
+		choices = (1.0 == static_cast<double>(entry->scale)) ? 2 : 3;
 		for (choice = 0; choice < choices; choice++) {
 			const char* text;
 			if (choice == 0) {
@@ -1104,7 +1089,7 @@ void CMenuPcs::CmdDraw()
 				entry = &m_cmdList->entries[index];
 			}
 		} else if (cmdMode == 1) {
-			for (s32 idx = m_cmdList->count; idx < m_cmdList->listEnd; idx++) {
+			for (idx = m_cmdList->count; idx < m_cmdList->listEnd; idx++) {
 				entry = &m_cmdList->entries[idx];
 				if (entry->tex == kCmdRowTexture) {
 					break;
@@ -1113,7 +1098,7 @@ void CMenuPcs::CmdDraw()
 			entry = entry + m_cmdState->selected[1];
 		} else {
 			entry = &m_cmdList->entries[m_cmdList->listEnd + 3];
-			const s32 choices = (1.0 == static_cast<double>(entry->scale)) ? 2 : 3;
+			choices = (1.0 == static_cast<double>(entry->scale)) ? 2 : 3;
 			const float pitch = static_cast<float>(
 			    ((static_cast<float>(entry->height) * entry->scale) - 16.0) /
 			    static_cast<double>(choices));
@@ -1141,7 +1126,7 @@ void CMenuPcs::CmdDraw()
 	}
 
 	const s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-	s32 idx = m_cmdState->selected[1] + m_cmdState->scrollTop;
+	idx = m_cmdState->selected[1] + m_cmdState->scrollTop;
 	if (idx >= letter[0]) {
 		idx -= letter[0];
 	}
@@ -1211,7 +1196,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		return 0;
 	}
 
-	mode = GetCmdStateView(this)->mode;
+	mode = GetCmdMode(this);
 
 	if (mode == 0) {
 		const s32 cmdCount = caravanWork->m_numCmdListSlots;
@@ -1334,30 +1319,13 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		if ((hold & 0xC) == 0) {
 			if (!((press & 0x100) == 0)) {
 				int comboChoice[5][2];
-				int combo[5][2];
 				int selected = static_cast<int>(GetCmdStateView(this)->scrollTop) +
 				               static_cast<int>(GetCmdStateView(this)->selected[mode]);
 				if (selected >= itemCount) {
 					selected -= itemCount;
 				}
 
-				CCaravanWork* const cw = Game.m_scriptFoodBase[0];
-				s16* const list2 = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-				const int itemCount2 = list2[0];
-				s16* const items = list2 + 1;
-
-				bool canUse;
-				if ((selected < 0) || (selected >= itemCount2)) {
-					canUse = false;
-				} else if (selected == 0) {
-					canUse = cw->m_commandListInventorySlotRef[GetCmdStateView(this)->selected[0]] >= 0;
-				} else if (selected == 1) {
-					canUse = (ChkUnite(GetCmdStateView(this)->selected[0], combo) != 0);
-				} else {
-					canUse = !EquipChk(static_cast<int>(items[selected - 2]));
-				}
-
-				if (canUse) {
+				if (ChkCmdActive(selected)) {
 					if (selected == 0) {
 						caravanWork->ChgCmdLst(GetCmdStateView(this)->selected[0], -1);
 					} else if (selected != 1) {
@@ -1369,14 +1337,10 @@ unsigned int CMenuPcs::CmdCtrlCur()
 						int comboCount;
 						comboCount = ChkUnite(GetCmdStateView(this)->selected[0], comboChoice);
 						if (comboCount == 1) {
-							const int recipe = comboChoice[0][0];
-							Game.m_scriptFoodBase[0]->UniteComList(
-							    comboChoice[0][1], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
+							CmdUnite(comboChoice[0][0], comboChoice[0][1]);
 						} else if (comboCount > 1) {
-							if (!(GetUniteRecipeCount(comboChoice[1][0]) == 2)) {
-								const int recipe = comboChoice[0][0];
-								Game.m_scriptFoodBase[0]->UniteComList(
-								    comboChoice[0][1], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
+							if (!(s_Unite[comboChoice[1][0]].count == 2)) {
+								CmdUnite(comboChoice[0][0], comboChoice[0][1]);
 							} else {
 								GetCmdStateView(this)->commandResult = 1;
 							}
@@ -1690,29 +1654,24 @@ void CMenuPcs::GetCmdItem()
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::ChkCmdActive(int itemIndex)
+inline int CMenuPcs::ChkCmdActive(int itemIndex)
 {
-	CmdState* const cmd = GetCmdStateView(this);
-	cmd->commandResult = 0;
-
 	const CCaravanWork* const caravan = Game.m_scriptFoodBase[0];
-	const s16 selected = cmd->selected[0];
-	int active = 0;
-
-	if (itemIndex == 0) {
-		active = caravan->m_commandListInventorySlotRef[selected] >= 0;
+	const s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+	const s16* items = list + 1;
+	const s32 count = list[0];
+	bool canUse;
+	if ((itemIndex < 0) || (itemIndex >= count)) {
+		canUse = false;
+	} else if (itemIndex == 0) {
+		canUse = caravan->m_commandListInventorySlotRef[m_cmdState->selected[0]] >= 0;
 	} else if (itemIndex == 1) {
 		int combo[5][2];
-		active = ChkUnite(selected, combo) > 0;
+		canUse = ChkUnite(m_cmdState->selected[0], combo) != 0;
 	} else {
-		s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		const int index = itemIndex - 1;
-		if ((index >= 0) && (index < list[0])) {
-			active = EquipChk(static_cast<int>(list[index]));
-		}
+		canUse = !EquipChk(static_cast<int>(items[itemIndex - 2]));
 	}
-
-	cmd->commandResult = static_cast<s8>(active != 0);
+	return canUse;
 }
 
 /*
@@ -1734,6 +1693,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	int candidates[10];
 	int k;
 	int ok;
+	int start;
 
 	if (comboOut != nullptr) {
 		for (int i = 0; i < 5; i++) {
@@ -1799,7 +1759,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 			} else {
 				itemKinds[slot] = 0x107;
 			}
-		} else if ((icon == 0) || (icon == 1) || (icon == 2) || (icon == 3)) {
+		} else if ((icon == kIconClavatWeapon) || (icon == kIconLiltyWeapon) || (icon == kIconYukeWeapon) || (icon == kIconSelkieWeapon)) {
 			itemKinds[slot] = 999;
 		} else if ((icon == 0x10) || (icon == 0x11)) {
 			itemKinds[slot] = itemId;
@@ -1816,8 +1776,8 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 	memset(matches, 0xff, sizeof(matches));
 
 	if ((itemKinds[selected] == 999) && (selected > 2)) {
-		int patIdx = 0;
-		for (const UniteRecipe* pat = s_Unite; pat->command >= 0; pat++, patIdx++) {
+		for (int patIdx = 0; s_Unite[patIdx].command >= 0; patIdx++) {
+			const UniteRecipe* pat = &s_Unite[patIdx];
 			if (pat->food == 0) {
 				continue;
 			}
@@ -1842,7 +1802,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		}
 	} else if (selectedFlag == 0) {
 		const int baseLen = static_cast<int>(s_Unite[0].count);
-		int start = selected - (baseLen - 1);
+		start = selected - (baseLen - 1);
 		for (int i = 0; i < baseLen; i++, start++) {
 			k = ok = 0;
 			for (; k < baseLen; k++) {
@@ -1861,15 +1821,15 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 		}
 	}
 
-	int group = 1;
-	for (const UniteRecipe* pat = s_Unite + 1; pat->command >= 0; pat++, group++) {
+	for (int group = 1; s_Unite[group].command >= 0; group++) {
+		const UniteRecipe* pat = &s_Unite[group];
 		if (((pat->food != 0) && (itemKinds[selected] == 999) && (selected > 2)) ||
 		    ((pat->count == 2) && (selectedFlag != 0))) {
 			continue;
 		}
 
 		const int len = pat->count;
-		for (int start = 0; start < len; start++) {
+		for (start = 0; start < len; start++) {
 			if ((start == 0) && (selectedFlag != 0)) {
 				start++;
 			}
@@ -1915,18 +1875,10 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
  * JP Address: TODO
  * JP Size: TODO
  */
-inline void CMenuPcs::CmdUnite(int selected, int comboIndex)
+inline void CMenuPcs::CmdUnite(int recipe, int start)
 {
-	int combo[5][2];
-	const int comboCount = ChkUnite(selected, combo);
-	if ((comboIndex < 0) || (comboIndex >= comboCount) || (combo[comboIndex][1] < 0)) {
-		return;
-	}
-
-	const int recipe = combo[comboIndex][0];
-	Game.m_scriptFoodBase[0]->UniteComList(
-		combo[comboIndex][1], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
-	GetCmdStateView(this)->selected[0] = static_cast<s16>(combo[comboIndex][1]);
+	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
+	caravanWork->UniteComList(start, s_Unite[recipe].count, s_Unite[recipe].command);
 }
 
 /*
@@ -2076,7 +2028,7 @@ void CMenuPcs::DrawUniteList()
 		                             static_cast<double>(entry->x));
 		if (topX != entry->x) {
 			const float target = static_cast<float>(entry->x + entry->width - 0x18) - width;
-			const float t = static_cast<float>(fabs(static_cast<double>(topX - entry->x)) / 64.0);
+			const float t = static_cast<float>(__fabs(static_cast<double>(topX - entry->x)) / 64.0);
 			x = (target - x) * t + x;
 		}
 
@@ -2102,12 +2054,11 @@ void CMenuPcs::DrawUniteList()
 			break;
 		}
 
-		const s16 slotType = caravan->m_commandListExtra[i];
-		if (slotType == 0) {
+		if (caravan->m_commandListExtra[i] == 0) {
 			continue;
 		}
 
-		if (slotType > 0) {
+		if (caravan->m_commandListExtra[i] > 0) {
 			groupStart = i;
 			if (i + 2 < 8) {
 				if (caravan->m_commandListExtra[i + 2] == -1) {
@@ -2148,7 +2099,7 @@ void CMenuPcs::DrawUniteList()
 			panelAlpha = startEntry->alpha;
 		} else {
 			panelAlpha = static_cast<float>(
-			    fabs(static_cast<double>(panelX - static_cast<float>(topX))) / 64.0);
+			    __fabs(static_cast<double>(panelX - static_cast<float>(topX))) / 64.0);
 		}
 
 		color.r = 0xFF;
@@ -2565,8 +2516,7 @@ unsigned int CMenuPcs::CmdClose1()
 			}
 
 			cw->UnuniteComList(sel, ununiteCount);
-			Game.m_scriptFoodBase[0]
-			    ->UniteComList(combo[0][1], GetUniteRecipeCount(combo[0][0]), GetUniteRecipeCmd(combo[0][0]));
+			CmdUnite(combo[0][0], combo[0][1]);
 
 			done = 0;
 			GetCmdStateView(this)->selected[0] = static_cast<s16>(combo[0][1]);
@@ -2591,20 +2541,24 @@ unsigned int CMenuPcs::CmdClose1()
 inline unsigned int CMenuPcs::CmdOpen2()
 {
 	int done;
-	CCaravanWork* caravanWork = Game.m_scriptFoodBase[0];
+	s32 selected;
+	s32 limit;
+	CCaravanWork* caravanWork;
+	s32 prev;
+	s32 next;
+
+	caravanWork = Game.m_scriptFoodBase[0];
 
 	GetCmdStateView(this)->transitionTimer = static_cast<s16>(GetCmdStateView(this)->transitionTimer + 1);
 
-	s32 selected = static_cast<s32>(GetCmdStateView(this)->selected[0]);
-	s32 prev;
+	selected = static_cast<s32>(GetCmdStateView(this)->selected[0]);
 	for (prev = selected - 1; prev > 2; prev--) {
 		if (caravanWork->m_commandListExtra[prev] >= 0) {
 			break;
 		}
 	}
 
-	s32 limit = static_cast<s32>(caravanWork->m_numCmdListSlots);
-	s32 next;
+	limit = static_cast<s32>(caravanWork->m_numCmdListSlots);
 	for (next = selected + 1; next < limit; next++) {
 		if (caravanWork->m_commandListExtra[next] >= 0) {
 			break;
@@ -2694,9 +2648,7 @@ unsigned int CMenuPcs::CmdClose2()
 
 			Game.m_scriptFoodBase[0]
 			    ->UnuniteComList(closeSel, i);
-			const int recipe = combo[comboIdx][0];
-			Game.m_scriptFoodBase[0]->UniteComList(
-			    comboSel[comboIdx * 2], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
+			CmdUnite(combo[comboIdx][0], comboSel[comboIdx * 2]);
 			GetCmdStateView(this)->selected[0] = static_cast<s16>(comboSel[comboIdx * 2]);
 			GetCmdStateView(this)->uniteState = 2;
 		}
@@ -2713,9 +2665,7 @@ unsigned int CMenuPcs::CmdClose2()
 				comboIdx = (!(modeSel == static_cast<u32>(comboSel[2]))) ? 0 : 1;
 			}
 
-			const int recipe = combo[comboIdx][0];
-			Game.m_scriptFoodBase[0]->UniteComList(
-				comboSel[comboIdx * 2], GetUniteRecipeCount(recipe), GetUniteRecipeCmd(recipe));
+			CmdUnite(combo[comboIdx][0], comboSel[comboIdx * 2]);
 			GetCmdStateView(this)->selected[0] = static_cast<s16>(comboSel[comboIdx * 2]);
 		} else if (UniteOpenAnim(-1) != 0) {
 			GetCmdStateView(this)->uniteState = 3;
