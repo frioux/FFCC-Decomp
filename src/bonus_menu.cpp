@@ -357,12 +357,12 @@ void CMenuPcs::createBonus()
 		for (i = 0; i < s_Rinfo->m_partyCount; i++) {
 			int leftIndex = order[i];
 			for (j = i + 1; j < s_Rinfo->m_partyCount; j++) {
-				int aFood = s_Rinfo->m_party[leftIndex].m_foodValue;
 				int aTotal = s_Rinfo->m_party[leftIndex].m_totalValue;
-				int bTotal = s_Rinfo->m_party[order[j]].m_totalValue;
-				int bFood = s_Rinfo->m_party[order[j]].m_foodValue;
+				int aFood = s_Rinfo->m_party[leftIndex].m_foodValue;
 				int aArtifact = s_Rinfo->m_party[leftIndex].m_artifactValue;
+				int bFood = s_Rinfo->m_party[order[j]].m_foodValue;
 				int bArtifact = s_Rinfo->m_party[order[j]].m_artifactValue;
+				int bTotal = s_Rinfo->m_party[order[j]].m_totalValue;
 				int coin = rand() & 1;
 
 				if (aTotal < bTotal ||
@@ -1763,9 +1763,9 @@ void CMenuPcs::CalcResultCloseAnim()
 		}
 
 		if ((sprite->flags & 2) == 0 && (sprite->motionX || sprite->motionY)) {
-			float fy = (float)sprite->y;
 			float ty = sprite->targetY;
 			float progress = (float)(1.0 - (1.0 / (double)sprite->duration) * (double)sprite->timer);
+			float fy = (float)sprite->y;
 			sprite->motionX = (sprite->targetX - (float)sprite->x) * progress;
 			sprite->motionY = (ty - fy) * progress;
 		}
@@ -3024,12 +3024,12 @@ void CMenuPcs::CalcSelectCloseAnim()
 #else
 	enum { kFadeFrames = 10 };
 #endif
-	int activePartyCount = s_Rinfo->m_partyCount;
 	CMenuPcs::Sprt2* sprite;
 	int twice;
 	int i;
 	CMenuPcs::Sprt2* alphaSprite;
 	int doneCount;
+	int activePartyCount = s_Rinfo->m_partyCount;
 	CCharaPcs::CHandle* handle;
 	int total;
 	int tribeId;

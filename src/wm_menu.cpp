@@ -4341,10 +4341,10 @@ void CMenuPcs::DrawTitleMenu()
 			         FLOAT_803313dc, FLOAT_803313dc,
 			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 			AlphaAdd();
-			state = m_wmWorldState->m_mainState;
 			float secondAlpha = alpha;
 			fX = kTitleSelectionX;
 			fX -= 6.0f;
+			state = m_wmWorldState->m_mainState;
 			if (state == 2 && m_wmWorldState->m_state12 == 0) {
 				int timer = (int)m_wmWorldState->m_titleState;
 				fX = static_cast<float>(kTitleSlideDistance *
@@ -8260,9 +8260,9 @@ void CMenuPcs::CalcMainMenuSub()
 			if (m_wmWorldState->m_nextMenuMode != -1 && i == 1 &&
 			    m_wmWorldState->m_cardChannel == 1 && m_wmWorldState->m_mainState != 2) {
 				double u = static_cast<double>(n) / 20.0;
-				float m00 = modelMtx[0][3];
 				float m10 = modelMtx[1][3];
 				float m20 = modelMtx[2][3];
+				float m00 = modelMtx[0][3];
 				modelMtx[0][3] = m00 + static_cast<float>(static_cast<float>(-m00 * u) * u);
 				modelMtx[1][3] = m10 + static_cast<float>(static_cast<float>(-0.2 - m10 * u) * u);
 				modelMtx[2][3] = m20 + static_cast<float>(static_cast<float>(51.5 - m20) * u);
@@ -9545,11 +9545,11 @@ void CMenuPcs::DrawMcWin(short state, short kind)
 	float bottom;
 	if (m_menuWindowInfo->state != 1) {
 		sx = centerX - 32.0f;
-		sy = centerY - 32.0f;
 		const float xAdd = (((centerX - static_cast<float>(m_menuWindowInfo->x)) - 32.0f) / static_cast<float>(kMcWindowFrames)) * static_cast<float>(m_menuWindowInfo->frame);
-		const float yAdd = (((centerY - static_cast<float>(m_menuWindowInfo->y)) - 32.0f) / static_cast<float>(kMcWindowFrames)) * static_cast<float>(m_menuWindowInfo->frame);
 		sx -= xAdd;
 		sw = static_cast<float>(2.0 * static_cast<double>(32.0f + xAdd));
+		sy = centerY - 32.0f;
+		const float yAdd = (((centerY - static_cast<float>(m_menuWindowInfo->y)) - 32.0f) / static_cast<float>(kMcWindowFrames)) * static_cast<float>(m_menuWindowInfo->frame);
 		sy -= yAdd;
 		sh = static_cast<float>(2.0 * static_cast<double>(32.0f + yAdd));
 	} else {
