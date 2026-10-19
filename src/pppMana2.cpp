@@ -606,8 +606,6 @@ static void CalcReflectionVector2(
     CameraPcs.GetViewMatrix(cameraMtx);
     PSMTXConcat(cameraMtx, matrix, cameraModelMtx);
 
-    const float half = 0.5f;
-
     while (dl < (u16*)((u8*)displayList + displayListSize)) {
         drawFmt = *(u8*)dl;
         itemCount = *(u16*)((u8*)dl + 1);
@@ -660,8 +658,8 @@ static void CalcReflectionVector2(
             vtxColor->g = 0x80;
             vtxColor->b = 0x80;
 
-            uv.y = half;
-            uv.x = half;
+            uv.y = 0.5f;
+            uv.x = 0.5f;
             vtxColor->a = 0xFF;
 
             switch (axis) {
@@ -669,16 +667,16 @@ static void CalcReflectionVector2(
                 invAxis = 2.0f * reflected.x;
                 if (vtxReflection->x >= 0.0f) {
                     vtxColor->r = (u8)(vtxColor->r + 0x7F);
-                    uv.x = half - reflected.z / invAxis;
-                    uv.y = half - reflected.y / invAxis;
+                    uv.x -= reflected.z / invAxis;
+                    uv.y -= reflected.y / invAxis;
                     uv.x *= 0.25f;
                     uv.y *= 0.25f;
                     uv.x += 0.25f;
                     uv.y += 0.25f;
                 } else {
                     vtxColor->r = (u8)(vtxColor->r - 0x7F);
-                    uv.x = half - reflected.z / invAxis;
-                    uv.y = half + reflected.y / invAxis;
+                    uv.x -= reflected.z / invAxis;
+                    uv.y += reflected.y / invAxis;
                     uv.x *= 0.25f;
                     uv.y *= 0.25f;
                     uv.x += 0.75f;
@@ -689,37 +687,37 @@ static void CalcReflectionVector2(
                 invAxis = 2.0f * reflected.y;
                 if (vtxReflection->y >= 0.0f) {
                     vtxColor->g = (u8)(vtxColor->g + 0x7F);
-                    uv.x = half + reflected.x / invAxis;
+                    uv.x += reflected.x / invAxis;
                     uv.x *= 0.25f;
-                    uv.y = half + reflected.z / invAxis;
+                    uv.y += reflected.z / invAxis;
                     uv.y *= 0.25f;
-                    uv.x += half;
+                    uv.x += 0.5f;
                 } else {
                     vtxColor->g = (u8)(vtxColor->g - 0x7F);
-                    uv.x = half - reflected.x / invAxis;
+                    uv.x -= reflected.x / invAxis;
                     uv.x *= 0.25f;
-                    uv.y = half + reflected.z / invAxis;
+                    uv.y += reflected.z / invAxis;
                     uv.y *= 0.25f;
                     uv.x += 0.25f;
-                    uv.y += half;
+                    uv.y += 0.5f;
                 }
                 break;
             case 2:
                 invAxis = 2.0f * reflected.z;
                 if (vtxReflection->z >= 0.0f) {
                     vtxColor->b = (u8)(vtxColor->b + 0x7F);
-                    uv.x = half + reflected.x / invAxis;
-                    uv.y = half - reflected.y / invAxis;
+                    uv.x += reflected.x / invAxis;
+                    uv.y -= reflected.y / invAxis;
                     uv.y *= 0.25f;
                     uv.x *= 0.25f;
                     uv.y += 0.25f;
                 } else {
                     vtxColor->b = (u8)(vtxColor->b - 0x7F);
-                    uv.x = half + reflected.x / invAxis;
-                    uv.y = half + reflected.y / invAxis;
+                    uv.x += reflected.x / invAxis;
+                    uv.y += reflected.y / invAxis;
                     uv.x *= 0.25f;
                     uv.y *= 0.25f;
-                    uv.x += half;
+                    uv.x += 0.5f;
                     uv.y += 0.25f;
                 }
                 break;
