@@ -350,10 +350,10 @@ update_step:
 advance_segment:
     if (segRemain >= trailStep) {
         float ratio = segCursor / segLen;
-        posX = segDx * ratio + startX;
         posZ = segDz * ratio + startZ;
-        segCursor += trailStep;
         posY = segDy * ratio + startY;
+        posX = segDx * ratio + startX;
+        segCursor += trailStep;
         segRemain -= trailStep;
         goto draw_loop;
     }

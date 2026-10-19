@@ -452,7 +452,7 @@ void CMenuPcs::EquipDraw()
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		int letterCount = letter[0];
 
-		for (int i = m_equipList->count; i < m_equipList->listEnd; i++) {
+		for (int i = m_equipList->count; i < m_equipList->listEnd; i++, item++) {
 			int tex = item->tex;
 			if (tex >= 0) {
 				x = (float)item->x;
@@ -541,7 +541,6 @@ void CMenuPcs::EquipDraw()
 					MenuPcs.DrawRect(0, x, y, w, h, u, v, scale, scale, 0.0f);
 				}
 			}
-			item++;
 		}
 	}
 

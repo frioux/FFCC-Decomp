@@ -261,10 +261,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
     float scaledRadius;
     float maxRadius;
     GXTexObj backSceneTex;
-    int secondaryOffset;
     VColor* colorWork;
     u32 maskTexSize;
     int maskOffset;
+    int secondaryOffset;
     Vec managerPos;
     pppModelSt* model;
     int tevStageCount;

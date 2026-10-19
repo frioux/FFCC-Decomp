@@ -809,6 +809,7 @@ void CGraphicPcs::drawScreenFade()
                 _GXSetTevAlphaIn(GX_TEVSTAGE0, (_GXTevAlphaArg)7, (_GXTevAlphaArg)4, (_GXTevAlphaArg)5, (_GXTevAlphaArg)7);
                 _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 
+                float z = 0.0f;
                 int tile = 0;
                 do {
                     CColor gradColor[2];
@@ -843,16 +844,16 @@ void CGraphicPcs::drawScreenFade()
                     gradColor[1].color.a = 0xFF;
 
                     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-                    GXPosition3f32((float)x, (float)y, kGraphicZero);
+                    GXPosition3f32((float)x, (float)y, z);
                     GXColor1u32(*(u32*)&gradColor[0].color);
                     GXTexCoord2u16(0, 0);
-                    GXPosition3f32((float)(x + 0x140), (float)y, kGraphicZero);
+                    GXPosition3f32((float)(x + 0x140), (float)y, z);
                     GXColor1u32(*(u32*)&gradColor[0].color);
                     GXTexCoord2u16(2, 0);
-                    GXPosition3f32((float)(x + 0x140), (float)(y + 0xE0), kGraphicZero);
+                    GXPosition3f32((float)(x + 0x140), (float)(y + 0xE0), z);
                     GXColor1u32(*(u32*)&gradColor[1].color);
                     GXTexCoord2u16(2, 2);
-                    GXPosition3f32((float)x, (float)(y + 0xE0), kGraphicZero);
+                    GXPosition3f32((float)x, (float)(y + 0xE0), z);
                     GXColor1u32(*(u32*)&gradColor[1].color);
                     GXTexCoord2u16(0, 2);
                     tile++;

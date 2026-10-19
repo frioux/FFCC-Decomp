@@ -505,10 +505,10 @@ void CMesMenu::onDraw()
         stateBlend = 0.0f;
     }
 
-    float width;
     float height;
     float drawX;
     float drawY;
+    float width;
 
     if (m_menuIndex < 4) {
         CCaravanWork* scriptFood = Game.m_scriptFoodBase[m_menuIndex];
