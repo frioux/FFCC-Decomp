@@ -428,7 +428,7 @@ void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text
  */
 inline float CMenuPcs::GetFontWidth(char* text, float scale, float margin)
 {
-	CFont* font = m_fonts[0];
+	CFont* font = GetFont22();
 
 	font->SetMargin(margin);
 	font->SetShadow(1);
@@ -1154,6 +1154,16 @@ void CMenuPcs::CalcOptionMenu()
 }
 
 #ifdef VERSION_GCCJGC
+static inline float CalcOptionHelpPos(CMenuPcs* menu, char* text)
+{
+	int length = strlen(text);
+	CFont* font = menu->GetFont22();
+	font->SetMargin(1.0f);
+	font->SetScale(1.0f);
+	float width = font->GetWidth(text);
+	return 320.0f - width / 2.0f;
+}
+
 static inline void DrawOptionLabel(CFont* font, int x, int y, _GXColor color,
                                    int tlut, char* text, float scale)
 {
@@ -1183,8 +1193,8 @@ void CMenuPcs::DrawOptionMenu()
 	float specialRowCos;
 	CFont* font = m_fonts[0];
 	int langRow = Game.m_gameWork.m_languageId - 1;
-	float w;
 	float h;
+	float w;
 	int leftXi;
 	int rightXi;
 	_GXColor color;
@@ -1232,8 +1242,8 @@ void CMenuPcs::DrawOptionMenu()
 #endif
 
 	CTexture* banner = m_wmOptionTextures[5];
-	w = static_cast<float>(banner->m_width);
-	h = static_cast<float>(banner->m_height);
+	w = static_cast<float>(banner->GetWidth());
+	h = static_cast<float>(banner->GetHeight());
 	Util.CalcUV(uv0.x, uv0.y, 0, 0, static_cast<unsigned int>(w), static_cast<unsigned int>(h));
 	Util.CalcUV(uv1.x, uv1.y, 0x280, static_cast<unsigned int>(h),
 	             static_cast<unsigned int>(w), static_cast<unsigned int>(h));
@@ -1243,8 +1253,8 @@ void CMenuPcs::DrawOptionMenu()
 	                        GX_BL_INVSRCALPHA);
 
 	CTexture* panel = m_wmOptionTextures[10];
-	w = static_cast<float>(panel->m_width);
-	h = static_cast<float>(panel->m_height);
+	w = static_cast<float>(panel->GetWidth());
+	h = static_cast<float>(panel->GetHeight());
 	Util.RenderTextureQuad(336.0f, 88.0f, w, h, panel, 0, 0, &color,
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 	uv0.x = 0.0f;
@@ -1267,8 +1277,8 @@ void CMenuPcs::DrawOptionMenu()
 	                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 	CTexture* cursor = m_textures[0];
-	w = static_cast<float>(cursor->m_width);
-	h = static_cast<float>(cursor->m_height);
+	w = static_cast<float>(cursor->GetWidth());
+	h = static_cast<float>(cursor->GetHeight());
 	Util.CalcUV(uv0.x, uv0.y, 0, 0, static_cast<unsigned int>(w),
 	             static_cast<unsigned int>(h));
 	Util.CalcUV(uv1.x, uv1.y, 0x20, 0x20, static_cast<unsigned int>(w),
@@ -1279,9 +1289,9 @@ void CMenuPcs::DrawOptionMenu()
 	                        GX_BL_INVSRCALPHA);
 
 	CTexture* marker = m_wmOptionTextures[2];
-	w = static_cast<float>(marker->m_width);
+	w = static_cast<float>(marker->GetWidth());
 	Util.RenderTextureQuad(64.0f, static_cast<float>(m_optionIndex * 0x28 + 0x70),
-	                        w, static_cast<float>(marker->m_height), marker, 0, 0,
+	                        w, static_cast<float>(marker->GetHeight()), marker, 0, 0,
 	                        &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
 #ifdef VERSION_GCCJGC
@@ -1292,8 +1302,8 @@ void CMenuPcs::DrawOptionMenu()
 #endif
 	for (int i = 0; i < 5; i++) {
 		CTexture* row = m_wmOptionTextures[0];
-		w = static_cast<float>(row->m_width);
-		h = static_cast<float>(row->m_height);
+		w = static_cast<float>(row->GetWidth());
+		h = static_cast<float>(row->GetHeight());
 		uv0.x = (i == m_optionIndex) ? 0.0f : 0.5f;
 		uv0.y = 0.0f;
 		uv1.x = (i == m_optionIndex) ? 0.5f : 1.0f;
@@ -1330,16 +1340,8 @@ void CMenuPcs::DrawOptionMenu()
 #endif
 
 #ifdef VERSION_GCCJGC
-	{
-		char* help = helpText[m_optionIndex];
-		strlen(help);
-		CFont* helpFont = m_fonts[0];
-		helpFont->SetMargin(1.0f);
-		helpFont->SetScale(1.0f);
-		float width = helpFont->GetWidth(help);
-		DrawOptionLabel(m_fonts[0], static_cast<int>(320.0f - width / 2.0f),
-		                391, color, 7, help, 1.0f);
-	}
+	DrawOptionLabel(m_fonts[0], static_cast<int>(CalcOptionHelpPos(this, helpText[m_optionIndex])),
+	                391, color, 7, helpText[m_optionIndex], 1.0f);
 #else
 	{
 		float helpTextY = 387.0f;
@@ -1360,11 +1362,9 @@ void CMenuPcs::DrawOptionMenu()
 	}
 
 	color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionRowAnim));
-	int rowAnimStep = static_cast<int>(m_optionRowAnim / OPTION_ROW_STEP);
-	float rowAngle = static_cast<float>(rowAnimStep) * OPTION_ROW_ANGLE_STEP;
-	float rowRad = 0.017453292f * rowAngle;
-	rowAngle = 2.0f * rowAngle;
-	float rowSin = static_cast<float>(sin(0.017453292f * rowAngle));
+	float angleStep = OPTION_ROW_ANGLE_STEP;
+	float rowRad = 0.017453292f * (static_cast<float>(static_cast<int>(m_optionRowAnim / OPTION_ROW_STEP)) * angleStep);
+	float rowSin = static_cast<float>(sin(0.017453292f * (2.0f * (static_cast<float>(static_cast<int>(m_optionRowAnim / OPTION_ROW_STEP)) * angleStep))));
 	float rowCos = static_cast<float>(cos(rowRad));
 
 	switch (m_optionIndex) {
@@ -1381,8 +1381,8 @@ void CMenuPcs::DrawOptionMenu()
 		row.rightText.y = 185.0f;
 #endif
 		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
-		unsigned int sideHeight = sideTexture->m_height;
-		unsigned int sideWidth = sideTexture->m_width;
+		unsigned int sideHeight = sideTexture->GetHeight();
+		unsigned int sideWidth = sideTexture->GetWidth();
 
 		SetUv(uv0, 0.0f, 0.0f);
 		SetUv(uv1, 0.5f, 1.0f);
@@ -1399,28 +1399,30 @@ void CMenuPcs::DrawOptionMenu()
 
 		color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionColumnAnim));
 		CTexture* selectorTexture = m_wmOptionTextureSet->GetTexture(4);
-		unsigned int selectorHeight = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_height));
-		unsigned int selectorWidth = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_width));
+		unsigned int selectorHeight = static_cast<unsigned int>(static_cast<float>(selectorTexture->GetHeight()));
+		unsigned int selectorWidth = static_cast<unsigned int>(static_cast<float>(selectorTexture->GetWidth()));
 		Util.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
 		Util.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorWidth, selectorHeight);
 		Util.RenderTextureQuad((m_gameInitMode == 0) ? row.selector.x : 96.0f + row.selector.x, row.selector.y,
 		                        120.0f, 48.0f, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+		Vec2d* leftText = &row.leftText;
+		Vec2d* rightText = &row.rightText;
 
 #ifdef VERSION_GCCJGC
 		if (m_gameInitMode == 0) {
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x - 2.0f),
-			                static_cast<int>(row.leftText.y - 2.0f), color, 0x17,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(leftText->x - 2.0f),
+			                static_cast<int>(leftText->y - 2.0f), color, 0x17,
 			                "\202\156\202\155", 1.2f);
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x),
-			                static_cast<int>(row.rightText.y), color, 6,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(rightText->x),
+			                static_cast<int>(rightText->y), color, 6,
 			                "\202\156\202\145\202\145", 1.0f);
 		} else {
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x),
-			                static_cast<int>(row.leftText.y), color, 6,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(leftText->x),
+			                static_cast<int>(leftText->y), color, 6,
 			                "\202\156\202\155", 1.0f);
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x - 2.0f),
-			                static_cast<int>(row.rightText.y - 2.0f), color, 0x17,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(rightText->x - 2.0f),
+			                static_cast<int>(rightText->y - 2.0f), color, 0x17,
 			                "\202\156\202\145\202\145", 1.2f);
 		}
 #else
@@ -1429,54 +1431,36 @@ void CMenuPcs::DrawOptionMenu()
 
 		if (m_gameInitMode == 0) {
 			{
-				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(12);
-				fnt->SetMargin(1.0f);
-				fnt->SetShadow(1);
-				float firstScale = baseScale * scale;
-				fnt->SetScale(firstScale);
-				float tw = fnt->GetWidth(txt);
-				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) *
-				                           0.5 + 368.0)),
-				          static_cast<int>(row.leftText.y - 2.0f), color, 0x17, txt, firstScale,
+				float tw = GetFontWidth(txt, baseScale * scale, 1.0f);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
+				                           2.0 + 368.0)),
+				          static_cast<int>(leftText->y - 2.0f), color, 0x17, txt, baseScale * scale,
 				          1.0f, 1.0f);
 			}
 			{
-				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(13);
-				fnt->SetMargin(1.0f);
-				fnt->SetShadow(1);
-				fnt->SetScale(scale);
-				float tw = fnt->GetWidth(txt);
-				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) *
-				                           0.5 + 464.0)),
-				          static_cast<int>(row.rightText.y), color, 6, txt, scale, 1.0f,
+				float tw = GetFontWidth(txt, scale, 1.0f);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
+				                           2.0 + 464.0)),
+				          static_cast<int>(rightText->y), color, 6, txt, scale, 1.0f,
 				          1.0f);
 			}
 		} else {
 			{
-				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(12);
-				fnt->SetMargin(1.0f);
-				fnt->SetShadow(1);
-				fnt->SetScale(scale);
-				float tw = fnt->GetWidth(txt);
-				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) *
-				                           0.5 + 368.0)),
-				          static_cast<int>(row.leftText.y), color, 6, txt, scale, 1.0f,
+				float tw = GetFontWidth(txt, scale, 1.0f);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
+				                           2.0 + 368.0)),
+				          static_cast<int>(leftText->y), color, 6, txt, scale, 1.0f,
 				          1.0f);
 			}
 			{
-				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(13);
-				fnt->SetMargin(1.0f);
-				fnt->SetShadow(1);
-				scale = baseScale * scale;
-				fnt->SetScale(scale);
-				float tw = fnt->GetWidth(txt);
-				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) *
-				                           0.5 + 464.0)),
-				          static_cast<int>(row.rightText.y - 2.0f), color, 0x17, txt, scale,
+				float tw = GetFontWidth(txt, baseScale * scale, 1.0f);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
+				                           2.0 + 464.0)),
+				          static_cast<int>(rightText->y - 2.0f), color, 0x17, txt, baseScale * scale,
 				          1.0f, 1.0f);
 			}
 		}
@@ -1496,8 +1480,8 @@ void CMenuPcs::DrawOptionMenu()
 		row.rightText.y = 185.0f;
 #endif
 		CTexture* sideTexture = m_wmOptionTextureSet->GetTexture(1);
-		unsigned int sideHeight = sideTexture->m_height;
-		unsigned int sideWidth = sideTexture->m_width;
+		unsigned int sideHeight = sideTexture->GetHeight();
+		unsigned int sideWidth = sideTexture->GetWidth();
 
 		SetUv(uv0, 0.0f, 0.0f);
 		SetUv(uv1, 0.5f, 1.0f);
@@ -1514,81 +1498,66 @@ void CMenuPcs::DrawOptionMenu()
 
 		color.a = static_cast<unsigned char>(static_cast<int>(255.0f * m_optionColumnAnim));
 		CTexture* selectorTexture = m_wmOptionTextureSet->GetTexture(4);
-		unsigned int selectorHeight = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_height));
-		unsigned int selectorWidth = static_cast<unsigned int>(static_cast<float>(selectorTexture->m_width));
+		unsigned int selectorHeight = static_cast<unsigned int>(static_cast<float>(selectorTexture->GetHeight()));
+		unsigned int selectorWidth = static_cast<unsigned int>(static_cast<float>(selectorTexture->GetWidth()));
 		Util.CalcUV(uv0.x, uv0.y, 0, 0, selectorWidth, selectorHeight);
 		Util.CalcUV(uv1.x, uv1.y, 0x78, 0x30, selectorWidth, selectorHeight);
 		Util.RenderTextureQuad((m_stereoMode == 0) ? row.selector.x : 112.0f + row.selector.x, row.selector.y,
 		                        120.0f, 48.0f, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+		Vec2d* leftText = &row.leftText;
+		Vec2d* rightText = &row.rightText;
 
 #ifdef VERSION_GCCJGC
 		if (m_stereoMode == 0) {
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x - 2.0f),
-			                static_cast<int>(row.leftText.y - 2.0f), color, 0x17,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(leftText->x - 2.0f),
+			                static_cast<int>(leftText->y - 2.0f), color, 0x17,
 			                "\203\130\203\145\203\214\203\111", 1.2f);
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x),
-			                static_cast<int>(row.rightText.y), color, 6,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(rightText->x),
+			                static_cast<int>(rightText->y), color, 6,
 			                "\203\202\203\155\203\211\203\213", 1.0f);
 		} else {
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x),
-			                static_cast<int>(row.leftText.y), color, 6,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(leftText->x),
+			                static_cast<int>(leftText->y), color, 6,
 			                "\203\130\203\145\203\214\203\111", 1.0f);
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x - 2.0f),
-			                static_cast<int>(row.rightText.y - 2.0f), color, 0x17,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(rightText->x - 2.0f),
+			                static_cast<int>(rightText->y - 2.0f), color, 0x17,
 			                "\203\202\203\155\203\211\203\213", 1.2f);
 		}
 #else
-		double stereoScale = 0.8;
 		if (m_stereoMode == 0) {
 			{
-				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(14);
-				fnt->SetMargin(1.0f);
-				fnt->SetShadow(1);
-				fnt->SetScale(stereoScale * baseScale);
-				float tw = fnt->GetWidth(txt);
-				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) *
-				                           0.5 + 360.0)),
-				          static_cast<int>(row.leftText.y - 2.0f), color, 0x17, txt,
-				          stereoScale * baseScale, 1.0f, 1.0f);
+				float tw = GetFontWidth(txt, baseScale * 0.8, 1.0f);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
+				                           2.0 + 360.0)),
+				          static_cast<int>(leftText->y - 2.0f), color, 0x17, txt,
+				          baseScale * 0.8, 1.0f, 1.0f);
 			}
 			{
-				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(15);
-				fnt->SetMargin(1.0f);
-				fnt->SetShadow(1);
-				fnt->SetScale(0.8f);
-				float tw = fnt->GetWidth(txt);
-				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) *
-				                           0.5 + 472.0)),
-				          static_cast<int>(row.rightText.y), color, 6, txt, 0.8f, 1.0f,
+				float tw = GetFontWidth(txt, 0.8f, 1.0f);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
+				                           2.0 + 472.0)),
+				          static_cast<int>(rightText->y), color, 6, txt, 0.8f, 1.0f,
 				          1.0f);
 			}
 		} else {
 			{
-				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(14);
-				fnt->SetMargin(1.0f);
-				fnt->SetShadow(1);
-				fnt->SetScale(0.8f);
-				float tw = fnt->GetWidth(txt);
-				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) *
-				                           0.5 + 360.0)),
-				          static_cast<int>(row.leftText.y), color, 6, txt, 0.8f, 1.0f,
+				float tw = GetFontWidth(txt, 0.8f, 1.0f);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
+				                           2.0 + 360.0)),
+				          static_cast<int>(leftText->y), color, 6, txt, 0.8f, 1.0f,
 				          1.0f);
 			}
 			{
-				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(15);
-				fnt->SetMargin(1.0f);
-				fnt->SetShadow(1);
-				fnt->SetScale(stereoScale * baseScale);
-				float tw = fnt->GetWidth(txt);
-				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) *
-				                           0.5 + 472.0)),
-				          static_cast<int>(row.rightText.y - 2.0f), color, 0x17, txt,
-				          stereoScale * baseScale, 1.0f, 1.0f);
+				float tw = GetFontWidth(txt, baseScale * 0.8, 1.0f);
+				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
+				                           2.0 + 472.0)),
+				          static_cast<int>(rightText->y - 2.0f), color, 0x17, txt,
+				          baseScale * 0.8, 1.0f, 1.0f);
 			}
 		}
 #endif
@@ -1619,8 +1588,8 @@ void CMenuPcs::DrawOptionMenu()
 		CTexture* meterTexture = m_wmOptionTextureSet->GetTexture(3);
 		leftXi = static_cast<int>(472.0f - pos.leftIcon.x);
 		rightXi = static_cast<int>((24.0f + pos.rightIcon.x) - 472.0f);
-		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
-		unsigned int meterWidth = static_cast<unsigned int>(static_cast<float>(meterTexture->m_width));
+		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->GetHeight()));
+		unsigned int meterWidth = static_cast<unsigned int>(static_cast<float>(meterTexture->GetWidth()));
 
 		Util.CalcUV(uv0.x, uv0.y, 0, 0x28, meterWidth, meterHeight);
 		Util.CalcUV(uv1.x, uv1.y, 0x18, 0x40, meterWidth, meterHeight);
@@ -1660,11 +1629,11 @@ void CMenuPcs::DrawOptionMenu()
 		Util.CalcUV(uv1.x, uv1.y, 0x50, 0x38, meterWidth, meterHeight);
 		Vec2d* bar = &pos.bar;
 		float barBaseX = bar->x;
-		for (int i = 0, x = 0; i < 12; i++, x += 0x10) {
-			Util.RenderTextureQuad(barBaseX + static_cast<float>(x), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
+		for (int i = 0; i < 12; i++) {
+			Util.RenderTextureQuad(barBaseX + static_cast<float>(i * 16), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
 			                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			if ((m_optionMenuState != 2) && (i + 1 <= m_bgmVolume)) {
-				Util.RenderTextureQuad(bar->x + static_cast<float>(x), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
+				Util.RenderTextureQuad(bar->x + static_cast<float>(i * 16), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
 				                        &uv1, &color, GX_BL_ONE, GX_BL_ONE);
 			}
 		}
@@ -1710,8 +1679,8 @@ void CMenuPcs::DrawOptionMenu()
 		CTexture* meterTexture = m_wmOptionTextureSet->GetTexture(3);
 		leftXi = static_cast<int>(472.0f - pos.leftIcon.x);
 		rightXi = static_cast<int>((24.0f + pos.rightIcon.x) - 472.0f);
-		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->m_height));
-		unsigned int meterWidth = static_cast<unsigned int>(static_cast<float>(meterTexture->m_width));
+		unsigned int meterHeight = static_cast<unsigned int>(static_cast<float>(meterTexture->GetHeight()));
+		unsigned int meterWidth = static_cast<unsigned int>(static_cast<float>(meterTexture->GetWidth()));
 
 		Util.CalcUV(uv0.x, uv0.y, 0x18, 0x28, meterWidth, meterHeight);
 		Util.CalcUV(uv1.x, uv1.y, 0x30, 0x40, meterWidth, meterHeight);
@@ -1751,11 +1720,11 @@ void CMenuPcs::DrawOptionMenu()
 		Util.CalcUV(uv1.x, uv1.y, 0x40, 0x38, meterWidth, meterHeight);
 		Vec2d* bar = &pos.bar;
 		float barBaseX = bar->x;
-		for (int i = 0, x = 0; i < 12; i++, x += 0x10) {
-			Util.RenderTextureQuad(barBaseX + static_cast<float>(x), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
+		for (int i = 0; i < 12; i++) {
+			Util.RenderTextureQuad(barBaseX + static_cast<float>(i * 16), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
 			                        &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			if ((m_optionMenuState != 2) && (i + 1 <= m_seVolume)) {
-				Util.RenderTextureQuad(bar->x + static_cast<float>(x), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
+				Util.RenderTextureQuad(bar->x + static_cast<float>(i * 16), bar->y, 16.0f, 16.0f, meterTexture, &uv0,
 				                        &uv1, &color, GX_BL_ONE, GX_BL_ONE);
 			}
 		}
@@ -1790,34 +1759,32 @@ void CMenuPcs::DrawOptionMenu()
 		} else {
 			rowAnimFrame = 0x10;
 		}
+		float frameAngle = 5.625f;
 		specialRowCos = static_cast<float>(
-			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * 5.625f))));
+			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * frameAngle))));
 #else
 		if (static_cast<double>(m_optionRowAnim) < 1.0) {
 			rowAnimFrame = static_cast<int>(m_optionRowAnim / 0.07692308f);
 		} else {
 			rowAnimFrame = 0xD;
 		}
+		float frameAngle = 6.923077f;
 		specialRowCos = static_cast<float>(
-			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * 6.923077f))));
+			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * frameAngle))));
 #endif
 
-		int modeU = 0x280;
-		int y = 0;
-		int uvY2 = 0x18;
-		int k = 0;
-		int uvY = 0;
-		for (int i = 0; i < 4; i++, y += 0x28, uvY += 0x20, uvY2 += 0x20, modeU += 0x40, k = 0) {
+		leftXi = 0;
+		for (int i = 0; i < 4; i++, leftXi = 0) {
 			CTexture* cursorPanel = m_wmOptionTextureSet->GetTexture(4);
-			float cursorWidth = static_cast<float>(cursorPanel->m_width);
-			float cursorHeight = static_cast<float>(cursorPanel->m_height);
+			float cursorWidth = static_cast<float>(cursorPanel->GetWidth());
+			float cursorHeight = static_cast<float>(cursorPanel->GetHeight());
 			if ((m_specialModeEdit != 0) && (m_specialModeCursor == i)) {
 				Util.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(cursorWidth - 48.0f), 0,
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
 				Util.CalcUV(uv1.x, uv1.y, static_cast<unsigned int>(cursorWidth), 0x28,
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
-				const Vec2d* pp = &pts[k];
-				Util.RenderTextureQuad(pp->x, pp->y + static_cast<float>(y), 48.0f,
+				const Vec2d* pp = &pts[leftXi];
+				Util.RenderTextureQuad(pp->x, pp->y + static_cast<float>(i * 0x28), 48.0f,
 				                        40.0f, cursorPanel, &uv0, &uv1, &color, GX_BL_SRCALPHA,
 				                        GX_BL_INVSRCALPHA);
 			}
@@ -1827,8 +1794,8 @@ void CMenuPcs::DrawOptionMenu()
 				             static_cast<unsigned int>(cursorHeight));
 				Util.CalcUV(uv1.x, uv1.y, static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight),
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
-				const Vec2d* pp1 = &pts[k + 1];
-				Util.RenderTextureQuad(pp1->x, pp1->y + static_cast<float>(y),
+				const Vec2d* pp1 = &pts[leftXi + 1];
+				Util.RenderTextureQuad(pp1->x, pp1->y + static_cast<float>(i * 0x28),
 				                        cursorWidth, 16.0f, cursorPanel,
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
@@ -1836,88 +1803,80 @@ void CMenuPcs::DrawOptionMenu()
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
 				Util.CalcUV(uv1.x, uv1.y, 0, static_cast<unsigned int>(cursorHeight),
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
-				Util.RenderTextureQuad(cursorWidth + pp1->x, pp1->y + static_cast<float>(y),
+				Util.RenderTextureQuad(cursorWidth + pp1->x, pp1->y + static_cast<float>(i * 0x28),
 				                        cursorWidth, 16.0f, cursorPanel,
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
 
 			CTexture* modePanel = m_wmOptionTextureSet->GetTexture(7);
-			float modeW = static_cast<float>(modePanel->m_width);
-			float modeH = static_cast<float>(modePanel->m_height);
+			float modeW = static_cast<float>(modePanel->GetWidth());
+			float modeH = static_cast<float>(modePanel->GetHeight());
 			unsigned int modeHeight = static_cast<unsigned int>(modeH);
 			unsigned int modeWidth = static_cast<unsigned int>(modeW);
 			Util.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(modeW - 48.0f),
-			             uvY, modeWidth, modeHeight);
-			Util.CalcUV(uv1.x, uv1.y, modeWidth, uvY2, modeWidth, modeHeight);
-			const Vec2d* pp2 = &pts[k + 2];
-			int modeXi = static_cast<int>(static_cast<float>(modeU) - pp2->x);
+			             i * 0x20, modeWidth, modeHeight);
+			Util.CalcUV(uv1.x, uv1.y, modeWidth, i * 0x20 + 0x18, modeWidth, modeHeight);
+			const Vec2d* pp2 = &pts[leftXi + 2];
+			int modeXi = static_cast<int>(static_cast<float>(i * 0x40 + 0x280) - pp2->x);
 			Util.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(modeXi) *
 			                                           specialRowCos + pp2->x)),
-			                        pp2->y + static_cast<float>(y), 40.0f, 24.0f,
+			                        pp2->y + static_cast<float>(i * 0x28), 40.0f, 24.0f,
 			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-			const Vec2d* pp3 = &pts[k + 3];
-			int step1 = static_cast<int>(24.0f + (static_cast<float>(modeU) - pp3->x));
+			const Vec2d* pp3 = &pts[leftXi + 3];
+			int step1 = static_cast<int>(24.0f + (static_cast<float>(i * 0x40 + 0x280) - pp3->x));
 			int textXi = static_cast<int>(pp3->x + static_cast<float>(step1) * specialRowCos);
 			if (m_specialModeFlags[i] == 0) {
-				Util.CalcUV(uv0.x, uv0.y, 0, uvY, modeWidth, modeHeight);
+				Util.CalcUV(uv0.x, uv0.y, 0, i * 0x20, modeWidth, modeHeight);
 				Util.CalcUV(uv1.x, uv1.y, 0x78, (i + 1) * 0x20, modeWidth, modeHeight);
-				Util.RenderTextureQuad(static_cast<float>(textXi), pp3->y + static_cast<float>(y),
+				Util.RenderTextureQuad(static_cast<float>(textXi), pp3->y + static_cast<float>(i * 0x28),
 				                        120.0f, 32.0f,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 #ifdef VERSION_GCCJGC
-				const Vec2d* pp4 = &pts[k + 4];
+				const Vec2d* pp4 = &pts[leftXi + 4];
 				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
 				DrawOptionLabel(m_fonts[0], textXi2 + 8,
-				                static_cast<int>(4.0f + (pp4->y + static_cast<float>(y))), color, 7,
+				                static_cast<int>(4.0f + (pp4->y + static_cast<float>(i * 0x28))), color, 7,
 				                "\203\211\203\103\203\147\202\156\202\155", 1.0f);
 #elif defined(VERSION_GCCE01)
-				const Vec2d* pp4 = &pts[k + 4];
+				const Vec2d* pp4 = &pts[leftXi + 4];
 				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
-				DrawFont(textXi2 + 8, static_cast<int>(-4.0f + (4.0f + (pp4->y + static_cast<float>(y)))),
+				DrawFont(textXi2 + 8, static_cast<int>(-4.0f + (4.0f + (pp4->y + static_cast<float>(i * 0x28)))),
 				         color, 7, OPT_MES(18), 1.0f, 1.0f);
 #else
-				CFont* fnt = m_fonts[0];
 				char* txt = OPT_MES(18);
-				const Vec2d* pp4 = &pts[k + 4];
+				const Vec2d* pp4 = &pts[leftXi + 4];
 				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
-				fnt->SetMargin(1.0f);
-				fnt->SetShadow(1);
-				fnt->SetScale(1.0f);
-				float tw = fnt->GetWidth(txt);
-				DrawFont(static_cast<int>(static_cast<float>((120.0f - tw) *
-				                          0.5 + textXi2)),
+				float tw = GetFontWidth(txt, 1.0f, 1.0f);
+				DrawFont(static_cast<int>(static_cast<float>((120.0f - tw) /
+				                          2.0 + textXi2)),
 				         static_cast<int>(-4.0f + (4.0f +
-				                          (pp4->y + static_cast<float>(y)))), color, 7,
+				                          (pp4->y + static_cast<float>(i * 0x28)))), color, 7,
 				         txt, 1.0f, 1.0f);
 #endif
 			} else {
 #ifdef VERSION_GCCJGC
 				DrawOptionLabel(m_fonts[0], textXi + 8,
-				                static_cast<int>(4.0f + (pp3->y + static_cast<float>(y))), color, 7,
+				                static_cast<int>(4.0f + (pp3->y + static_cast<float>(i * 0x28))), color, 7,
 				                "\203\211\203\103\203\147\202\156\202\145\202\145", 1.0f);
 #elif defined(VERSION_GCCE01)
-				DrawFont(textXi + 8, static_cast<int>(-4.0f + (4.0f + (pp3->y + static_cast<float>(y)))),
+				DrawFont(textXi + 8, static_cast<int>(-4.0f + (4.0f + (pp3->y + static_cast<float>(i * 0x28)))),
 				         color, 7, OPT_MES(19), 1.0f, 1.0f);
 #else
 				char* txt = OPT_MES(19);
-				CFont* fnt = m_fonts[0];
-				fnt->SetMargin(1.0f);
-				fnt->SetShadow(1);
-				fnt->SetScale(1.0f);
-				float tw = fnt->GetWidth(txt);
-				DrawFont(static_cast<int>(static_cast<float>((120.0f - tw) *
-				                          0.5 + textXi)),
+				float tw = GetFontWidth(txt, 1.0f, 1.0f);
+				DrawFont(static_cast<int>(static_cast<float>((120.0f - tw) /
+				                          2.0 + textXi)),
 				         static_cast<int>(-4.0f + (4.0f +
-				                          (pp3->y + static_cast<float>(y)))), color, 7,
+				                          (pp3->y + static_cast<float>(i * 0x28)))), color, 7,
 				         txt, 1.0f, 1.0f);
 #endif
-				const Vec2d* pp4e = &pts[k + 4];
+				const Vec2d* pp4e = &pts[leftXi + 4];
 				int panelXi = static_cast<int>(pp4e->x + static_cast<float>(step1) * specialRowCos);
-				Util.CalcUV(uv0.x, uv0.y, 0x78, uvY, modeWidth, modeHeight);
+				Util.CalcUV(uv0.x, uv0.y, 0x78, i * 0x20, modeWidth, modeHeight);
 				Util.CalcUV(uv1.x, uv1.y, 0xE0, (i + 1) * 0x20, modeWidth, modeHeight);
 				Util.RenderTextureQuad(static_cast<float>(panelXi),
-				                        pp4e->y + static_cast<float>(y), 112.0f, 32.0f,
+				                        pp4e->y + static_cast<float>(i * 0x28), 112.0f, 32.0f,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 			}
 		}
