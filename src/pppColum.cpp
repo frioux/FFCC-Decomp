@@ -76,8 +76,8 @@ void pppRenderColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
             baseY = positionWork->m_position.y;
             baseZ = positionWork->m_position.z;
             deltaX = 320.0f - baseX;
-            deltaY = 224.0f - baseY;
             segmentDir.x = deltaX;
+            deltaY = 224.0f - baseY;
             segmentDir.y = deltaY;
             segmentDir.z = -0.5f + baseZ;
 

@@ -357,8 +357,8 @@ void CMenuPcs::createBonus()
 		for (i = 0; i < s_Rinfo->m_partyCount; i++) {
 			int leftIndex = order[i];
 			for (j = i + 1; j < s_Rinfo->m_partyCount; j++) {
-				int aTotal = s_Rinfo->m_party[leftIndex].m_totalValue;
 				int aFood = s_Rinfo->m_party[leftIndex].m_foodValue;
+				int aTotal = s_Rinfo->m_party[leftIndex].m_totalValue;
 				int bTotal = s_Rinfo->m_party[order[j]].m_totalValue;
 				int bFood = s_Rinfo->m_party[order[j]].m_foodValue;
 				int aArtifact = s_Rinfo->m_party[leftIndex].m_artifactValue;
@@ -1785,8 +1785,8 @@ void CMenuPcs::CalcResultCloseAnim()
 			int centerY = (int)(float)((double)(float)((double)sprite->h / 2.0 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
 			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
 			m_wm.m_worldObjData[i].m_viewportY = (short)centerY;
-			m_wm.m_worldObjData[i].m_scissorX = (int)(12.0f + ((float)sprite->x + sprite->motionX));
 			m_wm.m_worldObjData[i].m_scissorY = (int)(((float)sprite->y + sprite->motionY) - 8.0f);
+			m_wm.m_worldObjData[i].m_scissorX = (int)(12.0f + ((float)sprite->x + sprite->motionX));
 			if ((double)m_wm.m_worldObjData[i].m_scissorX < 0.0) {
 				m_wm.m_worldObjData[i].m_scissorX = 0;
 			}
@@ -2089,9 +2089,9 @@ void CMenuPcs::CalcSelectOpenAnim()
 	int activePartyCount = s_Rinfo->m_partyCount;
 	int frame;
 	int doneCount;
-	int twice;
 	CMenuPcs::Sprt2* iconSprite;
 	int i;
+	int twice;
 	int tribeId;
 	CCharaPcs::CHandle* handle;
 	int total;
@@ -2370,8 +2370,8 @@ void CMenuPcs::CalcSelectOpenAnim()
 			int centerY = (int)(float)((double)(float)((double)sprite->h / 2.0 + (double)((float)sprite->y + sprite->motionY)) - 224.0);
 			m_wm.m_worldObjData[i].m_viewportX = (short)centerX;
 			m_wm.m_worldObjData[i].m_viewportY = (short)centerY;
-			m_wm.m_worldObjData[i].m_scissorX = (int)(12.0f + ((float)sprite->x + sprite->motionX));
 			m_wm.m_worldObjData[i].m_scissorY = (int)(((float)sprite->y + sprite->motionY) - 8.0f);
+			m_wm.m_worldObjData[i].m_scissorX = (int)(12.0f + ((float)sprite->x + sprite->motionX));
 			if ((double)m_wm.m_worldObjData[i].m_scissorX < 0.0) {
 				m_wm.m_worldObjData[i].m_scissorX = 0;
 			}

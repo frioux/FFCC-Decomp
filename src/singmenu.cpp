@@ -1884,8 +1884,8 @@ void CMenuPcs::DrawSingWin(short mode)
         leftScale *= m_menuWindowInfo->frame;
         float topScale = (top - m_menuWindowInfo->y - 32.0f) / SINGWIN_OPEN_FRAMES;
         topScale *= m_menuWindowInfo->frame;
-        left = (left - 32.0f) - leftScale;
         width = static_cast<float>(2.0 * static_cast<double>(32.0f + leftScale));
+        left = (left - 32.0f) - leftScale;
         height = static_cast<float>(2.0 * static_cast<double>(32.0f + topScale));
         top = (top - 32.0f) - topScale;
     } else {

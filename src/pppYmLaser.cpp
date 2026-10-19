@@ -393,9 +393,9 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 
 		GXLoadPosMtxImm(ppvCameraMatrix, GX_PNMTX0);
 		alphaMax = step->m_laser.m_trailAlpha;
-		alphaStep = (u8)((u8)alphaMax / (s32)step->m_laser.m_pointCount);
 		color.r = step->m_laser.m_trailColorR;
 		color.g = step->m_laser.m_trailColorG;
+		alphaStep = (u8)((u8)alphaMax / (s32)step->m_laser.m_pointCount);
 		color.b = step->m_laser.m_trailColorB;
 		color.a = alphaMax;
 		GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_laser.m_pointCount - 1) * 3));

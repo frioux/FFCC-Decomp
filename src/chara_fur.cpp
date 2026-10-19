@@ -417,8 +417,8 @@ void CChara::CModel::DrawFur(Mtx viewMtx, int shadowPass)
 		furDepth = -clipPos.z / clipPos.w;
 	}
 
-	float furLength = m_furLenScale * (1.0f - furDepth) + m_furLenScale;
 	float furStep = m_furStep;
+	float furLength = m_furLenScale * (1.0f - furDepth) + m_furLenScale;
 
 	_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
 	GXSetZCompLoc((u8)0);
