@@ -83,10 +83,10 @@ void CMesMenu::onDraw()
         stateBlend = 0.0f;
     }
 
-    float width;
     float height;
     float drawX;
     float drawY;
+    float width;
 
     if (m_menuIndex < 4) {
         CCaravanWork* scriptFood = Game.m_scriptFoodBase[m_menuIndex];
@@ -105,21 +105,21 @@ void CMesMenu::onDraw()
         }
         int maskY = m_menuIndex & 2;
         float posX = m_baseX;
-        float baseX = posX + pulseX;
+        drawX = posX + pulseX;
         float pulseY;
         if (maskY != 0) {
             pulseY = pulse;
         } else {
             pulseY = -pulse;
         }
-        float baseY = (m_baseY) + pulseY;
+        drawY = (m_baseY) + pulseY;
 
         MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(MesMenuBattleTexture));
         float titleAlpha = 255.0f * stageBlend;
         MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha)).Ref());
         unsigned int frameMask = m_menuIndex;
-        float frameX = baseX - (float)((frameMask & 1) ? 0x80 : 0);
-        float frameY = baseY - (float)((frameMask & 2) ? 0x38 : 0);
+        float frameX = drawX - (float)((frameMask & 1) ? 0x80 : 0);
+        float frameY = drawY - (float)((frameMask & 2) ? 0x38 : 0);
         MenuPcs.DrawRect(
             0, frameX, frameY, 128.0f, 56.0f,
             (float)(((frameMask & 2) != 0) ? 0x80 : 0),
@@ -131,7 +131,7 @@ void CMesMenu::onDraw()
         font->DrawInit();
         font->SetTlut(0xF);
         font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(titleAlpha)).color);
-        font->SetPosX(baseX + (((m_menuIndex & 1) != 0) ? (-70.0f) - titleWidth : 70.0f));
+        font->SetPosX(drawX + (((m_menuIndex & 1) != 0) ? (-70.0f) - titleWidth : 70.0f));
         font->SetPosY(27.0f + frameY);
         font->Draw(reinterpret_cast<char*>(scriptFood->m_name));
         MenuPcs.DrawInit();
@@ -147,7 +147,7 @@ void CMesMenu::onDraw()
             } else {
                 edgeX = m_windowWidth - width;
             }
-            drawX = baseX + edgeX;
+            drawX += edgeX;
 
             float edgeY;
             if ((m_menuIndex & 2) != 0) {
@@ -155,7 +155,7 @@ void CMesMenu::onDraw()
             } else {
                 edgeY = 60.0f;
             }
-            drawY = baseY + edgeY;
+            drawY += edgeY;
 
             float stateAlpha = 255.0f * stateBlend;
             float alphaF = stateAlpha * stageBlend;
@@ -282,7 +282,7 @@ void CMesMenu::onDraw()
                     } else {
                         iconEdgeX = (width - 144.0f) - (-10.0f);
                     }
-                    unsigned int anchorY = (iconAnchor - 1) & 2;
+                    int anchorY = (iconAnchor - 1) & 2;
                     float iconX = 0.0f;
                     iconX = drawX + iconX;
                     iconX += iconEdgeX;
