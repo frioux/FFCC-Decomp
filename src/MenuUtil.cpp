@@ -428,7 +428,7 @@ void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text
  */
 inline float CMenuPcs::GetFontWidth(char* text, float scale, float margin)
 {
-	CFont* font = m_fonts[0];
+	CFont* font = GetFont22();
 
 	font->SetMargin(margin);
 	font->SetShadow(1);
@@ -1154,6 +1154,16 @@ void CMenuPcs::CalcOptionMenu()
 }
 
 #ifdef VERSION_GCCJGC
+static inline float CalcOptionHelpPos(CMenuPcs* menu, char* text)
+{
+	int length = strlen(text);
+	CFont* font = menu->GetFont22();
+	font->SetMargin(1.0f);
+	font->SetScale(1.0f);
+	float width = font->GetWidth(text);
+	return 320.0f - width / 2.0f;
+}
+
 static inline void DrawOptionLabel(CFont* font, int x, int y, _GXColor color,
                                    int tlut, char* text, float scale)
 {
@@ -1330,16 +1340,8 @@ void CMenuPcs::DrawOptionMenu()
 #endif
 
 #ifdef VERSION_GCCJGC
-	{
-		char* help = helpText[m_optionIndex];
-		strlen(help);
-		CFont* helpFont = m_fonts[0];
-		helpFont->SetMargin(1.0f);
-		helpFont->SetScale(1.0f);
-		float width = helpFont->GetWidth(help);
-		DrawOptionLabel(m_fonts[0], static_cast<int>(320.0f - width / 2.0f),
-		                391, color, 7, help, 1.0f);
-	}
+	DrawOptionLabel(m_fonts[0], static_cast<int>(CalcOptionHelpPos(this, helpText[m_optionIndex])),
+	                391, color, 7, helpText[m_optionIndex], 1.0f);
 #else
 	{
 		float helpTextY = 387.0f;
@@ -1404,21 +1406,23 @@ void CMenuPcs::DrawOptionMenu()
 		Util.RenderTextureQuad((m_gameInitMode == 0) ? row.selector.x : 96.0f + row.selector.x, row.selector.y,
 		                        120.0f, 48.0f, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+		Vec2d* leftText = &row.leftText;
+		Vec2d* rightText = &row.rightText;
 
 #ifdef VERSION_GCCJGC
 		if (m_gameInitMode == 0) {
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x - 2.0f),
-			                static_cast<int>(row.leftText.y - 2.0f), color, 0x17,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(leftText->x - 2.0f),
+			                static_cast<int>(leftText->y - 2.0f), color, 0x17,
 			                "\202\156\202\155", 1.2f);
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x),
-			                static_cast<int>(row.rightText.y), color, 6,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(rightText->x),
+			                static_cast<int>(rightText->y), color, 6,
 			                "\202\156\202\145\202\145", 1.0f);
 		} else {
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x),
-			                static_cast<int>(row.leftText.y), color, 6,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(leftText->x),
+			                static_cast<int>(leftText->y), color, 6,
 			                "\202\156\202\155", 1.0f);
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x - 2.0f),
-			                static_cast<int>(row.rightText.y - 2.0f), color, 0x17,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(rightText->x - 2.0f),
+			                static_cast<int>(rightText->y - 2.0f), color, 0x17,
 			                "\202\156\202\145\202\145", 1.2f);
 		}
 #else
@@ -1431,7 +1435,7 @@ void CMenuPcs::DrawOptionMenu()
 				float tw = GetFontWidth(txt, baseScale * scale, 1.0f);
 				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
 				                           2.0 + 368.0)),
-				          static_cast<int>(row.leftText.y - 2.0f), color, 0x17, txt, baseScale * scale,
+				          static_cast<int>(leftText->y - 2.0f), color, 0x17, txt, baseScale * scale,
 				          1.0f, 1.0f);
 			}
 			{
@@ -1439,7 +1443,7 @@ void CMenuPcs::DrawOptionMenu()
 				float tw = GetFontWidth(txt, scale, 1.0f);
 				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
 				                           2.0 + 464.0)),
-				          static_cast<int>(row.rightText.y), color, 6, txt, scale, 1.0f,
+				          static_cast<int>(rightText->y), color, 6, txt, scale, 1.0f,
 				          1.0f);
 			}
 		} else {
@@ -1448,7 +1452,7 @@ void CMenuPcs::DrawOptionMenu()
 				float tw = GetFontWidth(txt, scale, 1.0f);
 				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
 				                           2.0 + 368.0)),
-				          static_cast<int>(row.leftText.y), color, 6, txt, scale, 1.0f,
+				          static_cast<int>(leftText->y), color, 6, txt, scale, 1.0f,
 				          1.0f);
 			}
 			{
@@ -1456,7 +1460,7 @@ void CMenuPcs::DrawOptionMenu()
 				float tw = GetFontWidth(txt, baseScale * scale, 1.0f);
 				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
 				                           2.0 + 464.0)),
-				          static_cast<int>(row.rightText.y - 2.0f), color, 0x17, txt, baseScale * scale,
+				          static_cast<int>(rightText->y - 2.0f), color, 0x17, txt, baseScale * scale,
 				          1.0f, 1.0f);
 			}
 		}
@@ -1501,21 +1505,23 @@ void CMenuPcs::DrawOptionMenu()
 		Util.RenderTextureQuad((m_stereoMode == 0) ? row.selector.x : 112.0f + row.selector.x, row.selector.y,
 		                        120.0f, 48.0f, selectorTexture, &uv0, &uv1, &color,
 		                        GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+		Vec2d* leftText = &row.leftText;
+		Vec2d* rightText = &row.rightText;
 
 #ifdef VERSION_GCCJGC
 		if (m_stereoMode == 0) {
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x - 2.0f),
-			                static_cast<int>(row.leftText.y - 2.0f), color, 0x17,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(leftText->x - 2.0f),
+			                static_cast<int>(leftText->y - 2.0f), color, 0x17,
 			                "\203\130\203\145\203\214\203\111", 1.2f);
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x),
-			                static_cast<int>(row.rightText.y), color, 6,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(rightText->x),
+			                static_cast<int>(rightText->y), color, 6,
 			                "\203\202\203\155\203\211\203\213", 1.0f);
 		} else {
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.leftText.x),
-			                static_cast<int>(row.leftText.y), color, 6,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(leftText->x),
+			                static_cast<int>(leftText->y), color, 6,
 			                "\203\130\203\145\203\214\203\111", 1.0f);
-			DrawOptionLabel(m_fonts[0], static_cast<int>(row.rightText.x - 2.0f),
-			                static_cast<int>(row.rightText.y - 2.0f), color, 0x17,
+			DrawOptionLabel(m_fonts[0], static_cast<int>(rightText->x - 2.0f),
+			                static_cast<int>(rightText->y - 2.0f), color, 0x17,
 			                "\203\202\203\155\203\211\203\213", 1.2f);
 		}
 #else
@@ -1525,7 +1531,7 @@ void CMenuPcs::DrawOptionMenu()
 				float tw = GetFontWidth(txt, baseScale * 0.8, 1.0f);
 				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
 				                           2.0 + 360.0)),
-				          static_cast<int>(row.leftText.y - 2.0f), color, 0x17, txt,
+				          static_cast<int>(leftText->y - 2.0f), color, 0x17, txt,
 				          baseScale * 0.8, 1.0f, 1.0f);
 			}
 			{
@@ -1533,7 +1539,7 @@ void CMenuPcs::DrawOptionMenu()
 				float tw = GetFontWidth(txt, 0.8f, 1.0f);
 				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
 				                           2.0 + 472.0)),
-				          static_cast<int>(row.rightText.y), color, 6, txt, 0.8f, 1.0f,
+				          static_cast<int>(rightText->y), color, 6, txt, 0.8f, 1.0f,
 				          1.0f);
 			}
 		} else {
@@ -1542,7 +1548,7 @@ void CMenuPcs::DrawOptionMenu()
 				float tw = GetFontWidth(txt, 0.8f, 1.0f);
 				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
 				                           2.0 + 360.0)),
-				          static_cast<int>(row.leftText.y), color, 6, txt, 0.8f, 1.0f,
+				          static_cast<int>(leftText->y), color, 6, txt, 0.8f, 1.0f,
 				          1.0f);
 			}
 			{
@@ -1550,7 +1556,7 @@ void CMenuPcs::DrawOptionMenu()
 				float tw = GetFontWidth(txt, baseScale * 0.8, 1.0f);
 				DrawFont2(static_cast<int>(static_cast<float>((120.0f - tw) /
 				                           2.0 + 472.0)),
-				          static_cast<int>(row.rightText.y - 2.0f), color, 0x17, txt,
+				          static_cast<int>(rightText->y - 2.0f), color, 0x17, txt,
 				          baseScale * 0.8, 1.0f, 1.0f);
 			}
 		}
@@ -1767,8 +1773,8 @@ void CMenuPcs::DrawOptionMenu()
 			cos(static_cast<double>(0.017453292f * (static_cast<float>(rowAnimFrame) * frameAngle))));
 #endif
 
-		int k = 0;
-		for (int i = 0; i < 4; i++, k = 0) {
+		leftXi = 0;
+		for (int i = 0; i < 4; i++, leftXi = 0) {
 			CTexture* cursorPanel = m_wmOptionTextureSet->GetTexture(4);
 			float cursorWidth = static_cast<float>(cursorPanel->GetWidth());
 			float cursorHeight = static_cast<float>(cursorPanel->GetHeight());
@@ -1777,7 +1783,7 @@ void CMenuPcs::DrawOptionMenu()
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
 				Util.CalcUV(uv1.x, uv1.y, static_cast<unsigned int>(cursorWidth), 0x28,
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
-				const Vec2d* pp = &pts[k];
+				const Vec2d* pp = &pts[leftXi];
 				Util.RenderTextureQuad(pp->x, pp->y + static_cast<float>(i * 0x28), 48.0f,
 				                        40.0f, cursorPanel, &uv0, &uv1, &color, GX_BL_SRCALPHA,
 				                        GX_BL_INVSRCALPHA);
@@ -1788,7 +1794,7 @@ void CMenuPcs::DrawOptionMenu()
 				             static_cast<unsigned int>(cursorHeight));
 				Util.CalcUV(uv1.x, uv1.y, static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight),
 				             static_cast<unsigned int>(cursorWidth), static_cast<unsigned int>(cursorHeight));
-				const Vec2d* pp1 = &pts[k + 1];
+				const Vec2d* pp1 = &pts[leftXi + 1];
 				Util.RenderTextureQuad(pp1->x, pp1->y + static_cast<float>(i * 0x28),
 				                        cursorWidth, 16.0f, cursorPanel,
 				                        &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
@@ -1810,14 +1816,14 @@ void CMenuPcs::DrawOptionMenu()
 			Util.CalcUV(uv0.x, uv0.y, static_cast<unsigned int>(modeW - 48.0f),
 			             i * 0x20, modeWidth, modeHeight);
 			Util.CalcUV(uv1.x, uv1.y, modeWidth, i * 0x20 + 0x18, modeWidth, modeHeight);
-			const Vec2d* pp2 = &pts[k + 2];
+			const Vec2d* pp2 = &pts[leftXi + 2];
 			int modeXi = static_cast<int>(static_cast<float>(i * 0x40 + 0x280) - pp2->x);
 			Util.RenderTextureQuad(static_cast<float>(static_cast<int>(static_cast<float>(modeXi) *
 			                                           specialRowCos + pp2->x)),
 			                        pp2->y + static_cast<float>(i * 0x28), 40.0f, 24.0f,
 			                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-			const Vec2d* pp3 = &pts[k + 3];
+			const Vec2d* pp3 = &pts[leftXi + 3];
 			int step1 = static_cast<int>(24.0f + (static_cast<float>(i * 0x40 + 0x280) - pp3->x));
 			int textXi = static_cast<int>(pp3->x + static_cast<float>(step1) * specialRowCos);
 			if (m_specialModeFlags[i] == 0) {
@@ -1827,19 +1833,19 @@ void CMenuPcs::DrawOptionMenu()
 				                        120.0f, 32.0f,
 				                        modePanel, &uv0, &uv1, &color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 #ifdef VERSION_GCCJGC
-				const Vec2d* pp4 = &pts[k + 4];
+				const Vec2d* pp4 = &pts[leftXi + 4];
 				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
 				DrawOptionLabel(m_fonts[0], textXi2 + 8,
 				                static_cast<int>(4.0f + (pp4->y + static_cast<float>(i * 0x28))), color, 7,
 				                "\203\211\203\103\203\147\202\156\202\155", 1.0f);
 #elif defined(VERSION_GCCE01)
-				const Vec2d* pp4 = &pts[k + 4];
+				const Vec2d* pp4 = &pts[leftXi + 4];
 				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
 				DrawFont(textXi2 + 8, static_cast<int>(-4.0f + (4.0f + (pp4->y + static_cast<float>(i * 0x28)))),
 				         color, 7, OPT_MES(18), 1.0f, 1.0f);
 #else
 				char* txt = OPT_MES(18);
-				const Vec2d* pp4 = &pts[k + 4];
+				const Vec2d* pp4 = &pts[leftXi + 4];
 				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
 				float tw = GetFontWidth(txt, 1.0f, 1.0f);
 				DrawFont(static_cast<int>(static_cast<float>((120.0f - tw) /
@@ -1865,7 +1871,7 @@ void CMenuPcs::DrawOptionMenu()
 				                          (pp3->y + static_cast<float>(i * 0x28)))), color, 7,
 				         txt, 1.0f, 1.0f);
 #endif
-				const Vec2d* pp4e = &pts[k + 4];
+				const Vec2d* pp4e = &pts[leftXi + 4];
 				int panelXi = static_cast<int>(pp4e->x + static_cast<float>(step1) * specialRowCos);
 				Util.CalcUV(uv0.x, uv0.y, 0x78, i * 0x20, modeWidth, modeHeight);
 				Util.CalcUV(uv1.x, uv1.y, 0xE0, (i + 1) * 0x20, modeWidth, modeHeight);
