@@ -443,20 +443,17 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
         color.a = alphaMax;
 
         GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_laser.m_pointCount - 1) * 3));
-        u8 trailColorR = color.r;
-        u8 trailColorG = color.g;
-        u8 trailColorB = color.b;
         for (int j = 0; j < (int)(step->m_laser.m_pointCount - 1); j++) {
             _GXColor trailStartColor;
-            trailStartColor.r = trailColorR;
-            trailStartColor.g = trailColorG;
-            trailStartColor.b = trailColorB;
+            trailStartColor.r = color.r;
+            trailStartColor.g = color.g;
+            trailStartColor.b = color.b;
             trailStartColor.a = (u8)alphaMax - alphaStep * j;
 
             _GXColor trailEndColor;
-            trailEndColor.r = trailColorR;
-            trailEndColor.g = trailColorG;
-            trailEndColor.b = trailColorB;
+            trailEndColor.r = color.r;
+            trailEndColor.g = color.g;
+            trailEndColor.b = color.b;
             trailEndColor.a = (u8)alphaMax - alphaStep * (j + 1);
 
             GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
@@ -547,7 +544,8 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
             color.b = 0xFF;
             color.a = 0xFF;
             for (i = 0; i < (int)(u32)step->m_laser.m_pointCount; i++) {
-                if ((work->m_points[i].x == zero) && (work->m_points[i].y == zero) && (work->m_points[i].z == zero)) {
+                Vec* pt = &work->m_points[i];
+                if ((pt->x == zero) && (pt->y == zero) && (pt->z == zero)) {
                     continue;
                 }
                 PSMTXScale(

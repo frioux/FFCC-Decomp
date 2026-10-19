@@ -281,7 +281,6 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 	float length;
 	float halfWidth;
 	float u0;
-	float u1;
 	float uvStep;
 	pppFMATRIX mtxOut;
 	pppFMATRIX unitMtx;
@@ -399,25 +398,22 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 		color.b = step->m_laser.m_trailColorB;
 		color.a = alphaMax;
 		GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((step->m_laser.m_pointCount - 1) * 3));
-		u8 trailColorR = color.r;
-		u8 trailColorG = color.g;
-		u8 trailColorB = color.b;
 		for (int j = 0; j < (int)(step->m_laser.m_pointCount - 1); j++) {
-			u0 = uvStep * (float)j;
-			u1 = uvStep * (float)(j + 1);
 			_GXColor trailStartColor;
-			trailStartColor.r = trailColorR;
-			trailStartColor.g = trailColorG;
-			trailStartColor.b = trailColorB;
+			trailStartColor.r = color.r;
+			trailStartColor.g = color.g;
+			trailStartColor.b = color.b;
 			trailStartColor.a = (u8)alphaMax - alphaStep * j;
+
 			_GXColor trailEndColor;
-			trailEndColor.r = trailColorR;
-			trailEndColor.g = trailColorG;
-			trailEndColor.b = trailColorB;
+			trailEndColor.r = color.r;
+			trailEndColor.g = color.g;
+			trailEndColor.b = color.b;
 			trailEndColor.a = (u8)alphaMax - alphaStep * (j + 1);
 
 			GXPosition3f32(work->m_origin.x, work->m_origin.y, work->m_origin.z);
 			GXColor1u32(*(u32*)&trailStartColor);
+			u0 = uvStep * (float)j;
 			GXTexCoord2f32(u0, one);
 
 			GXPosition3f32(work->m_points[j].x, work->m_points[j].y, work->m_points[j].z);
@@ -426,7 +422,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 
 			GXPosition3f32(work->m_points[j + 1].x, work->m_points[j + 1].y, work->m_points[j + 1].z);
 			GXColor1u32(*(u32*)&trailEndColor);
-			GXTexCoord2f32(u1, zero);
+			GXTexCoord2f32(uvStep * (float)(j + 1), zero);
 		}
 		GXEnd();
 
@@ -503,9 +499,8 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 			color.b = 0xFF;
 			color.a = 0xFF;
 			for (i = 0; (int)i < (int)(u32)step->m_laser.m_pointCount; i++) {
-				if ((work->m_points[i].x == zero) &&
-					(work->m_points[i].y == zero) &&
-					(work->m_points[i].z == zero)) {
+				Vec* pt = &work->m_points[i];
+				if ((pt->x == zero) && (pt->y == zero) && (pt->z == zero)) {
 					continue;
 				}
 				PSMTXScale(pointMtx, 2.0f, 2.0f,
