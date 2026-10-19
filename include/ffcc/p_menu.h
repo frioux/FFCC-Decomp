@@ -703,7 +703,7 @@ public:
     unsigned int CmdOpen0();
     unsigned int CmdClose0();
     void GetCmdItem();
-    void ChkCmdActive(int);
+    int ChkCmdActive(int);
     int ChkUnite(int, int (*)[2]);
     void CmdUnite(int, int);
     void CmdDismantle(int);
