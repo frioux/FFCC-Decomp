@@ -324,8 +324,6 @@ static void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* contex
     pppBlurCharaStep* step = reinterpret_cast<pppBlurCharaStep*>(param);
     float screenWidth = 320.0f;
     float screenHeight = 224.0f;
-    int width;
-    int height;
     CCharaPcs::CHandle* handle = GetCharaHandlePtr(work->m_ownerObj, 0);
     _GXTexObj backTexObj;
     Vec posA;
@@ -333,10 +331,7 @@ static void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* contex
     _GXColor quadColor;
 
     GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
-    width = (int)screenWidth;
-    height = (int)screenHeight;
-
-    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, width, height, 0, GX_LINEAR, GX_TF_RGBA8, 0);
+    Graphic.GetBackBufferRect2(Graphic.m_scratchTextureBuffer, &backTexObj, 0, 0, (int)screenWidth, (int)screenHeight, 0, GX_LINEAR, GX_TF_RGBA8, 0);
 
     Util.SetVtxFmt_POS_CLR();
     quadColor.r = 0;
@@ -347,8 +342,8 @@ static void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* contex
     posA.x = 0.0f;
     posA.y = 0.0f;
     posA.z = 0.0f;
-    posB.x = (float)width;
-    posB.y = (float)height;
+    posB.x = (float)(int)screenWidth;
+    posB.y = (float)(int)screenHeight;
     posB.z = 0.0f;
 
     Util.BeginQuadEnv();
@@ -367,7 +362,7 @@ static void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* contex
 
     Graphic.SetViewport();
     GXSetScissor(0, 0, 0x280, 0x1C0);
-    Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, width, height, 0, GX_LINEAR, GX_TF_I8, 0);
+    Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, (int)screenWidth, (int)screenHeight, 0, GX_LINEAR, GX_TF_I8, 0);
 
     if (step->m_afterDrawPass == 1) {
         float scaledOffsetY;
@@ -404,7 +399,7 @@ static void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* contex
         Util.RenderQuad(posA, posB, quadColor, 0, 0);
         Util.EndQuadEnv();
 
-        Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, width, height, 0, GX_LINEAR, GX_TF_I8, 0);
+        Graphic.GetBackBufferRect2(work->m_captureBuffer, work->m_smallTexObj, 0, 0, (int)screenWidth, (int)screenHeight, 0, GX_LINEAR, GX_TF_I8, 0);
     }
 
     Util.RenderTextureQuad(0.0f, 0.0f, screenWidth, screenHeight, &backTexObj, 0, 0, 0,
