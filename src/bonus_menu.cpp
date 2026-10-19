@@ -1069,10 +1069,10 @@ void CMenuPcs::CalcResultOpenAnim()
  */
 void CMenuPcs::DrawResultOpenAnim()
 {
+	int i;
+	int lastKind;
 	int modelIndex;
 	CMenuPcs::Sprt2* sprite;
-	int lastKind;
-	int i;
 	int activePartyCount;
 
 	if (this->m_bonusState->m_initialized != 0) {
@@ -1199,17 +1199,16 @@ void CMenuPcs::DrawResultOpenAnim()
 		font->SetTlut(7);
 		font->DrawInit();
 
-		int textIndex;
 		char text[128];
 		{
-			for (i = textIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
-				CMenuPcs::Sprt2* sprite = &m_bonusAnim->sprites[i];
+			for (i = modelIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
+				sprite = &m_bonusAnim->sprites[i];
 				if (sprite->kind == -1) {
 					font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * sprite->alpha)).color);
 
-					int partyIndex = textIndex % activePartyCount;
+					int partyIndex = modelIndex % activePartyCount;
 					int partySlot = s_Rinfo->m_party[partyIndex].m_partySlot;
-					if (textIndex < activePartyCount) {
+					if (modelIndex < activePartyCount) {
 						CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
 						strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
 					} else {
@@ -1226,7 +1225,7 @@ void CMenuPcs::DrawResultOpenAnim()
 					float x = (float)sprite->x + sprite->motionX;
 					float y = (float)sprite->y + sprite->motionY;
 #ifndef VERSION_GCCJGC
-					if (textIndex < activePartyCount) {
+					if (modelIndex < activePartyCount) {
 						y -= 4.0f;
 					}
 #endif
@@ -1238,8 +1237,8 @@ void CMenuPcs::DrawResultOpenAnim()
 #endif
 					font->Draw(text);
 
-					textIndex++;
-					if (textIndex == activePartyCount) {
+					modelIndex++;
+					if (modelIndex == activePartyCount) {
 						font = this->m_fonts[1];
 						font->SetMargin(1.0f);
 						font->SetShadow(0);
@@ -2011,17 +2010,16 @@ void CMenuPcs::DrawResultCloseAnim()
 	font0->SetTlut(7);
 	font0->DrawInit();
 
-	int textIndex;
 	char text[128];
 	{
-		for (i = textIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
+		for (i = modelIndex = 0; i < (int)m_bonusAnim->header.count; i++) {
 			sprite = &m_bonusAnim->sprites[i];
 			if (sprite->kind == -1) {
 				font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * sprite->alpha)).color);
 
-				int partyIndex = textIndex % activePartyCount;
+				int partyIndex = modelIndex % activePartyCount;
 				int partySlot = s_Rinfo->m_party[partyIndex].m_partySlot;
-				if (textIndex < activePartyCount) {
+				if (modelIndex < activePartyCount) {
 					CCaravanWork* caravanWork = Game.m_scriptFoodBase[partySlot];
 					strcpy(text, reinterpret_cast<char*>(caravanWork->m_name));
 				} else {
@@ -2038,7 +2036,7 @@ void CMenuPcs::DrawResultCloseAnim()
 				float x = (float)sprite->x + sprite->motionX;
 				float y = (float)sprite->y + sprite->motionY;
 #ifndef VERSION_GCCJGC
-				if (textIndex < activePartyCount) {
+				if (modelIndex < activePartyCount) {
 					y -= 4.0f;
 				}
 #endif
@@ -2050,8 +2048,8 @@ void CMenuPcs::DrawResultCloseAnim()
 #endif
 				font->Draw(text);
 
-				textIndex++;
-				if (textIndex == activePartyCount) {
+				modelIndex++;
+				if (modelIndex == activePartyCount) {
 					CFont* font1 = this->m_fonts[1];
 					font = font1;
 					font1->SetMargin(1.0f);
@@ -3302,6 +3300,7 @@ inline void CMenuPcs::DrawSelectCloseAnim()
  */
 inline void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprite, int value)
 {
+	int digitIndex;
 	int digits[3];
 	int digitCount;
 
@@ -3322,7 +3321,7 @@ inline void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprite, int value)
 
 	float digitW = (float)sprite->w;
 	float digitX = (float)((3.0 * (double)sprite->w - (float)(digitCount * sprite->w)) * 0.5 + (double)sprite->x);
-	for (int digitIndex = 0; digitIndex < digitCount; digitIndex++) {
+	for (digitIndex = 0; digitIndex < digitCount; digitIndex++) {
 		MenuPcs.DrawRect(0, digitX, (float)sprite->y, digitW, (float)sprite->h,
 		    (float)(sprite->w * digits[digitIndex]), sprite->mulY,
 		    sprite->depth, sprite->depth, 0.0f);
