@@ -431,6 +431,7 @@ void CMesMenu::onCalc()
 #else
 void CMesMenu::onDraw()
 {
+    float alpha255;
     static int tCut[4] = {1, 6, 7, 6};
 
     if ((m_menuIndex == 0) &&
@@ -798,7 +799,7 @@ void CMesMenu::onDraw()
             float sinY = sinf(angle);
             float sinX = sinf((-1.5707964f) + angle);
             MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(MesMenuGbaTexture));
-            float alpha255 = 255.0f * windowScale;
+            alpha255 = 255.0f * windowScale;
             MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>((0.5f * alpha255) * stageBlend)).Ref());
             float fadeScale = 1.0f - pulseScale;
             float promptX = (float)(int)(40.0f + drawX);

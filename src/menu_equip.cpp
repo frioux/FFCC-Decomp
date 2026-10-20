@@ -359,6 +359,7 @@ void CMenuPcs::EquipDraw()
 	float textY;
 	int helpItem;
 	int chk;
+	int drawIndex;
 	int helpFound = 0;
 	CCaravanWork* caravanWork;
 	int mode;
@@ -448,7 +449,7 @@ void CMenuPcs::EquipDraw()
 
 	if (m_equipState->prevMode != 0) {
 		MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
-		int drawIndex = 0;
+		drawIndex = 0;
 		item = &m_equipList->entries[m_equipList->count];
 		s16* letter = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
 		int letterCount = letter[0];

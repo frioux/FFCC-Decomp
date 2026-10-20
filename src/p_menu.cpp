@@ -1187,6 +1187,7 @@ inline void CMenuPcs::DrawBar(float x, float y, float width, CMenuPcs::TEX texBa
 void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs::TEX texBase, float corner)
 {
     float cornerH;
+    float vOff;
 	if (width <= 0.0f || height <= 0.0f) {
 		return;
 	}
@@ -1196,7 +1197,7 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
 	float midH = (height - twoCorner < 0.0f) ? 0.0f : height - twoCorner;
 	float uOff = (twoCorner - width < 0.0f) ? 0.0f : twoCorner - width;
 	uOff *= 0.5f;
-	float vOff = (twoCorner - height < 0.0f) ? 0.0f : twoCorner - height;
+	vOff = (twoCorner - height < 0.0f) ? 0.0f : twoCorner - height;
 	vOff *= 0.5f;
 	const int tex = static_cast<int>(texBase);
 
