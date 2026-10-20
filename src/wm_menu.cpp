@@ -5185,7 +5185,7 @@ void CMenuPcs::CalcFukidashi()
 	char tempBuf[64];
 	char secondLine[64];
 #endif
-	int fieldVal = m_wmPlaceNo;
+	char fieldVal = m_wmPlaceNo;
 	if (fieldVal == 0x0F) {
 		strcpy(nameBuffer, Game.m_gameWork.m_townName);
 #ifdef VERSION_GCCJGC
@@ -5332,7 +5332,7 @@ void CMenuPcs::CalcFukidashi()
 	}
 
 	// Player character model slots
-	unsigned int field1a = (unsigned int)m_wmIconFlags;
+	short field1a = (unsigned int)m_wmIconFlags;
 	if ((field1a & 0x200) != 0 && (field1a & 0xF) != 0) {
 		CMenuPcs::FCV* const yTbl = &s_WoodTrns;
 		int playerCount;
@@ -6967,7 +6967,7 @@ void CMenuPcs::CalcCharaSelect()
 			entry.m_currentSlot = static_cast<short>(currentSlot);
 
 			if (((*pRep) & 0x006F) == 0) {
-				const unsigned short trig = (*pTrig);
+				const int trig = (*pTrig);
 				CCaravanWork& work = Game.m_caravanWorkArr[entry.m_currentSlot];
 				if ((trig & 0x0100) != 0 && work.m_shopBusyFlag != 0) {
 					Sound.PlaySe(4, 0x40, 0x7F, 0);

@@ -357,12 +357,18 @@ void CMenuPcs::createBonus()
 		for (i = 0; i < s_Rinfo->m_partyCount; i++) {
 			int leftIndex = order[i];
 			for (j = i + 1; j < s_Rinfo->m_partyCount; j++) {
-				int aTotal = s_Rinfo->m_party[leftIndex].m_totalValue;
-				int aFood = s_Rinfo->m_party[leftIndex].m_foodValue;
-				int aArtifact = s_Rinfo->m_party[leftIndex].m_artifactValue;
-				int bFood = s_Rinfo->m_party[order[j]].m_foodValue;
-				int bArtifact = s_Rinfo->m_party[order[j]].m_artifactValue;
-				int bTotal = s_Rinfo->m_party[order[j]].m_totalValue;
+				int aFood;
+				int bFood;
+				int aArtifact;
+				int bArtifact;
+				int aTotal;
+				int bTotal;
+				aTotal = s_Rinfo->m_party[leftIndex].m_totalValue;
+				aFood = s_Rinfo->m_party[leftIndex].m_foodValue;
+				bTotal = s_Rinfo->m_party[order[j]].m_totalValue;
+				bFood = s_Rinfo->m_party[order[j]].m_foodValue;
+				aArtifact = s_Rinfo->m_party[leftIndex].m_artifactValue;
+				bArtifact = s_Rinfo->m_party[order[j]].m_artifactValue;
 				int coin = rand() & 1;
 
 				if (aTotal < bTotal ||
@@ -1098,8 +1104,7 @@ void CMenuPcs::DrawResultOpenAnim()
 						modelIndex++;
 						continue;
 					}
-					int __p15 = modelIndex;
-					SetProjection(__p15);
+					SetProjection(modelIndex);
 					SetLight(1);
 					handle->m_flags = 0x300543;
 					handle->Draw(5);
@@ -1464,8 +1469,7 @@ void CMenuPcs::DrawResultCountAnim()
 				if (modelIndex < activePartyCount) {
 					handle = s_Rinfo->m_party[modelIndex].m_partyHandle;
 				} else if (modelIndex < doubleCount) {
-					int __p11 = modelIndex;
-					handle = m_wm.m_handles[__p11 - activePartyCount];
+					handle = m_wm.m_handles[modelIndex - activePartyCount];
 				} else {
 					continue;
 				}
@@ -2819,7 +2823,7 @@ void CMenuPcs::CalcSelectWait()
 	} else {
 		if ((int)this->m_bonusState->m_selectionDelay == 0 && this->m_bonusState->m_currentRank < activePartyCount) {
 			int padSlot = s_Rinfo->m_party[i].m_partySlot;
-			int repeat = Pad.GetButtonRepeat(padSlot);
+			unsigned short repeat = Pad.GetButtonRepeat(padSlot);
 			unsigned short down = Pad.GetButtonDown(padSlot);
 			if ((repeat & 9) != 0) {
 				this->m_bonusState->m_selection++;

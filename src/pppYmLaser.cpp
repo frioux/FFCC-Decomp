@@ -275,7 +275,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrl
 	s32 dataValIndex = step->m_dataValIndex;
 	u32 count;
 	s32 i;
-	s32 alphaStep;
+	short alphaStep;
 	char alphaMax;
 	float negHalfWidth;
 	float length;
