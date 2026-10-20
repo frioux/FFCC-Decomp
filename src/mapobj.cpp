@@ -319,7 +319,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
     Init();
 
     chunkFile.PushChunk();
-    int objIndex = this - g_MapMng.GetMapObjArray();
+    short objIndex = this - g_MapMng.GetMapObjArray();
     CChunkFile::CChunk chunk;
     while (chunkFile.GetNextChunk(chunk) != 0) {
         switch (chunk.m_id) {
