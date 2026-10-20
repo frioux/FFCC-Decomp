@@ -944,7 +944,7 @@ enum {
 void CMenuPcs::DrawSingleStat(float alpha)
 {
     CFont* font;
-	float y;
+    float y;
 #ifdef VERSION_GCCP01
     int languageId = Game.m_gameWork.m_languageId;
 #endif
@@ -1867,8 +1867,8 @@ void CMenuPcs::DrawSingWin(short mode)
 {
     int i;
 
-	float topScale;
-	double innerW;
+    float topScale;
+    double innerW;
     if (mode >= 0 && m_menuWindowInfo->state != mode) {
         m_menuWindowInfo->state = mode;
     }
@@ -2565,7 +2565,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
 {
     int tex;
-	int barX;
+    int barX;
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 

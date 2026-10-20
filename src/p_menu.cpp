@@ -1186,7 +1186,7 @@ inline void CMenuPcs::DrawBar(float x, float y, float width, CMenuPcs::TEX texBa
  */
 void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs::TEX texBase, float corner)
 {
-	float cornerH;
+    float cornerH;
 	if (width <= 0.0f || height <= 0.0f) {
 		return;
 	}

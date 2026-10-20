@@ -226,7 +226,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlT
     float xCoord;
     float ySq;
 
-	u32 xFine;
+    u32 xFine;
     if (ppvUserStopPartF != 0) {
         return;
     }

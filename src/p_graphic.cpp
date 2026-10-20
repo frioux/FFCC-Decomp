@@ -661,7 +661,7 @@ void CGraphicPcs::drawScreenFade()
     Mtx44 worldScreenMtx;
     Mtx identityMtx;
 
-	int radius;
+    int radius;
     C_MTXOrtho(orthoMtx, kGraphicZero, kGraphicScreenHeight, kGraphicZero, kGraphicScreenWidth, kGraphicZero, -100.0f);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 

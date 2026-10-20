@@ -1675,7 +1675,7 @@ void CMapMng::DrawBefore()
  */
 void CMapMng::Draw()
 {
-	int shadowCount;
+    int shadowCount;
     if (m_mapReadReady == 0) {
         return;
     }
