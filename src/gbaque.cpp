@@ -4225,6 +4225,7 @@ void GbaQueue::ClrChgRadarMode(int channel)
  */
 int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 {
+	int statusCount;
 	struct ScouterEntry
 	{
 		unsigned char m_baseDataIndex;
@@ -4286,7 +4287,7 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 								localScouterInfo[i].m_traits[0] = 4;
 							}
 						} else {
-							int statusCount = 0;
+							statusCount = 0;
 
 							if (form0 == 0) {
 								localScouterInfo[i].m_traits[0] = 5;

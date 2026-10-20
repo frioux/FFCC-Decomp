@@ -358,6 +358,7 @@ void CMenuPcs::EquipDraw()
 {
 	float textY;
 	int helpItem;
+	int chk;
 	int helpFound = 0;
 	CCaravanWork* caravanWork;
 	int mode;
@@ -513,7 +514,7 @@ void CMenuPcs::EquipDraw()
 								alpha = (float)(0.5 * (double)item->alpha);
 							}
 						} else {
-							int chk = idx - 1;
+							chk = idx - 1;
 							bool equipped = EquipChk((int)letter[chk + 1]);
 							if (((chk + 1) >= letterCount) || equipped || !ChkEquipActive(chk + 1)) {
 								if (equipped) {

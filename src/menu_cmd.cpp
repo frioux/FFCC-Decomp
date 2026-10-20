@@ -687,6 +687,8 @@ void CMenuPcs::CmdDraw()
 	s32 idx;
 	s32 row;
 	s32 choice;
+	s32 sel;
+	s16 mode;
 	s32 hasItemHelp = false;
 	s32 helpId;
 	float rowH;
@@ -872,7 +874,7 @@ void CMenuPcs::CmdDraw()
 					float rowAlpha = entry->alpha;
 					s32 rowTex = entry->tex;
 					if (rowTex == kCmdRowTexture) {
-						s32 sel = specialRow + m_cmdState->scrollTop;
+						sel = specialRow + m_cmdState->scrollTop;
 						if ((itemCount >= 8) && (sel >= itemCount)) {
 							sel -= itemCount;
 						}
@@ -1138,7 +1140,7 @@ void CMenuPcs::CmdDraw()
 		helpId = -1;
 	}
 
-	const s16 mode = m_cmdState->mode;
+	mode = m_cmdState->mode;
 	if (mode == 0) {
 		if (helpId == -1) {
 			if (caravan->m_commandListExtra[m_cmdState->selected[0]] == 0) {

@@ -661,6 +661,7 @@ void CGraphicPcs::drawScreenFade()
     Mtx44 worldScreenMtx;
     Mtx identityMtx;
 
+	int radius;
     C_MTXOrtho(orthoMtx, kGraphicZero, kGraphicScreenHeight, kGraphicZero, kGraphicScreenWidth, kGraphicZero, -100.0f);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
@@ -766,7 +767,7 @@ void CGraphicPcs::drawScreenFade()
                     pos.y = clampedY;
                 }
 
-                const int radius = (int)(1280.0f * (1.0f - fadeWave));
+                radius = (int)(1280.0f * (1.0f - fadeWave));
                 drawSFCircle(0x500, radius, (int)pos.x, (int)pos.y, baseColor, baseColor);
                 drawSFCircle(radius, radius - 8, (int)pos.x, (int)pos.y, baseColor, baseColor2);
             }

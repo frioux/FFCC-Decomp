@@ -367,6 +367,7 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
  */
 void CRingMenu::onDraw()
 {
+	float fullAlpha;
 	if (!((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1))) {
 		return;
 	}
@@ -665,7 +666,7 @@ void CRingMenu::onDraw()
 					            static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 30) & 0xC0000000) >> 31)
 					        == 0)) {
 						const float dimAlpha = showScale * (128.0f * fade * transitionScale);
-						const float fullAlpha = showScale * (255.0f * fade * transitionScale);
+						fullAlpha = showScale * (255.0f * fade * transitionScale);
 						const float barY = 20.0f + textY;
 
 						for (int i = 0; i < caravanWork->GetNumCmdList(); i++) {

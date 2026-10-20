@@ -1773,6 +1773,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
  */
 void CGMonObj::mlHide()
 {
+	int action;
 	if (m_unk6BE != 0) {
 		return;
 	}
@@ -1787,7 +1788,7 @@ void CGMonObj::mlHide()
 	}
 
 	if (partyIndex >= 0) {
-		int action = m_actionBranch;
+		action = m_actionBranch;
 		unsigned short noticeFlags = m_scriptHandle->m_romWork[0x7F];
 		int monClass = m_scriptHandle->m_baseDataIndex;
 

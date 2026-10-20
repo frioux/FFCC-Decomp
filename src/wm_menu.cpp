@@ -5092,6 +5092,7 @@ void CMenuPcs::CalcFukidashi()
 {
 	int padIdx;
 	int i;
+	int slotIdx;
 	if (m_wmBubbleVisible != 1) {
 		return;
 	}
@@ -5340,7 +5341,7 @@ void CMenuPcs::CalcFukidashi()
 			if ((field1a & (1 << bitIdx)) != 0) playerCount++;
 		}
 
-		int slotIdx = 0;
+		slotIdx = 0;
 		for (padIdx = 0; padIdx < 4; padIdx++) {
 			if ((m_wmIconFlags & (1 << padIdx)) != 0) {
 				int slot8 = padIdx + 8;
@@ -5424,6 +5425,7 @@ void CMenuPcs::CalcFukidashi()
  */
 void CMenuPcs::DrawFukidashi()
 {
+	int bitIndex;
 #ifdef VERSION_GCCJGC
 	const int kBubbleIconTextureBase = 24;
 #else
@@ -5469,7 +5471,7 @@ void CMenuPcs::DrawFukidashi()
 	unsigned int iconFlags = (unsigned int)m_wmIconFlags;
 	if ((iconFlags & 0x3F0) != 0 && (iconFlags & 0x1FF) != 0) {
 		if ((iconFlags & 0xF) != 0) {
-			int bitIndex = 0;
+			bitIndex = 0;
 			int drawnIcons = 0;
 			while (bitIndex < 4 && drawnIcons < 2) {
 				if ((m_wmIconFlags & (1 << bitIndex)) != 0) {
@@ -5707,6 +5709,7 @@ inline void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFo
 void CMenuPcs::CalcWMFrame()
 {
 	int i;
+	int digitW;
 	short mainState = m_wmWorldState->m_mainState;
 	if (mainState == 0) {
 		return;
@@ -5809,7 +5812,7 @@ void CMenuPcs::CalcWMFrame()
 		for (i = topDigitIdx; i >= 0; i--) {
 				m_wm.m_frameData->m_yearSprites[i].m_x = (short)digitX;
 				int digit = digits[i];
-				int digitW = s_YearWTbl[digit];
+				digitW = s_YearWTbl[digit];
 				m_wm.m_frameData->m_yearSprites[i].m_y = kWorldYearDigitY;
 				m_wm.m_frameData->m_yearSprites[i].m_width = (short)digitW;
 				m_wm.m_frameData->m_yearSprites[i].m_height = 0x20;
@@ -5903,6 +5906,7 @@ void CMenuPcs::DrawWMFrame()
 {
 
 	GXColor matColor;
+	float suffixX;
 	short sVar = m_wmWorldState->m_mainState;
 	float alpha;
 	if (sVar == 0) {
@@ -6068,7 +6072,8 @@ void CMenuPcs::DrawWMFrame()
 		if (digitCnt != 3 && language != 5) {
 			Sprt* digit = &m_wm.m_frameData->m_yearSprites[0];
 			float suffixU = FLOAT_803313dc;
-			float suffixX = static_cast<float>(digit->m_width) * digit->m_scale +
+			suffixX = static_cast<float>(digit->m_width) * digit->m_scale +
+			                static_cast<float>(digit->m_x);
 			                static_cast<float>(digit->m_x);
 			float suffixY = static_cast<float>(digit->m_y);
 			float suffixScale = digit->m_scale;
@@ -8038,6 +8043,8 @@ void CMenuPcs::DrawCursor(int x, int y, float scale)
  */
 void CMenuPcs::CalcMainMenuSub()
 {
+	float rotZSel;
+	float rotYSel;
 #ifdef VERSION_GCCP01
 	const int kRotateFrames = 14;
 #else
@@ -8159,8 +8166,8 @@ void CMenuPcs::CalcMainMenuSub()
 			m_wmWorldState->m_titleState = 0;
 		}
 
-		const float rotZSel = 0.01745329238474369f * selectedRotZ;
-		const float rotYSel = 0.01745329238474369f * selectedRotY;
+		rotZSel = 0.01745329238474369f * selectedRotZ;
+		rotYSel = 0.01745329238474369f * selectedRotY;
 		for (i = 0; i < 5; i++) {
 			if (!(((m_wmWorldState->m_mainState > 0) && (m_wmWorldState->m_mainState < 4)) || i == 1)) {
 				continue;
@@ -8507,6 +8514,10 @@ inline int CMenuPcs::ChkMcDataCnt()
 void CMenuPcs::DrawMCList()
 {
 	int digitIdx;
+	float labelX;
+	float iconX;
+	float playX;
+	float locationY;
 	static const int s_TimeWTbl[] = {17, 10, 16, 16, 19, 17, 16, 16, 16, 15, 8};
 	static const unsigned char s_LocTex[][4] = {
 		{1, 1, 0, 0},
@@ -8815,7 +8826,7 @@ nextListEntry:
 #endif
 				}
 
-				float labelX = 104.0f;
+				labelX = 104.0f;
 #ifdef VERSION_GCCJGC
 				float dateLabelY = 56.0f + slotY;
 #else
@@ -8837,7 +8848,7 @@ nextListEntry:
 				         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 
 				MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kMcFaceTexture));
-				float iconX = 144.0f;
+				iconX = 144.0f;
 				const float iconY = 24.0f + slotY;
 				for (int member = 0; member < 4; member++) {
 					const int modelNo = slotData->m_characterIds[member];
@@ -8896,7 +8907,7 @@ nextListEntry:
 				playWidth += static_cast<float>(s_TimeWTbl[10]);
 				playWidth += static_cast<float>(s_TimeWTbl[playDigits[3]]);
 				playWidth += static_cast<float>(s_TimeWTbl[playDigits[4]]);
-				float playX = 496.0f - playWidth;
+				playX = 496.0f - playWidth;
 				for (digitIdx = 0; digitIdx < 5; digitIdx++) {
 					if (playDigits[digitIdx] >= 0) {
 						if (digitIdx == 3) {
@@ -8995,7 +9006,7 @@ nextListEntry:
 #else
 				Game.UpperItemName(locationStr);
 				const float locationWidth = fontF8->GetWidth(locationStr);
-				float locationY = 16.0f + slotY;
+				locationY = 16.0f + slotY;
 				if (locationWidth <= 144.0f) {
 					fontF8->SetPosX(496.0f - locationWidth);
 					fontF8->SetPosY(locationY);
@@ -9665,6 +9676,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 	int i;
 	int maxWidth;
 	const WinMessEntry* winMess;
+	int textWidth;
 #ifdef VERSION_GCCJGC
 	int msgId;
 #endif
@@ -9756,7 +9768,7 @@ void CMenuPcs::DrawMcWinMess(int winType, int messType)
 
 			if (winType == 0 || isDollar != 0) {
 #endif
-				const int textWidth = font->GetWidth(textBuf);
+				textWidth = font->GetWidth(textBuf);
 				posX = static_cast<float>((m_menuWindowInfo->width - textWidth) / 2.0 + m_menuWindowInfo->x);
 			}
 			font->SetPosX(posX);

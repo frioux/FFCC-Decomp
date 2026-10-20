@@ -349,6 +349,9 @@ static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBi
  */
 void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* params, _pppCtrlTable* ctrlTable)
 {
+	int baseGreen;
+	int baseBlue;
+	int baseAlpha;
     RyjMegaBirthModelDataOffsets* offsets = GetRyjMegaBirthModelDataOffsets(ctrlTable);
     VRyjMegaBirthModel* work =
         (VRyjMegaBirthModel*)(obj->m_workArea + offsets->m_workOffset);
@@ -376,9 +379,9 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* params, _ppp
     init_matrix(obj, emitterMatrix, params, work);
 
     int baseRed = baseColor->m_color.rgba[0];
-    int baseGreen = baseColor->m_color.rgba[1];
-    int baseBlue = baseColor->m_color.rgba[2];
-    int baseAlpha = baseColor->m_color.rgba[3];
+    baseGreen = baseColor->m_color.rgba[1];
+    baseBlue = baseColor->m_color.rgba[2];
+    baseAlpha = baseColor->m_color.rgba[3];
 
     for (int i = 0; i < numParticles; i++) {
         if (particle->m_life != 0) {

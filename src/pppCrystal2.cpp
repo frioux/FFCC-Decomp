@@ -226,6 +226,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlT
     float xCoord;
     float ySq;
 
+	u32 xFine;
     if (ppvUserStopPartF != 0) {
         return;
     }
@@ -270,7 +271,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlT
                 }
 #endif
 
-                u32 xFine = x & 3;
+                xFine = x & 3;
                 if (magnitude > 1.0f) {
                     magnitude = 1.0f;
                 }

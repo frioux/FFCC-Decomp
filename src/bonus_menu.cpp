@@ -3344,6 +3344,7 @@ inline void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprite, int value)
  */
 void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 {
+	float xCorner;
 	if (alpha <= 0.0) {
 		return;
 	}
@@ -3393,7 +3394,7 @@ void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 	}
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameTopTexture));
-	float xCorner = corner + x;
+	xCorner = corner + x;
 	float innerW = (float)((double)w - 64.0);
 	MenuPcs.DrawRect(0, xCorner, y, innerW, corner, 0.0f, 0.0f, texScale, texScale, 0.0f);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kBonusFrameBottomTexture));
