@@ -42,8 +42,6 @@ enum {
     kWaterTriangleCount = 0x200,
 };
 
-static const char sRenderMana2Message[] = "Render Mana2!!";
-
 struct Mana2SetupBlock
 {
     u8 m_pad0[8];
@@ -947,7 +945,7 @@ static void Mana2_BeforeDrawCallback(CChara::CModel*, void* work, void* step, fl
  */
 void pppRenderMana2(pppMana2*, pppMana2Step*, _pppCtrlTable*)
 {
-    Graphic.Printf(const_cast<char*>(sRenderMana2Message));
+    Graphic.Printf("Render Mana2!!");
     GXSetNumTevStages(1);
     GXSetNumTexGens(1);
     GXSetNumChans(1);

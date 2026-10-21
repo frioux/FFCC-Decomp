@@ -208,7 +208,6 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
  */
 void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize, unsigned short detail, _GXVtxFmt vtxFmt)
 {
-    static const char s_display_list_alloc_error[] = "Error allocating display list (%d, %d)\n";
     const int ringVertexCount = detail + 1;
     unsigned long displayListSize =
         ((ringVertexCount + (detail - 2) * ringVertexCount * 2) * 6 * sizeof(float) + 0x1F) & ~0x1F;
@@ -308,7 +307,7 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
 
     *outDisplayListSize = GXEndDisplayList();
     if (*outDisplayListSize > displayListSize) {
-        OSReport(s_display_list_alloc_error, displayListSize, *outDisplayListSize);
+        OSReport("Error allocating display list (%d, %d)\n", displayListSize, *outDisplayListSize);
         OSPanic("pppYmEnv.cpp", 0x19f, "Exiting");
     }
 
