@@ -1,11 +1,11 @@
-extern "C" const char* gMcStatusMessagesJp[] = {
+extern "C" __declspec(weak) const char* gMcStatusMessagesJp[] = {
     "\203\146\201\133\203\136\202\252\202\261\202\355\202\352\202\304\202\242\202\334\202\267",
     "\203\146\201\133\203\136\202\252\202\240\202\350\202\334\202\271\202\361",
     "\202\307\202\352\202\360\203\215\201\133\203\150\202\265\202\334\202\267\202\251\201\110",
     "\202\307\202\261\202\311\203\132\201\133\203\165\202\265\202\334\202\267\202\251\201\110",
 };
 
-extern "C" const char* gMcWindowMessagesJp[] = {
+extern "C" __declspec(weak) const char* gMcWindowMessagesJp[] = {
     "",
     "\203X\203\215\203b\203g\202\360\221I\202\361\202\305\202\255\202\276\202\263\202\242\201B",
     "\203X\203\215\203b\203g\202`\201@\201@\203X\203\215\203b\203g\202a",
@@ -131,7 +131,7 @@ extern "C" const char* gMcWindowMessagesJp[] = {
     "d",
 };
 
-extern "C" const char* gMcGuestWindowMessagesJp[] = {
+extern "C" __declspec(weak) const char* gMcGuestWindowMessagesJp[] = {
     "",
     "\201u\203Q\203X\203g\201v\202\314\203L\203\203\203\211\203N\203^\201[\202\314\202\335\202\305",
     "\203p\201[\203e\203B\202\360\202\255\202\336\202\261\202\306\202\315\202\305\202\253\202\334\202\271\202\361\201B",
@@ -149,7 +149,7 @@ extern "C" const char* gMcGuestWindowMessagesJp[] = {
     "\202\261\202\355\202\352\202\304\202\242\202\334\202\267\201B",
 };
 
-extern "C" WinMessEntry gMcWindowsJp[] = {
+extern "C" __declspec(weak) WinMessEntry gMcWindowsJp[] = {
     {3, {1, 0, 2, 0, 0, 0, 0, 0}},
     {2, {3, 4, 0, 0, 0, 0, 0, 0}},
     {3, {5, 28, 6, 0, 0, 0, 0, 0}},
