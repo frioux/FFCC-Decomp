@@ -22,12 +22,6 @@ static const float kMapHitBoundsMaxInit = -10000000000.0f;
 static const float kMapHitVertexOffsetScale = 0.10000000149011612f;
 static const float kMapHitRadiusScale = 4.0f;
 static const double kMapHitRadiusBase = -1.0;
-static const char s_maphit_cpp[] = "maphit.cpp";
-static const char sOldMidFormat[] = {
-    (char)0x8C, (char)0xC3, (char)0x82, (char)0xA2, (char)0x20, (char)0x4D, (char)0x49, (char)0x44,
-    (char)0x20, (char)0x82, (char)0xCC, (char)0x8C, (char)0x60, (char)0x8E, (char)0xAE, (char)0x82,
-    (char)0xC5, (char)0x82, (char)0xB7, (char)0x81, (char)0x42, (char)0x0A, (char)0x00,
-};
 
 CMapCylinder g_hit_cyl;
 CMapCylinder g_hit_cyl_min;
@@ -632,7 +626,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
         case 'HITV': {
             m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
             m_vertices =
-                new (g_MapMng.m_stage, const_cast<char*>(s_maphit_cpp), 0x143)
+                new (g_MapMng.m_stage, "maphit.cpp", 0x143)
                     Vec[m_vertexCount];
 
             for (int i = 0; i < m_vertexCount; i++) {
@@ -661,7 +655,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
         case 'HITF': {
             m_faceCount = static_cast<unsigned short>(chunk.m_arg0);
             m_faces =
-                new (g_MapMng.m_stage, const_cast<char*>(s_maphit_cpp), 0x159)
+                new (g_MapMng.m_stage, "maphit.cpp", 0x159)
                     CMapHitFace[m_faceCount];
 
             const float offsetScale = kMapHitVertexOffsetScale;
@@ -692,7 +686,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
 
                 if (chunk.m_version == 0) {
                     if ((unsigned int)System.m_execParam >= 1) {
-                        System.Printf(const_cast<char*>(sOldMidFormat));
+                        System.Printf("古い MID の形式です。\n");
                     }
                     chunkFile.Align(4);
                     for (int i = 0; i < face.m_vertexCount; i++) {
@@ -702,7 +696,7 @@ int CMapHit::ReadOtmHit(CChunkFile& chunkFile)
                     face.m_radiusScale = kMapHitZero;
                 } else if (chunk.m_version == 1) {
                     if ((unsigned int)System.m_execParam >= 1) {
-                        System.Printf(const_cast<char*>(sOldMidFormat));
+                        System.Printf("古い MID の形式です。\n");
                     }
                     face.m_radiusScale = chunkFile.GetF4();
                     chunkFile.Align(4);
