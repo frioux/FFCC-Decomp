@@ -85,8 +85,6 @@ static inline const char* GetGoOutMessageLine(int languageId, int line)
 
 #endif
 
-static const char s_gooutCpp[] = "goout.cpp";
-
 static inline CGoOutSaveDatLayout& GoOutSaveDat(Mc::SaveDat* saveData)
 {
     return *reinterpret_cast<CGoOutSaveDatLayout*>(saveData);
@@ -2039,8 +2037,8 @@ void CGoOutMenu::Calc()
         m_menuStringSlot = 0;
         SetMainMode(1);
         MenuPcs.m_goOutTransferSaveData =
-            static_cast<Mc::SaveDat*>(operator new(0x8BD0, MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), kTransferSaveAllocLine));
-        MenuPcs.m_goOutTransferWork = operator new(0x8BD0, MenuPcs.m_menuStage, const_cast<char*>(s_gooutCpp), kTransferWorkAllocLine);
+            static_cast<Mc::SaveDat*>(operator new(0x8BD0, MenuPcs.m_menuStage, "goout.cpp", kTransferSaveAllocLine));
+        MenuPcs.m_goOutTransferWork = operator new(0x8BD0, MenuPcs.m_menuStage, "goout.cpp", kTransferWorkAllocLine);
         MenuPcs.m_goOutTransferWorkActive = 0;
         MenuPcs.m_goOutUnknown888 = 0;
         MenuPcs.m_goOutSaveLoadMode = 0;
