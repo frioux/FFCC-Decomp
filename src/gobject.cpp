@@ -233,7 +233,6 @@ inline void VECLerp(Vec* a, Vec* b, Vec* out, float t)
 #define GOBJECT_LINE(line, usLine, jpLine) (line)
 #endif
 
-static const char s_gobject_cpp[] = "gobject.cpp";
 static const char s_noTurnMotion[36] =
     "\203\136\201\133\203\223\203\202\201\133\203\126\203\207\203\223"
     "\202\315\202\240\202\350\202\334\202\271\202\361\201\102\012";
@@ -745,7 +744,7 @@ void CGObject::LoadShield(int itemId)
     }
 
     if (itemId > 0) {
-        m_shieldModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), GOBJECT_LINE(0xA23, 0xA23, 0xA15)) CCharaPcs::CHandle;
+        m_shieldModelHandle = new (Game.m_mainStage, "gobject.cpp", GOBJECT_LINE(0xA23, 0xA23, 0xA15)) CCharaPcs::CHandle;
         m_shieldModelHandle->Add();
 
         const unsigned long textureVariant = (m_ownerType == 0)
@@ -775,7 +774,7 @@ void CGObject::LoadWeapon(int itemId, int itemVariant)
     }
 
     if (itemId > 0) {
-        m_weaponModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), GOBJECT_LINE(0xA11, 0xA11, 0xA03)) CCharaPcs::CHandle;
+        m_weaponModelHandle = new (Game.m_mainStage, "gobject.cpp", GOBJECT_LINE(0xA11, 0xA11, 0xA03)) CCharaPcs::CHandle;
         m_weaponModelHandle->Add();
 
         const unsigned long textureVariant = (m_ownerType == 0)
@@ -801,7 +800,7 @@ void CGObject::LoadModel(int kind, unsigned long modelId, unsigned long variant,
         m_charaModelHandle = 0;
     }
 
-    m_charaModelHandle = new (Game.m_mainStage, const_cast<char*>(s_gobject_cpp), GOBJECT_LINE(0xA01, 0xA01, 0x9F3)) CCharaPcs::CHandle;
+    m_charaModelHandle = new (Game.m_mainStage, "gobject.cpp", GOBJECT_LINE(0xA01, 0xA01, 0x9F3)) CCharaPcs::CHandle;
     m_charaModelHandle->Add();
     m_charaModelHandle->LoadModel(kind, modelId, variant, 0, -1, 0, arg3);
 }
