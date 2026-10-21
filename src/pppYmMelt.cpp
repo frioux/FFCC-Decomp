@@ -236,8 +236,6 @@ void pppRenderYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offse
     }
 }
 
-static const char s_pppYmMelt_cpp[] = "pppYmMelt.cpp";
-
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -316,7 +314,7 @@ void pppFrameYmMelt(pppYmMelt* ymMelt, PYmMelt* ctrl, PYmMeltDataOffsets* offset
     if (work->m_vertexData == nullptr) {
         work->m_vertexData = (VERTEX_DATA*)pppMemAlloc(
             (unsigned long)vertexCount * sizeof(VERTEX_DATA), ppvEnv->m_stagePtr,
-            const_cast<char*>(s_pppYmMelt_cpp),
+            "pppYmMelt.cpp",
             0xA9);
 
         vertexBase = work->m_vertexData;

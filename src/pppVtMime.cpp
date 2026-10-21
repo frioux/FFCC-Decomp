@@ -37,8 +37,6 @@ struct VtMimeEnv
 STATIC_ASSERT(sizeof(VtMimeDataOffsets) == 0x4);
 STATIC_ASSERT(offsetof(VtMimeDataOffsets, m_stateOffset) == 0x0);
 
-static const char s_pppVtMime_cpp[] = "pppVtMime.cpp";
-
 static inline VtMimeDataOffsets* GetVtMimeDataOffsets(_pppCtrlTable* ctrl)
 {
     return reinterpret_cast<VtMimeDataOffsets*>(ctrl->m_serializedDataOffsets);
@@ -68,7 +66,7 @@ void pppVtMimeDes(_pppPObjLink* object, _pppCtrlTable* ctrl)
     VtMimeState* state = GetVtMimeState(object, ctrl);
 
     if (state->vertexBuffer != 0) {
-        Graphic._WaitDrawDone(const_cast<char*>(s_pppVtMime_cpp), 0x50);
+        Graphic._WaitDrawDone("pppVtMime.cpp", 0x50);
         pppMemFree(state->vertexBuffer);
         state->vertexBuffer = 0;
     }
@@ -138,7 +136,7 @@ void pppDrawVtMime(_pppPObject* object, VtMimeData* data, _pppCtrlTable* ctrl)
 
     if (*memPtr == 0) {
         *memPtr = pppMemAlloc((unsigned long)(vertCount * 0xC), reinterpret_cast<CMemory::CStage*>(env->stage),
-                              const_cast<char*>(s_pppVtMime_cpp), 0x2B);
+                              "pppVtMime.cpp", 0x2B);
     }
 
     float* outputVerts = (float*)*memPtr;

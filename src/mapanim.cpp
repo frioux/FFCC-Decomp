@@ -10,8 +10,6 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
-static const char s_mapanim_cpp[] = "mapanim.cpp";
-
 /*
  * --INFO--
  * PAL Address: 0x8004a4a0
@@ -154,24 +152,24 @@ inline void CMapAnimNode::ReadOtmAnimNode(CChunkFile& chunkFile, CMapAnim* mapAn
             m_node = g_MapMng.GetMapObj(nodeIdx);
         } else if (chunk.m_id == 0x5452414E) {
             CMapAnimKeyDt* keyData =
-                new (g_MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4C) CMapAnimKeyDt;
+                new (g_MapMng.m_stage, "mapanim.cpp", 0x4C) CMapAnimKeyDt;
             m_tracks = keyData;
             mapAnimKeyDtArray->Add(m_tracks);
             m_tracks->position.count = chunk.m_size >> 4;
             m_tracks->position.keys =
-                new (g_MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x4F)
+                new (g_MapMng.m_stage, "mapanim.cpp", 0x4F)
                     CMapAnimKey[m_tracks->position.count];
             memcpy(m_tracks->position.keys, chunkFile.GetAddress(), chunk.m_size);
         } else if (chunk.m_id == 0x524F5420) {
             m_tracks->rotation.count = chunk.m_size >> 4;
             m_tracks->rotation.keys =
-                new (g_MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x55)
+                new (g_MapMng.m_stage, "mapanim.cpp", 0x55)
                     CMapAnimKey[m_tracks->rotation.count];
             memcpy(m_tracks->rotation.keys, chunkFile.GetAddress(), chunk.m_size);
         } else if (chunk.m_id == 0x5343414C) {
             m_tracks->scale.count = chunk.m_size >> 4;
             m_tracks->scale.keys =
-                new (g_MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0x5B)
+                new (g_MapMng.m_stage, "mapanim.cpp", 0x5B)
                     CMapAnimKey[m_tracks->scale.count];
             memcpy(m_tracks->scale.keys, chunkFile.GetAddress(), chunk.m_size);
         }
@@ -198,7 +196,7 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
             m_startFrame = static_cast<int>(chunkFile.Get4());
             m_endFrame = static_cast<int>(chunkFile.Get4());
         } else if (chunk.m_id == 0x4E4F4445) {
-            CMapAnimNode* item = new (g_MapMng.m_stage, const_cast<char*>(s_mapanim_cpp), 0xC2) CMapAnimNode;
+            CMapAnimNode* item = new (g_MapMng.m_stage, "mapanim.cpp", 0xC2) CMapAnimNode;
             item->ReadOtmAnimNode(chunkFile, this);
             mapAnimNodes.Add(item);
         }

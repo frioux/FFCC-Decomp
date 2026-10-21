@@ -21,8 +21,6 @@ STATIC_ASSERT(sizeof(pppColumDataOffsets) == 0x10);
 STATIC_ASSERT(offsetof(pppColumDataOffsets, m_positionWorkOffset) == 0x08);
 STATIC_ASSERT(offsetof(pppColumDataOffsets, m_frameWorkOffset) == 0x0C);
 
-static const char s_pppColum_cpp[] = "pppColum.cpp";
-
 static inline pppColumDataOffsets* GetColumDataOffsets(_pppCtrlTable* ctrl)
 {
     return reinterpret_cast<pppColumDataOffsets*>(ctrl->m_serializedDataOffsets);
@@ -179,7 +177,7 @@ void pppFrameColum(pppColum *column, pppColumStep *step, _pppCtrlTable *ctrl)
         if (frameWork->m_values == 0) {
             frameWork->m_values = (pppColumValue*)pppMemAlloc(
                 (unsigned long)step->m_count * 0xc, ppvEnv->m_stagePtr,
-                const_cast<char*>(s_pppColum_cpp), 0x7d);
+                "pppColum.cpp", 0x7d);
 
             values = frameWork->m_values;
             for (i = 0; i < (int)step->m_count; i++) {

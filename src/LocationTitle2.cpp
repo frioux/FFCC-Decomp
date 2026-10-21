@@ -29,8 +29,6 @@ STATIC_ASSERT(sizeof(LocationTitle2DataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(LocationTitle2DataOffsets, m_workOffset) == 0x00);
 STATIC_ASSERT(offsetof(LocationTitle2DataOffsets, m_colorOffset) == 0x04);
 
-static const char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
-
 static inline LocationTitle2DataOffsets* GetLocationTitle2DataOffsets(pppLocationTitle2Offsets* offsets)
 {
     return reinterpret_cast<LocationTitle2DataOffsets*>(offsets->m_serializedDataOffsets);
@@ -240,7 +238,7 @@ extern "C" void pppFrameLocationTitle2(pppLocationTitle2* locationTitle, pppLoca
 
     if (work->m_particles == 0) {
         work->m_particles = static_cast<LocationTitle2Particle*>(pppMemAlloc(
-            unkB->m_maxCount * sizeof(LocationTitle2Particle), ppvEnv->m_stagePtr, const_cast<char*>(s_LocationTitle2_cpp),
+            unkB->m_maxCount * sizeof(LocationTitle2Particle), ppvEnv->m_stagePtr, "LocationTitle2.cpp",
             0x70));
         memset(work->m_particles, 0, unkB->m_maxCount * sizeof(LocationTitle2Particle));
 

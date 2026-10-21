@@ -51,7 +51,6 @@ static unsigned long s_bitMask = 0;
 static const char sMapOctTreeNodeMeshTypeFmt[] =
     "\n\n===============================================\n\n\t\t\tm_node=%d   m_meshtype=%d\n\n\n"
     "===============================================\n\n";
-static const char s_mapocttree_cpp[] = "mapocttree.cpp";
 
 namespace {
 static inline CMapObj* GetMapObjByIndex(unsigned short index)
@@ -881,7 +880,7 @@ int COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
             }
 
             nodeCount = m_nodeCount;
-            m_nodePool = new (g_MapMng.m_stage, const_cast<char*>(s_mapocttree_cpp), 0x59)
+            m_nodePool = new (g_MapMng.m_stage, "mapocttree.cpp", 0x59)
                 COctNode[nodeCount];
             break;
         }

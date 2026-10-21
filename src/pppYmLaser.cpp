@@ -17,8 +17,6 @@
 #include <string.h>
 
 
-static const char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
-
 typedef pppLaserWorkBase pppYmLaserWork;
 
 STATIC_ASSERT(offsetof(pppLaserDataOffsets, m_colorBlockOffset) == 0x4);
@@ -130,7 +128,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppLaserStep* step, _pppCtrlT
 
 	if (work->m_points == 0) {
 		work->m_points = (Vec*)pppMemAlloc(
-			(u32)step->m_laser.m_pointCount * 0xc, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmLaser_cpp), 0x5d);
+			(u32)step->m_laser.m_pointCount * 0xc, ppvEnv->m_stagePtr, "pppYmLaser.cpp", 0x5d);
 		memset(work->m_points, 0, (u32)step->m_laser.m_pointCount * 0xc);
 		emptyHistory = 1;
 	}

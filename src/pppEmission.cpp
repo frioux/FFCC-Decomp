@@ -17,8 +17,6 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h"
 #include "ffcc/ppp_linkage.h"
 
-static const char s_pppEmission_cpp[] = "pppEmission.cpp";
-
 static inline MtxPtr CameraMatrix() { return CameraPcs.m_cameraMatrix; }
 
 typedef CChara::CMesh::CDisplayList EmissionDisplayList;
@@ -169,7 +167,7 @@ void pppFrameEmission(pppEmission* emission, PEmission* step, _pppCtrlTable* ctr
             state->m_particles = static_cast<EmissionParticle*>(pppMemAlloc(
                 (unsigned long)step->m_initWOrk << 4,
                 ppvEnv->m_stagePtr,
-                const_cast<char*>(s_pppEmission_cpp),
+                "pppEmission.cpp",
                 0x16F));
 
             EmissionParticle* particle = state->m_particles;
@@ -249,7 +247,7 @@ void pppDestructEmission(pppEmission* emission, _pppCtrlTable* ctrl) {
 
     ClearEmissionModelCallbacks(model);
 
-    Graphic._WaitDrawDone(const_cast<char*>(s_pppEmission_cpp), 0x118);
+    Graphic._WaitDrawDone("pppEmission.cpp", 0x118);
     EmissionParticle* particles = state->m_particles;
     if (particles != 0) {
         pppMemFree(particles);

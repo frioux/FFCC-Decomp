@@ -61,8 +61,6 @@ struct VYmMegaBirthShpTail3
 
 static pppFMATRIX g_matUnit;
 
-static const char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
-
 STATIC_ASSERT(sizeof(PYmMegaBirthShpTail3) == 0xBC);
 STATIC_ASSERT(sizeof(VYmMegaBirthShpTail3) == 0x84);
 STATIC_ASSERT(offsetof(PYmMegaBirthShpTail3, m_shapeIndex) == 0x4);
@@ -689,14 +687,14 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
         work->m_maxParticles = param->m_maxParticles;
         work->m_particles = (_PARTICLE_DATA*)pppMemAlloc(
             work->m_maxParticles * sizeof(_PARTICLE_DATA), ppvEnv->m_stagePtr,
-            const_cast<char*>(s_pppYmMegaBirthShpTail3_cpp), 0x2db);
+            "pppYmMegaBirthShpTail3.cpp", 0x2db);
         if (work->m_particles != 0) {
             memset(work->m_particles, 0, work->m_maxParticles * sizeof(_PARTICLE_DATA));
         }
 
         work->m_wmats = (_PARTICLE_WMAT*)pppMemAlloc(
             work->m_maxParticles * sizeof(_PARTICLE_WMAT), ppvEnv->m_stagePtr,
-            const_cast<char*>(s_pppYmMegaBirthShpTail3_cpp), 0x2e3);
+            "pppYmMegaBirthShpTail3.cpp", 0x2e3);
         if (work->m_wmats != 0) {
             memset(work->m_wmats, 0, work->m_maxParticles * sizeof(_PARTICLE_WMAT));
         }

@@ -50,8 +50,6 @@ struct VYmMegaBirthShpTail2
 
 static pppFMATRIX g_matUnit;
 
-static const char s_pppYmMegaBirthShpTail2_cpp[] = "pppYmMegaBirthShpTail2.cpp";
-
 STATIC_ASSERT(sizeof(PYmMegaBirthShpTail2) == 0x90);
 STATIC_ASSERT(sizeof(VYmMegaBirthShpTail2) == 0x50);
 STATIC_ASSERT(offsetof(VYmMegaBirthShpTail2, m_particles) == 0x3C);
@@ -702,20 +700,20 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
     if (work->m_particles == 0) {
         work->m_maxParticles = param->m_maxParticles;
         work->m_particles = (_PARTICLE_DATA*)pppMemAlloc(
-            work->m_maxParticles * sizeof(_PARTICLE_DATA), ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMegaBirthShpTail2_cpp), 0x30e);
+            work->m_maxParticles * sizeof(_PARTICLE_DATA), ppvEnv->m_stagePtr, "pppYmMegaBirthShpTail2.cpp", 0x30e);
         if (work->m_particles != 0) {
             memset(work->m_particles, 0, work->m_maxParticles * sizeof(_PARTICLE_DATA));
         }
 
         work->m_wmats = (_PARTICLE_WMAT*)pppMemAlloc(
-            work->m_maxParticles * sizeof(_PARTICLE_WMAT), ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMegaBirthShpTail2_cpp), 0x316);
+            work->m_maxParticles * sizeof(_PARTICLE_WMAT), ppvEnv->m_stagePtr, "pppYmMegaBirthShpTail2.cpp", 0x316);
         if (work->m_wmats != 0) {
             memset(work->m_wmats, 0, work->m_maxParticles * sizeof(_PARTICLE_WMAT));
         }
 
         if (param->m_enableParticleColor != 0) {
             work->m_colors = (_PARTICLE_COLOR*)pppMemAlloc(
-                work->m_maxParticles * sizeof(_PARTICLE_COLOR), ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmMegaBirthShpTail2_cpp), 0x31e);
+                work->m_maxParticles * sizeof(_PARTICLE_COLOR), ppvEnv->m_stagePtr, "pppYmMegaBirthShpTail2.cpp", 0x31e);
             if (work->m_colors != 0) {
                 memset(work->m_colors, 0, work->m_maxParticles * sizeof(_PARTICLE_COLOR));
             }

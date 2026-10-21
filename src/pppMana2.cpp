@@ -43,7 +43,6 @@ enum {
 };
 
 static const char sRenderMana2Message[] = "Render Mana2!!";
-static const char s_pppMana2_cpp[] = "pppMana2.cpp";
 
 struct Mana2SetupBlock
 {
@@ -1017,25 +1016,25 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
 
         if (mana2Work->m_sourceTexObjs == 0) {
             mana2Work->m_sourceTexObjs =
-                static_cast<GXTexObj*>(pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1D7));
+                static_cast<GXTexObj*>(pppMemAlloc(0xC0, ppvEnv->m_stagePtr, "pppMana2.cpp", 0x1D7));
         }
         if (mana2Work->m_generatedTexObj0 == 0) {
             mana2Work->m_generatedTexObj0 =
-                static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1DD));
+                static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr, "pppMana2.cpp", 0x1DD));
         }
         if (mana2Work->m_generatedTexObj1 == 0) {
             mana2Work->m_generatedTexObj1 =
-                static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1E1));
+                static_cast<GXTexObj*>(pppMemAlloc(0x20, ppvEnv->m_stagePtr, "pppMana2.cpp", 0x1E1));
         }
 
         texBufferSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGB565, GX_FALSE, 0);
         if (mana2Work->m_generatedTexture0 == 0) {
             mana2Work->m_generatedTexture0 =
-                pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1E9);
+                pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, "pppMana2.cpp", 0x1E9);
         }
         if (mana2Work->m_generatedTexture1 == 0) {
             mana2Work->m_generatedTexture1 =
-                pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1EB);
+                pppMemAlloc(texBufferSize, ppvEnv->m_stagePtr, "pppMana2.cpp", 0x1EB);
         }
 
         GXInitTexObj(mana2Work->m_generatedTexObj0, mana2Work->m_generatedTexture0, 0x80, 0x80, GX_TF_RGB565, GX_REPEAT, GX_REPEAT, GX_FALSE);
@@ -1043,7 +1042,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
 
         if (mana2Work->m_baseParaboloidTexObjs == 0) {
             mana2Work->m_baseParaboloidTexObjs =
-                static_cast<GXTexObj*>(pppMemAlloc(0xC0, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x1F6));
+                static_cast<GXTexObj*>(pppMemAlloc(0xC0, ppvEnv->m_stagePtr, "pppMana2.cpp", 0x1F6));
         }
         dstTexObj = mana2Work->m_baseParaboloidTexObjs;
         for (i = 0; i < 6; i++, dstTexObj++) {
@@ -1059,7 +1058,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
 
         if (mana2Work->m_paraboloidMap == 0) {
             mana2Work->m_paraboloidMap =
-                pppMemAlloc(0xA5E8, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x211);
+                pppMemAlloc(0xA5E8, ppvEnv->m_stagePtr, "pppMana2.cpp", 0x211);
             genParaboloidMap(mana2Work->m_paraboloidMap, &mana2Work->m_paraboloidMapSize, 0x1E, GX_VTXFMT7);
         }
 
@@ -1074,7 +1073,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                     if (mana2Work->m_meshReflectionVec == 0) {
                         mana2Work->m_meshReflectionVec =
                             static_cast<Vec*>(pppMemAlloc(meshData->m_vertexCount * sizeof(Vec), ppvEnv->m_stagePtr,
-                                                          const_cast<char*>(s_pppMana2_cpp), 0x232));
+                                                          "pppMana2.cpp", 0x232));
                         Vec* reflectionVec = mana2Work->m_meshReflectionVec;
                         for (u32 j = 0; j < meshData->m_vertexCount; j++) {
                             reflectionVec[j].x = reflectionVec[j].y = reflectionVec[j].z = 0.0f;
@@ -1084,7 +1083,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                     if (mana2Work->m_meshColors == 0) {
                         mana2Work->m_meshColors =
                             static_cast<GXColor*>(pppMemAlloc(meshData->m_vertexCount * sizeof(GXColor), ppvEnv->m_stagePtr,
-                                                              const_cast<char*>(s_pppMana2_cpp), 0x23B));
+                                                              "pppMana2.cpp", 0x23B));
                         GXColor* color = mana2Work->m_meshColors;
                         for (u32 j = 0; j < meshData->m_vertexCount; j++) {
                             color[j].r = 0xFF;
@@ -1097,7 +1096,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
                     if (mana2Work->m_meshTexCoords == 0) {
                         mana2Work->m_meshTexCoords =
                             static_cast<S16Vec2d*>(pppMemAlloc(meshData->m_vertexCount * 6, ppvEnv->m_stagePtr,
-                                                               const_cast<char*>(s_pppMana2_cpp), 0x244));
+                                                               "pppMana2.cpp", 0x244));
                         S16Vec* texCoord = reinterpret_cast<S16Vec*>(mana2Work->m_meshTexCoords);
                         for (u32 j = 0; j < meshData->m_vertexCount; j++) {
                             texCoord[j].x = texCoord[j].y = 0;
@@ -1106,11 +1105,11 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
 
                     mana2Work->m_displayListCopies =
                         static_cast<void**>(pppMemAlloc(meshData->m_displayListCount * sizeof(void*), ppvEnv->m_stagePtr,
-                                                        const_cast<char*>(s_pppMana2_cpp), 0x24B));
+                                                        "pppMana2.cpp", 0x24B));
                     CChara::CMesh::CDisplayList* displayList = meshData->m_displayLists;
                     for (s32 dlIndex = meshData->m_displayListCount - 1; dlIndex >= 0; dlIndex--, displayList++) {
                         void* copiedDisplayList =
-                            pppMemAlloc(displayList->m_size, ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x255);
+                            pppMemAlloc(displayList->m_size, ppvEnv->m_stagePtr, "pppMana2.cpp", 0x255);
                         mana2Work->m_displayListCopies[dlIndex] = copiedDisplayList;
                         mana2Work->m_displayListCopies[dlIndex] = reinterpret_cast<void*>(
                             (reinterpret_cast<u32>(mana2Work->m_displayListCopies[dlIndex]) + 0x1F) & 0xFFFFFFE0);
@@ -1123,15 +1122,15 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2Step* step, _pppCtrlTable* ctrl)
 
                 if (((step->m_type == 1) && strcmp(meshData->m_name, "obj4") == 0) ||
                     ((step->m_type == 2) && strcmp(meshData->m_name, "obj2") == 0)) {
-                    mana2Work->m_positions = static_cast<Vec*>(pppMemAlloc(kWaterVertexCount * sizeof(Vec), ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26A));
-                    mana2Work->m_normals = static_cast<Vec*>(pppMemAlloc(kWaterVertexCount * sizeof(Vec), ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26B));
-                    mana2Work->m_colors = static_cast<GXColor*>(pppMemAlloc(kWaterVertexCount * sizeof(GXColor), ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26C));
-                    mana2Work->m_texCoord0 = static_cast<Vec2d*>(pppMemAlloc(kWaterVertexCount * sizeof(Vec2d), ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26D));
-                    mana2Work->m_texCoord1 = static_cast<Vec2d*>(pppMemAlloc(kWaterVertexCount * sizeof(Vec2d), ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26E));
-                    mana2Work->m_waterHeightA = static_cast<float*>(pppMemAlloc(kWaterVertexCount * sizeof(float), ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x26F));
-                    mana2Work->m_waterHeightB = static_cast<float*>(pppMemAlloc(kWaterVertexCount * sizeof(float), ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x270));
-                    mana2Work->m_indices = static_cast<u16*>(pppMemAlloc(kWaterTriangleCount * 3 * sizeof(u16), ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x271));
-                    mana2Work->m_reflectionVec = static_cast<Vec*>(pppMemAlloc(kWaterVertexCount * sizeof(Vec), ppvEnv->m_stagePtr, const_cast<char*>(s_pppMana2_cpp), 0x272));
+                    mana2Work->m_positions = static_cast<Vec*>(pppMemAlloc(kWaterVertexCount * sizeof(Vec), ppvEnv->m_stagePtr, "pppMana2.cpp", 0x26A));
+                    mana2Work->m_normals = static_cast<Vec*>(pppMemAlloc(kWaterVertexCount * sizeof(Vec), ppvEnv->m_stagePtr, "pppMana2.cpp", 0x26B));
+                    mana2Work->m_colors = static_cast<GXColor*>(pppMemAlloc(kWaterVertexCount * sizeof(GXColor), ppvEnv->m_stagePtr, "pppMana2.cpp", 0x26C));
+                    mana2Work->m_texCoord0 = static_cast<Vec2d*>(pppMemAlloc(kWaterVertexCount * sizeof(Vec2d), ppvEnv->m_stagePtr, "pppMana2.cpp", 0x26D));
+                    mana2Work->m_texCoord1 = static_cast<Vec2d*>(pppMemAlloc(kWaterVertexCount * sizeof(Vec2d), ppvEnv->m_stagePtr, "pppMana2.cpp", 0x26E));
+                    mana2Work->m_waterHeightA = static_cast<float*>(pppMemAlloc(kWaterVertexCount * sizeof(float), ppvEnv->m_stagePtr, "pppMana2.cpp", 0x26F));
+                    mana2Work->m_waterHeightB = static_cast<float*>(pppMemAlloc(kWaterVertexCount * sizeof(float), ppvEnv->m_stagePtr, "pppMana2.cpp", 0x270));
+                    mana2Work->m_indices = static_cast<u16*>(pppMemAlloc(kWaterTriangleCount * 3 * sizeof(u16), ppvEnv->m_stagePtr, "pppMana2.cpp", 0x271));
+                    mana2Work->m_reflectionVec = static_cast<Vec*>(pppMemAlloc(kWaterVertexCount * sizeof(Vec), ppvEnv->m_stagePtr, "pppMana2.cpp", 0x272));
 
                     float* waterHeightA = mana2Work->m_waterHeightA;
                     float* waterHeightB = mana2Work->m_waterHeightB;

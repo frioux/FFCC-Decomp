@@ -150,10 +150,7 @@ static inline void SetCmakeFontColor(CFont* font, float alpha)
 #ifdef VERSION_GCCJGC
 #include "ffcc/cmake_jp.inc"
 static const char s_cmakeSubfontPath[] = "dvd/menu/subfont.fnt";
-static const char s_cmake_cpp[] = "cmake.cpp";
-#define CMAKE_SOURCE_NAME s_cmake_cpp
 #else
-#define CMAKE_SOURCE_NAME "cmake.cpp"
 static const char* s_NameEntryStr[] = {
     "ABCDEFGHIJKL",
     "MNOPQRSTUVWX",
@@ -3472,7 +3469,7 @@ void CMenuPcs::calcVillageMenu()
 #else
             const int allocationLine = 0xCB3;
 #endif
-            villageWork = operator new(0x48, stage, const_cast<char*>(CMAKE_SOURCE_NAME), allocationLine);
+            villageWork = operator new(0x48, stage, "cmake.cpp", allocationLine);
             memset(villageWork, 0, 0x48);
             LoadCmakeVillageName();
             m_menuResultCode = 1;
