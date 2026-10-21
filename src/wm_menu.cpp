@@ -2179,7 +2179,9 @@ void CMenuPcs::CalcLoadMenu()
 			SetMcWinInfo(windowWidth, windowHeight);
 			m_menuWindowInfo->state = 0;
 			m_wmWorldState->m_flag09 = 1;
+#if !defined(VERSION_GCCJGC)
 			m_wmWorldState->m_counter1A = 0;
+#endif
 		}
 		if (m_menuWindowInfo->state == 1
 		    && m_wmWorldState->m_counter1A == 0) {
