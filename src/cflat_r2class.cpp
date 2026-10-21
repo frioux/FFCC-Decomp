@@ -20,13 +20,6 @@
 #include <dolphin/mtx.h>
 #include <math.h>
 
-static const char sCFlatRuntime2SetClassSystemValWarn[] =
-    "!!!!!!!!!!!!!!!charUpdate"
-    "\202\252\203x\201[\203X\203N\203\211\203X\202\310\202\307\202\305\216g\227p\202\263\202\352\202\304\202\334\202\267\201B"
-    "!!!!!!!!!!!!!!!!!!!!\n";
-static const char sCFlatRuntime2AnimStateWarn[] =
-    "\203|\201[\203g\224\324\215\206\202\252\210\331\217\355\202\305\202\267\201B";
-
 namespace {
 
 typedef unsigned char u8;
@@ -204,7 +197,9 @@ void CFlatRuntime2::onSetClassSystemVal(int systemVal, CFlatRuntime::CObject* ob
 
 	if ((engineFlags & 5) != 5 && systemVal == -0x1B) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 2) {
-			System.Printf(const_cast<char*>(sCFlatRuntime2SetClassSystemValWarn));
+			System.Printf("!!!!!!!!!!!!!!!charUpdate"
+					"\202\252\203x\201[\203X\203N\203\211\203X\202\310\202\307\202\305\216g\227p\202\263\202\352\202\304\202\334\202\267\201B"
+					"!!!!!!!!!!!!!!!!!!!!\n");
 		}
 		return;
 	}
@@ -524,7 +519,9 @@ CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* objec
 
 	if (((engineFlags & 5) != 5) && (systemVal == -0x1B)) {
 		if (static_cast<unsigned int>(System.m_execParam) >= 2) {
-			System.Printf(const_cast<char*>(sCFlatRuntime2SetClassSystemValWarn));
+			System.Printf("!!!!!!!!!!!!!!!charUpdate"
+					"\202\252\203x\201[\203X\203N\203\211\203X\202\310\202\307\202\305\216g\227p\202\263\202\352\202\304\202\334\202\267\201B"
+					"!!!!!!!!!!!!!!!!!!!!\n");
 		}
 		LastResult(this) = 0;
 		return reinterpret_cast<CFlatRuntime::CVal*>(&LastResult(this));
@@ -881,7 +878,7 @@ int CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int com
 			{
 				signed char animState = static_cast<signed char>(engineObject->m_animStateMisc);
 				if (((animState < 0) || (animState >= 4)) && static_cast<unsigned int>(System.m_execParam) >= 2) {
-					System.Printf(const_cast<char*>(sCFlatRuntime2AnimStateWarn));
+					System.Printf("\203|\201[\203g\224\324\215\206\202\252\210\331\217\355\202\305\202\267\201B");
 				}
 			}
 			push(object, 0);
