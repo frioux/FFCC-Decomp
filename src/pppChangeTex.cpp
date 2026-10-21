@@ -32,8 +32,6 @@ STATIC_ASSERT(offsetof(ChangeTexWork, m_bboxMax) == 0x38);
 STATIC_ASSERT(offsetof(ChangeTexWork, m_cachedValue) == 0x44);
 STATIC_ASSERT(sizeof(ChangeTexDisplayListCopy) == 0x8);
 
-static const char s_pppChangeTex_cpp[] = "pppChangeTex.cpp";
-
 static void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 static void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
 
@@ -167,10 +165,10 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 		work->m_cachedValue = -10000.0f;
 		work->m_meshColorArrays = static_cast<GXColor**>(pppMemAlloc(
 		    model0->GetRefData()->m_meshCount * sizeof(GXColor*), ppvEnv->m_stagePtr,
-		    const_cast<char*>(s_pppChangeTex_cpp), 0x163));
+		    "pppChangeTex.cpp", 0x163));
 		work->m_displayListArrays = static_cast<ChangeTexDisplayListCopy***>(pppMemAlloc(
 		    model0->GetRefData()->m_meshCount * sizeof(ChangeTexDisplayListCopy**), ppvEnv->m_stagePtr,
-		    const_cast<char*>(s_pppChangeTex_cpp), 0x166));
+		    "pppChangeTex.cpp", 0x166));
 
 		colorArray = work->m_meshColorArrays;
 		for (meshIdx = 0; meshIdx < model0->GetRefData()->m_meshCount; meshIdx++, meshList++) {
@@ -182,7 +180,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 
 			work->m_displayListArrays[meshIdx] = static_cast<ChangeTexDisplayListCopy**>(
 			    pppMemAlloc(meshList->m_data->m_displayListCount * sizeof(ChangeTexDisplayListCopy*), ppvEnv->m_stagePtr,
-			                const_cast<char*>(s_pppChangeTex_cpp), 0x181));
+			                "pppChangeTex.cpp", 0x181));
 
 			dlIdx = meshList->m_data->m_displayListCount - 1;
 			dlInfo = meshList->m_data->m_displayLists;
@@ -190,11 +188,11 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 			for (; dlIdx >= 0; dlIdx--, dlInfo++) {
 				dlPair = static_cast<ChangeTexDisplayListCopy*>(
 				    pppMemAlloc(sizeof(ChangeTexDisplayListCopy), ppvEnv->m_stagePtr,
-				                const_cast<char*>(s_pppChangeTex_cpp), 0x18B));
+				                "pppChangeTex.cpp", 0x18B));
 				*dlEntry = dlPair;
 				(*dlEntry)->m_size = dlInfo->m_size;
 				(*dlEntry)->m_data = pppMemAlloc(
-				    dlInfo->m_size, ppvEnv->m_stagePtr, const_cast<char*>(s_pppChangeTex_cpp), 0x18D);
+				    dlInfo->m_size, ppvEnv->m_stagePtr, "pppChangeTex.cpp", 0x18D);
 				memcpy((*dlEntry)->m_data, dlInfo->m_data, dlInfo->m_size);
 				Util.ReWriteDisplayList((*dlEntry)->m_data, (unsigned long)dlInfo->m_size, 1);
 				dlEntry--;
@@ -202,7 +200,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, ChangeTexStep* step, _pppCtrlTab
 
 			*colorArray = static_cast<GXColor*>(
 			    pppMemAlloc(meshList->m_data->m_vertexCount * sizeof(GXColor), ppvEnv->m_stagePtr,
-			                const_cast<char*>(s_pppChangeTex_cpp), 0x196));
+			                "pppChangeTex.cpp", 0x196));
 			memset(*colorArray, 0, meshList->m_data->m_vertexCount * sizeof(GXColor));
 
 			colorArray++;
@@ -275,7 +273,7 @@ void pppDestructChangeTex(pppChangeTex* changeTex, _pppCtrlTable* data)
 	ChangeTexDisplayListCopy** dlEntries;
 	unsigned int j;
 
-	Graphic._WaitDrawDone(const_cast<char*>(s_pppChangeTex_cpp), 0x9d);
+	Graphic._WaitDrawDone("pppChangeTex.cpp", 0x9d);
 	work = GetChangeTexWork(changeTex, data);
 	handle0 = GetCharaHandlePtr(work->m_charaObj, 0);
 	handle1 = GetCharaHandlePtr(work->m_charaObj, 1);
