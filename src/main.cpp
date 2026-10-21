@@ -7,16 +7,6 @@
 
 static void game(int, char**);
 
-static const char kDefaultScriptName[] = "ffcc_0";
-#ifndef VERSION_GCCJGC
-static const char kLanguageArgUs[] = "us";
-static const char kLanguageArgUk[] = "uk";
-static const char kLanguageArgGr[] = "gr";
-static const char kLanguageArgIt[] = "it";
-static const char kLanguageArgFr[] = "fr";
-static const char kLanguageArgSp[] = "sp";
-#endif
-
 #ifdef VERSION_GCCJGC
 /*
  * --INFO--
@@ -33,7 +23,7 @@ static inline void game(int argc, char** argv)
     int i;
 
     Game.Init();
-    strcpy(Game.m_startScriptName, kDefaultScriptName);
+    strcpy(Game.m_startScriptName, "ffcc_0");
 
     if (argc != 0) {
         copyScriptName = 0;
@@ -114,7 +104,7 @@ void game(int argc, char** argv)
     int i;
 
     Game.Init();
-    strcpy(Game.m_startScriptName, kDefaultScriptName);
+    strcpy(Game.m_startScriptName, "ffcc_0");
 
     if (argc != 0) {
         copyScriptName = 0;
@@ -124,27 +114,27 @@ void game(int argc, char** argv)
                 strcpy(Game.m_startScriptName, argv[i]);
                 copyScriptName = 0;
             } else if (parseLanguage) {
-                int cmp = strcmp(argv[i], kLanguageArgUs);
+                int cmp = strcmp(argv[i], "us");
                 if (cmp == 0) {
                     Game.m_gameWork.m_languageId = 1;
                 } else {
-                    cmp = strcmp(argv[i], kLanguageArgUk);
+                    cmp = strcmp(argv[i], "uk");
                     if (cmp == 0) {
                         Game.m_gameWork.m_languageId = 1;
                     } else {
-                        cmp = strcmp(argv[i], kLanguageArgGr);
+                        cmp = strcmp(argv[i], "gr");
                         if (cmp == 0) {
                             Game.m_gameWork.m_languageId = 2;
                         } else {
-                            cmp = strcmp(argv[i], kLanguageArgIt);
+                            cmp = strcmp(argv[i], "it");
                             if (cmp == 0) {
                                 Game.m_gameWork.m_languageId = 3;
                             } else {
-                                cmp = strcmp(argv[i], kLanguageArgFr);
+                                cmp = strcmp(argv[i], "fr");
                                 if (cmp == 0) {
                                     Game.m_gameWork.m_languageId = 4;
                                 } else {
-                                    cmp = strcmp(argv[i], kLanguageArgSp);
+                                    cmp = strcmp(argv[i], "sp");
                                     if (cmp == 0) {
                                         Game.m_gameWork.m_languageId = 5;
                                     } else {

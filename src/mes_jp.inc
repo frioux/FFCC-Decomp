@@ -257,7 +257,10 @@ void CMes::addString(char** text, int branchMode)
             {
                 if ((unsigned int)System.m_execParam >= 1U)
                 {
-                    System.Printf(const_cast<char*>(s_MessageSpeedTagUsed));
+                    System.Printf(
+                        "\x83\x81\x83\x62\x83\x5A\x81\x5B\x83\x57\x88\xEA\x8F\x75\x95\x5C\x8E\xA6"
+                        "\x83\x82\x81\x5B\x83\x68\x82\xC5<speed>\x83\x5E\x83\x4F\x82\xAA\x8E\x67"
+                        "\x97\x70\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD\x81\x42\n");
                 }
             }
             else
