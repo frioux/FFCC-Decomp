@@ -419,6 +419,13 @@ redsound_inline_off_units = {
     "RedStream",
     *parse_unit_env_set("FFCC_REDSOUND_INLINE_OFF_UNITS"),
 }
+# These units have no strings owned by stripped functions, so retail's separate
+# anonymous string literals are reproduced without pooling.
+redsound_unpooled_str_units = {
+    "RedDriver",
+    "RedMemory",
+    "RedStream",
+}
 redsound_inline_deferred_units = parse_unit_env_set(
     "FFCC_REDSOUND_INLINE_DEFERRED_UNITS"
 )
@@ -444,6 +451,8 @@ def redsound_unit_cflags(unit_name: str, *, cpp_exceptions: bool = False) -> Lis
         flags = replace_flag_prefix(flags, "-inline ", "-inline off")
     elif unit_name in redsound_inline_deferred_units:
         flags = replace_flag_prefix(flags, "-inline ", "-inline deferred")
+    if unit_name in redsound_unpooled_str_units:
+        flags = replace_flag_prefix(flags, "-str ", "-str reuse,readonly")
     flags = [*flags, *redsound_extra_flags]
     return flags
 

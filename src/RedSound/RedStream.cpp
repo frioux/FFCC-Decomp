@@ -10,16 +10,6 @@
 #include <dolphin/os.h>
 #include <string.h>
 
-static const char sRedStreamBufferDidntSecureFmt[] = "%s%sStream Buffer didn't secure.%s\n";
-static const char sRedStreamLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
-static const char sRedStreamMainMemoryDidntCreateFmt[] = "%s%sM-Memory didn't create.(need:0x%6.6X)%s\n";
-static const char sRedStreamAramMemoryDidntCreateFmt[] = "%s%sA-Memory didn't create.(need:0x%6.6X)%s\n";
-static const char sRedStreamPauseOnFmt[] = "%sPause : Stream : ON  %d\n";
-static const char sRedStreamPauseOffFmt[] = "%sPause : Stream : OFF %d\n";
-static const char sRedStreamLogErrorColor[] = "\x1B[7;31m";
-static const char sRedStreamLogReset[] = "\x1B[0m";
-static const char sRedStreamLogWarnColor[] = "\x1B[4;31m";
-
 enum RedStreamStringLayout {
 	REDSOUND_STREAM_BUFFER_DIDNT_SECURE_FMT_SIZE = 0x24,
 	REDSOUND_STREAM_LOG_PREFIX_SIZE = 0x12,
@@ -135,23 +125,8 @@ STATIC_ASSERT(offsetof(RedStreamDATA, m_streamCursor) == REDSOUND_STREAM_CURSOR_
 STATIC_ASSERT(offsetof(RedStreamDATA, m_streamCursorBase) == REDSOUND_STREAM_CURSOR_BASE_OFFSET);
 STATIC_ASSERT(offsetof(RedStreamDATA, m_aramBuffer) == REDSOUND_STREAM_ARAM_BUFFER_OFFSET);
 STATIC_ASSERT(sizeof(RedStreamDATA) == REDSOUND_STREAM_DATA_SIZE);
-STATIC_ASSERT(sizeof(sRedStreamBufferDidntSecureFmt) == REDSOUND_STREAM_BUFFER_DIDNT_SECURE_FMT_SIZE);
-STATIC_ASSERT(sizeof(sRedStreamLogPrefix) == REDSOUND_STREAM_LOG_PREFIX_SIZE);
-STATIC_ASSERT(sizeof(sRedStreamMainMemoryDidntCreateFmt) == REDSOUND_STREAM_MAIN_MEMORY_DIDNT_CREATE_FMT_SIZE);
-STATIC_ASSERT(sizeof(sRedStreamAramMemoryDidntCreateFmt) == REDSOUND_STREAM_ARAM_MEMORY_DIDNT_CREATE_FMT_SIZE);
-STATIC_ASSERT(sizeof(sRedStreamPauseOnFmt) == REDSOUND_STREAM_PAUSE_ON_FMT_SIZE);
-STATIC_ASSERT(sizeof(sRedStreamPauseOffFmt) == REDSOUND_STREAM_PAUSE_OFF_FMT_SIZE);
-STATIC_ASSERT(sizeof(sRedStreamLogErrorColor) == REDSOUND_STREAM_LOG_ERROR_COLOR_SIZE);
-STATIC_ASSERT(sizeof(sRedStreamLogReset) == REDSOUND_STREAM_LOG_RESET_SIZE);
-STATIC_ASSERT(sizeof(sRedStreamLogWarnColor) == REDSOUND_STREAM_LOG_WARN_COLOR_SIZE);
-STATIC_ASSERT(sizeof(sRedStreamBufferDidntSecureFmt) + sizeof(sRedStreamLogPrefix) +
-                  sizeof(sRedStreamMainMemoryDidntCreateFmt) + sizeof(sRedStreamAramMemoryDidntCreateFmt) +
-                  sizeof(sRedStreamPauseOnFmt) + sizeof(sRedStreamPauseOffFmt) ==
-              REDSOUND_STREAM_RODATA_STRING_SIZE);
 STATIC_ASSERT(REDSOUND_STREAM_MAP_RODATA_STRING_OFFSET == 0);
 STATIC_ASSERT(REDSOUND_STREAM_RODATA_STRING_SIZE == REDSOUND_STREAM_MAP_RODATA_STRING_SIZE);
-STATIC_ASSERT(sizeof(sRedStreamLogErrorColor) + sizeof(sRedStreamLogReset) + sizeof(sRedStreamLogWarnColor) ==
-              REDSOUND_STREAM_SDATA2_STRING_SIZE);
 STATIC_ASSERT(REDSOUND_STREAM_MAP_SDATA2_STRING_OFFSET == 0);
 STATIC_ASSERT(REDSOUND_STREAM_SDATA2_STRING_SIZE == REDSOUND_STREAM_MAP_SDATA2_STRING_SIZE);
 
@@ -570,16 +545,16 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 			streamData->m_state = REDSOUND_STREAM_STATE_LOADING;
 		} else {
 			if (RedReportPrintIsEnabled()) {
-				OSReport(sRedStreamBufferDidntSecureFmt, sRedStreamLogPrefix, sRedStreamLogErrorColor, sRedStreamLogReset);
+				OSReport("%s%sStream Buffer didn't secure.%s\n", "\x1B[7;34mSound\x1B[0m:", "\x1B[7;31m", "\x1B[0m");
 				fflush(__files + 1);
 			}
 			if (RedStreamDataHasBuffer(streamData)) {
 				RedDelete(streamData->m_buffer);
 			} else {
 				if (RedReportPrintIsEnabled()) {
-					OSReport(sRedStreamMainMemoryDidntCreateFmt,
-					         sRedStreamLogPrefix, sRedStreamLogWarnColor, REDSOUND_STREAM_TRANSFER_BUFFER_SIZE,
-					         sRedStreamLogReset);
+					OSReport("%s%sM-Memory didn't create.(need:0x%6.6X)%s\n",
+					         "\x1B[7;34mSound\x1B[0m:", "\x1B[4;31m", REDSOUND_STREAM_TRANSFER_BUFFER_SIZE,
+					         "\x1B[0m");
 					fflush(__files + 1);
 				}
 			}
@@ -587,10 +562,10 @@ int StreamPlay(int streamID, void* streamHeader, int fileSize, int pan, int volu
 				RedDeleteA(streamData->m_aramBuffer);
 			} else {
 				if (RedReportPrintIsEnabled()) {
-					OSReport(sRedStreamAramMemoryDidntCreateFmt,
-					         sRedStreamLogPrefix, sRedStreamLogWarnColor,
+					OSReport("%s%sA-Memory didn't create.(need:0x%6.6X)%s\n",
+					         "\x1B[7;34mSound\x1B[0m:", "\x1B[4;31m",
 					         RedStreamHeaderGetAramSize(&streamData->m_header),
-					         sRedStreamLogReset);
+					         "\x1B[0m");
 					fflush(__files + 1);
 				}
 			}
@@ -699,9 +674,9 @@ void StreamPause(int streamID, int pause)
 
 	if (RedReportPrintIsEnabled()) {
 		if (pause == REDSOUND_PAUSE_ON) {
-			OSReport(sRedStreamPauseOnFmt, sRedStreamLogPrefix, streamID);
+			OSReport("%sPause : Stream : ON  %d\n", "\x1B[7;34mSound\x1B[0m:", streamID);
 		} else {
-			OSReport(sRedStreamPauseOffFmt, sRedStreamLogPrefix, streamID);
+			OSReport("%sPause : Stream : OFF %d\n", "\x1B[7;34mSound\x1B[0m:", streamID);
 		}
 		fflush(__files + 1);
 	}
