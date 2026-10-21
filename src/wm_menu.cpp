@@ -983,42 +983,31 @@ void CMenuPcs::InitCharaInfo()
 	float z;
 	float zero;
 	int slot;
-	int baseX;
-	int baseSlot;
-	int baseY;
 	int row;
 	int col;
+	int x;
 	int y;
 
 	zero = 0.0f;
 	z = 50.0f;
 	row = 0;
-	baseSlot = 0x20;
-	baseY = 0x66;
 	while (row < 2) {
-		slot = baseSlot;
-		col = 0;
-		baseX = 0x68;
-		for (; col < 4; col++) {
-			y = baseY;
+		for (col = 0; col < 4; col++) {
+			slot = row * 4 + 0x20 + col;
+			x = 0x68 + col * 0x90;
+			y = 0x66 + row * 0xB8;
 			if (row != 0) {
-				y = baseY + 8;
+				y += 8;
 			}
-
-			m_wm.m_worldObjData[slot].m_viewportX = static_cast<short>(baseX - 0xA0);
+			m_wm.m_worldObjData[slot].m_viewportX = static_cast<short>(x - 0xA0);
 			m_wm.m_worldObjData[slot].m_viewportY = static_cast<short>(y - 0x70);
 			m_wm.m_worldObjData[slot].m_viewportWidth = 0x140;
 			m_wm.m_worldObjData[slot].m_viewportHeight = 0xE0;
 			m_wm.m_worldObjData[slot].m_cameraPosition.x = zero;
 			m_wm.m_worldObjData[slot].m_cameraPosition.y = zero;
 			m_wm.m_worldObjData[slot].m_cameraPosition.z = z;
-
-			slot += 1;
-			baseX = baseX + 0x90;
 		}
 		row++;
-		baseSlot += 4;
-		baseY = baseY + 0xB8;
 	}
 
 	for (slot = 0; slot < kWmMenuPlayerCount; slot++) {
