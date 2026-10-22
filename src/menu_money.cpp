@@ -149,11 +149,11 @@ int CMenuPcs::MoneyCtrlCur()
 	if (mode == 0) {
 		int gil;
 		s16* sel = &this->m_moneyState->selections[mode];
-		int cursor = *sel;
+		digitPlace = *sel;
 		unsigned int placeValue = 1;
-		while (0 < cursor) {
+		while (0 < digitPlace) {
 			placeValue *= 10;
-			cursor--;
+			digitPlace--;
 		}
 
 		if ((hold & 8) != 0) {
