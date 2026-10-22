@@ -691,7 +691,6 @@ void CMenuPcs::CmdDraw()
 	s16 mode;
 	s32 hasItemHelp = false;
 	s32 helpId;
-	float rowH;
 	float rowU;
 	float t;
 	float x;
@@ -820,9 +819,9 @@ void CMenuPcs::CmdDraw()
 				x = static_cast<float>(entry->x);
 				y = static_cast<float>(entry->y);
 				w = static_cast<float>(entry->width);
-				rowH = static_cast<float>(entry->height);
-				t = entry->v;
+				h = static_cast<float>(entry->height);
 				rowU = entry->u;
+				t = entry->v;
 
 				if (idx == m_cmdList->count) {
 					MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(1));
@@ -848,7 +847,7 @@ void CMenuPcs::CmdDraw()
 
 					w = entry->alpha * w;
 					if (w > 0.0f) {
-						MenuPcs.DrawRect(0, x, y, w, rowH, rowU, t, colors,
+						MenuPcs.DrawRect(0, x, y, w, h, rowU, t, colors,
 						    1.0f, 1.0f, 0.0f);
 						x += w;
 						rowU += w;
@@ -865,7 +864,7 @@ void CMenuPcs::CmdDraw()
 						w = static_cast<float>(
 						    1.0 / static_cast<double>(entry->duration));
 						w *= static_cast<float>(entry->width);
-						MenuPcs.DrawRect(0, x, y, w, rowH, rowU, t, colors,
+						MenuPcs.DrawRect(0, x, y, w, h, rowU, t, colors,
 						    1.0f, 1.0f, 0.0f);
 					}
 
@@ -893,7 +892,7 @@ void CMenuPcs::CmdDraw()
 							if ((sel + 2 >= itemCount) || EquipChk(static_cast<int>(letterBuf[sel + 1]))) {
 								if (sel + 2 < itemCount) {
 									DrawEquipMark(static_cast<s32>(x - 12.0f),
-									    static_cast<s32>(((rowH - 24.0f) / 2.0) + y),
+									    static_cast<s32>(((h - 24.0f) / 2.0) + y),
 									    entry->alpha);
 								}
 								rowTex = kCmdDisabledRowTexture;
@@ -903,7 +902,7 @@ void CMenuPcs::CmdDraw()
 
 						if ((rowTex == kCmdRowTexture) &&
 						    (specialRow == m_cmdState->selected[1])) {
-							t += rowH;
+							t += h;
 						}
 						specialRow++;
 					}
@@ -916,7 +915,7 @@ void CMenuPcs::CmdDraw()
 					colors[0].a = static_cast<u8>(255.0f * rowAlpha);
 					GXSetChanMatColor(GX_COLOR0A0, colors[0]);
 
-					MenuPcs.DrawRect(0, x, y, w, rowH, rowU, t, entry->scale,
+					MenuPcs.DrawRect(0, x, y, w, h, rowU, t, entry->scale,
 					    entry->scale, 0.0f);
 				}
 			}
@@ -988,8 +987,7 @@ void CMenuPcs::CmdDraw()
 
 		DrawInit();
 
-		rowEntry = entry;
-		for (row = 0; row < 8; row++, rowEntry++) {
+		for (row = 0, rowEntry = entry; row < 8; row++, rowEntry++) {
 			if ((itemCount <= 8) && (row + m_cmdState->scrollTop >= itemCount)) {
 				break;
 			}
