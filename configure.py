@@ -717,7 +717,7 @@ config.libs = [
             Object(Equivalent, "pppRandUpIV.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRandUpShort.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRyjMegaBirth.cpp"),
-            Object(NonMatching, "pppRyjMegaBirthModel.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppRyjMegaBirthModel.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppScale.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppScaleLoopAuto.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "pppSclAccele.cpp"),
