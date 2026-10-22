@@ -2562,6 +2562,7 @@ void CShopMenu::DrawSoubiBase()
  */
 void CShopMenu::DrawItemList()
 {
+    int row;
     int y = 0x4C;
     int itemIndex = m_listTop;
     unsigned int selectableFrame = 10;
@@ -2569,7 +2570,7 @@ void CShopMenu::DrawItemList()
         selectableFrame = 0xF;
     }
 
-    for (int row = 0; row < m_visibleRows; ++row, y += 0x1C) {
+    for (row = 0; row < m_visibleRows; ++row, y += 0x1C) {
         int itemCount = getItemCnt();
 
         if (itemIndex >= itemCount) {
@@ -2611,7 +2612,8 @@ void CShopMenu::DrawItemList()
             font->DrawInit();
             font->SetPosX(static_cast<float>(frameX - 0x54));
             font->SetPosY(static_cast<float>(y - 0x14));
-            font->Draw(GetItemName(itemNo));
+            char* name = GetItemName(itemNo);
+            font->Draw(name);
             MenuPcs.DrawInit();
             MenuPcs.DrawSingleIcon(itemNo, frameX + 0x54, y - 0x18, FLOAT_80332d28, 0, FLOAT_80332d28);
         }
@@ -3107,7 +3109,7 @@ inline void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 
     char* text;
     if (CheckSell(index)) {
-        text = Game.m_cFlatDataArr[1].GetTable(6)[itemNo];
+        text = Game.GetHelpName(itemNo);
     } else {
         text = const_cast<char*>(s_cannotMakeHere);
     }
@@ -3143,7 +3145,7 @@ void CShopMenu::DrawItemHelp(int index, int centerX, int y)
 
     int canSelect = CheckSell(sel);
     if (canSelect) {
-        sourceText = Game.m_cFlatDataArr[1].GetTable(6)[itemNo];
+        sourceText = Game.GetHelpName(itemNo);
     } else {
         sourceText = ShopMenuMes(languageId, SHOP_MENU_TEXT_CANNOT_CRAFT_HERE);
     }
