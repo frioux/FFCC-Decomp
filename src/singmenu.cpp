@@ -28,8 +28,12 @@ static const float s_PCScl[4] = {0.87f, 0.78f, 0.78f, 0.87f};
 #include "src/singmenu_str_data.inc"
 #endif
 
-extern "C" {
-const u8 gSingMenuItemIconByType[0x1F5] = {
+#ifdef VERSION_GCCJGC
+extern "C"
+#else
+static
+#endif
+const u8 s_ItemIcon[0x1F5] = {
     0x26, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x26, 0x26, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
     0x26, 0x26, 0x26, 0x26, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02,
@@ -63,7 +67,6 @@ const u8 gSingMenuItemIconByType[0x1F5] = {
     0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
     0x22, 0x22, 0x22, 0x22, 0x22,
 };
-}
 #include "ffcc/textureman.h"
 #include "ffcc/util.h"
 #include <dolphin/gx.h>
@@ -211,9 +214,7 @@ extern "C" {
 int s_DynamicMess[5];
 }
 static char s_DynamicMessStr[0x400];
-extern "C" SingMenuStaticMessageInfo s_singleMenuStaticMessages[];
-
-extern "C" SingMenuStaticMessageInfo s_singleMenuStaticMessages[] = {
+SingMenuStaticMessageInfo s_SingMess[] = {
     {4, {14, 15, 16, 3, 0, 0, 0, 0}},
     {2, {15, 3, 0, 0, 0, 0, 0, 0}},
     {4, {30, 31, 32, 3, 0, 0, 0, 0}},
@@ -262,7 +263,7 @@ int gSingMenuAsyncLoadCompleted;
 int gSingMenuHasScriptFoodBase;
 int gSingMenuForcedSelection;
 extern "C" SingMenuTextureRef s_singleMenuModelTextureTable[];
-float FLOAT_8032ea78 = 0.8999999761581421f;
+static float s_WinMessScl = 0.8999999761581421f;
 
 #ifndef VERSION_GCCJGC
 static inline const char* GetSingWinMessage(int staticText, const char* dynamicText, int useDynamic)
@@ -427,7 +428,7 @@ void CMenuPcs::SingMenuInit()
         m_singleMenuMode = 8;
         gSingMenuForcedSelection = -1;
     }
-    FLOAT_8032ea78 = 0.8999999761581421f;
+    s_WinMessScl = 0.8999999761581421f;
     m_singleLifeTimer = -1;
     m_singleMenuCtrlResetFlag = 1;
     m_singleMenuInitialized = 1;
@@ -1592,7 +1593,7 @@ void CMenuPcs::SingleDrawCtrl()
 
     memset(m_singMenuState, 0, sizeof(SingMenuState));
     m_singMenuState->selectedIndex = previousMode;
-    FLOAT_8032ea78 = 0.8999999761581421f;
+    s_WinMessScl = 0.8999999761581421f;
 }
 
 /*
@@ -1671,7 +1672,7 @@ void CMenuPcs::DrawSingleIcon(int iconNo, int posX, int posY, float alpha, int r
     if (rawIcon != 0) {
         icon = iconNo;
     } else {
-        icon = static_cast<int>(gSingMenuItemIconByType[iconNo]);
+        icon = static_cast<int>(s_ItemIcon[iconNo]);
     }
 
     int row = icon / 8;
@@ -2013,7 +2014,7 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     font->SetMargin(1.0f);
 #endif
     font->SetShadow(1);
-    font->SetScale(FLOAT_8032ea78);
+    font->SetScale(s_WinMessScl);
     font->DrawInit();
 
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, 0xFF).color);
@@ -2022,18 +2023,18 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     if (useDynamic != 0) {
         lineCount = s_DynamicMess[0];
     } else {
-        lineCount = s_singleMenuStaticMessages[messageNo].lineCount;
+        lineCount = s_SingMess[messageNo].lineCount;
     }
     for (i = 0; i < lineCount; i++) {
 #ifdef VERSION_GCCJGC
         if (!useDynamic) {
-            text = GetMenuStr(s_singleMenuStaticMessages[messageNo].textIds[i]);
+            text = GetMenuStr(s_SingMess[messageNo].textIds[i]);
         } else {
             text = s_DynamicMessStr + i * 0x80;
         }
 #else
         if (useDynamic == 0) {
-            text = GetSingWinMessage(s_singleMenuStaticMessages[messageNo].textIds[i], s_DynamicMessStr + i * 0x80, 0);
+            text = GetSingWinMessage(s_SingMess[messageNo].textIds[i], s_DynamicMessStr + i * 0x80, 0);
         } else {
             text = s_DynamicMessStr + i * 0x80;
         }
@@ -2048,8 +2049,8 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
     float x = static_cast<float>(static_cast<double>(win->width - maxWidth) / 2.0
             + static_cast<double>(win->x));
     float y = static_cast<float>(win->y + 0x20);
-    int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
-    if (22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight) > 0.0f) {
+    int lineHeight = static_cast<int>(22.0f * s_WinMessScl);
+    if (22.0f * s_WinMessScl - static_cast<float>(lineHeight) > 0.0f) {
         lineHeight++;
     }
     int lineStep = lineHeight + 3;
@@ -2062,11 +2063,11 @@ void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
         if (useDynamic != 0) {
             text = s_DynamicMessStr + i * 0x80;
         } else {
-            text = GetMenuStr(s_singleMenuStaticMessages[messageNo].textIds[i]);
+            text = GetMenuStr(s_SingMess[messageNo].textIds[i]);
         }
 #else
         if (useDynamic == 0) {
-            text = GetSingWinMessage(s_singleMenuStaticMessages[messageNo].textIds[i], s_DynamicMessStr + i * 0x80, 0);
+            text = GetSingWinMessage(s_SingMess[messageNo].textIds[i], s_DynamicMessStr + i * 0x80, 0);
         } else {
             text = s_DynamicMessStr + i * 0x80;
         }
@@ -2116,25 +2117,25 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
 #else
     font->SetShadow(1);
 #endif
-    font->SetScale(FLOAT_8032ea78);
+    font->SetScale(s_WinMessScl);
 
     maxWidth = 0;
     if (useDynamic != 0) {
         lineCount = s_DynamicMess[0];
     } else {
-        lineCount = s_singleMenuStaticMessages[messageNo].lineCount;
+        lineCount = s_SingMess[messageNo].lineCount;
     }
     for (i = 0; i < lineCount; i++) {
         const char* text;
 #ifdef VERSION_GCCJGC
         if (!useDynamic) {
-            text = GetMenuStr(s_singleMenuStaticMessages[messageNo].textIds[i]);
+            text = GetMenuStr(s_SingMess[messageNo].textIds[i]);
         } else {
             text = s_DynamicMessStr + i * 0x80;
         }
 #else
         if (useDynamic == 0) {
-            text = GetSingWinMessage(s_singleMenuStaticMessages[messageNo].textIds[i], s_DynamicMessStr + i * 0x80, 0);
+            text = GetSingWinMessage(s_SingMess[messageNo].textIds[i], s_DynamicMessStr + i * 0x80, 0);
         } else {
             text = s_DynamicMessStr + i * 0x80;
         }
@@ -2151,8 +2152,8 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
         maxWidth -= 0x18;
     }
 
-    int lineHeight = static_cast<int>(22.0f * FLOAT_8032ea78);
-    if (22.0f * FLOAT_8032ea78 - static_cast<float>(lineHeight) > 0.0f) {
+    int lineHeight = static_cast<int>(22.0f * s_WinMessScl);
+    if (22.0f * s_WinMessScl - static_cast<float>(lineHeight) > 0.0f) {
         lineHeight++;
     }
 
@@ -2248,7 +2249,7 @@ void CMenuPcs::SetSingDynamicWinMessInfo(
  */
 void CMenuPcs::SetSingWinScl(float scale)
 {
-    FLOAT_8032ea78 = scale;
+    s_WinMessScl = scale;
 }
 
 /*
@@ -2262,7 +2263,7 @@ void CMenuPcs::SetSingWinScl(float scale)
  */
 inline float CMenuPcs::GetSingWinScl()
 {
-    return FLOAT_8032ea78;
+    return s_WinMessScl;
 }
 
 /*
@@ -2276,7 +2277,7 @@ inline float CMenuPcs::GetSingWinScl()
  */
 int CMenuPcs::SingWinMessHeight()
 {
-    float scaled = 22.0f * FLOAT_8032ea78;
+    float scaled = 22.0f * s_WinMessScl;
     int lineHeight = static_cast<int>(scaled);
 
     if (scaled - static_cast<float>(lineHeight) > 0.0f) {
@@ -2745,7 +2746,7 @@ inline void CMenuPcs::SingLifeResetWait()
 #ifndef VERSION_GCCJGC
 int CMenuPcs::GetItemIcon(int index)
 {
-    return gSingMenuItemIconByType[index];
+    return s_ItemIcon[index];
 }
 #endif
 

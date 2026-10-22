@@ -12,8 +12,8 @@
 
 #include <dolphin/gx.h>
 
-extern "C" const unsigned char gSingMenuItemIconByType[0x1F5];
 #ifdef VERSION_GCCJGC
+extern "C" const unsigned char s_ItemIcon[0x1F5];
 extern "C" const char* gSingMenuTextTableJp[56];
 extern "C" const char* gSingMenuTribeTableJp[4];
 extern "C" const char* gSingMenuJobTableJp[8];
@@ -638,7 +638,7 @@ public:
 #endif
     int GetItemType(int, int);
 #ifdef VERSION_GCCJGC
-    int GetItemIcon(int index) { return gSingMenuItemIconByType[index]; }
+    int GetItemIcon(int index) { return s_ItemIcon[index]; }
 #else
     int GetItemIcon(int);
 #endif
