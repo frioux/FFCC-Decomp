@@ -879,8 +879,8 @@ void CMaterialMan::SetUnderWaterTex()
  */
 void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int setVtxDesc, _GXTevScale tevScale)
 {
-
     CMaterial* material;
+    unsigned int tevBit;
     int isStd1000 = 0;
     SetStdEnv();
 
@@ -1275,7 +1275,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
         GXSetArray(GX_VA_NRM, m_normals, 6);
     }
     material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
-    unsigned int tevBit = m_curEnvTevBit;
+    tevBit = m_curEnvTevBit;
     tevBit &= material->m_tevBit;
     if (m_activeEnvTevBit == tevBit) {
         return;
@@ -1370,7 +1370,7 @@ void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int
             } else {
                 IncTexCoordIdCur();
                 texCoordId = m_texCoordIdCur;
-                GXSetTexCoordGen2(static_cast<GXTexCoordID>(texCoordId), GX_TG_MTX2x4, GX_TG_TEX1, 0x3C, GX_FALSE, 0x7D);
+                GXSetTexCoordGen2(static_cast<GXTexCoordID>(m_texCoordIdCur), GX_TG_MTX2x4, GX_TG_TEX1, 0x3C, GX_FALSE, 0x7D);
             }
             m_numTevStage = 1;
             IncTexMtxCur();
