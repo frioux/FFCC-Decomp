@@ -4365,12 +4365,6 @@ void CMenuPcs::DrawTitleMenu()
 		MenuPcs.SetAttrFmt((FMT)0);
 		const float kColorScale = FLOAT_80331458;
 		const float kZero = FLOAT_803313dc;
-		unsigned int itemYOffset = 0xFFFFFFF8;
-#ifdef VERSION_GCCJGC
-		int itemTexX = 0;
-#else
-		unsigned int itemTexY = 0x70;
-#endif
 		for (int i = 0; i < 2; i++) {
 			float labelAlpha;
 			if (m_wmWorldState->m_mainState == 1) {
@@ -4386,14 +4380,14 @@ void CMenuPcs::DrawTitleMenu()
 
 			float yPos = FLOAT_8033177C;
 			if (i != 0) {
-				yPos = yPos + (float)((int)itemYOffset);
+				yPos = yPos + (float)(i * 0x28 - 8);
 			}
 			MenuPcs.DrawRect(0, kTitleLabelX, yPos,
 			         kTitleLabelWidth, 40.0f,
 #ifdef VERSION_GCCJGC
-			         static_cast<float>(itemTexX), 56.0f,
+			         static_cast<float>(i * 120), 56.0f,
 #else
-			         kZero, (float)((int)itemTexY),
+			         kZero, (float)(0x70 + i * 0x28),
 #endif
 			         FLOAT_803313e8, FLOAT_803313e8, kZero);
 
@@ -4414,25 +4408,19 @@ void CMenuPcs::DrawTitleMenu()
 				float cursorX = static_cast<float>((640.0f - kTitleLabelWidth * cursorScale) / 2.0);
 				float cursorY = FLOAT_8033177C - (40.0f * cursorScale - 40.0f);
 				if (i != 0) {
-					cursorY = cursorY + (float)((int)itemYOffset);
+					cursorY = cursorY + (float)(i * 0x28 - 8);
 				}
 				MenuPcs.DrawRect(0,
 				         cursorX,
 				         cursorY,
 				         kTitleLabelWidth, 40.0f,
 #ifdef VERSION_GCCJGC
-				         static_cast<float>(itemTexX), 56.0f,
+				         static_cast<float>(i * 120), 56.0f,
 #else
-				         kZero, (float)((int)itemTexY),
+				         kZero, (float)(0x70 + i * 0x28),
 #endif
 				         cursorScale, cursorScale, kZero);
 			}
-			itemYOffset += 0x28;
-#ifdef VERSION_GCCJGC
-			itemTexX += 120;
-#else
-			itemTexY += 0x28;
-#endif
 		}
 
 		// Logo and copyright textures
