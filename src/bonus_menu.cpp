@@ -164,6 +164,7 @@ void CMenuPcs::createBonus()
 {
 	int i;
 	int j;
+	CCaravanWork** slot;
 #ifndef VERSION_GCCJGC
 	char fontPath[128];
 #endif
@@ -301,7 +302,7 @@ void CMenuPcs::createBonus()
 			s_Rinfo->m_party[activeCount].m_tribeId = (unsigned int)Game.m_scriptFoodBase[i]->m_tribeId;
 			activeCount++;
 
-			CCaravanWork** slot = &Game.m_scriptFoodBase[i];
+			slot = &Game.m_scriptFoodBase[i];
 			for (j = 0; j < BonusSummaryData::kTemporaryArtifactCount; j++) {
 				int itemId = (*slot)->m_inventoryItems[CCaravanWork::kTemporaryArtifactStart + j];
 				if (itemId > 0) {
@@ -329,7 +330,7 @@ void CMenuPcs::createBonus()
 			i = 0;
 
 			for (; i < s_Rinfo->m_partyCount; i++) {
-				CCaravanWork** slot = &Game.m_scriptFoodBase[s_Rinfo->m_party[i].m_partySlot];
+				slot = &Game.m_scriptFoodBase[s_Rinfo->m_party[i].m_partySlot];
 
 				for (j = 0; j < BonusSummaryData::kArtifactCount; j++) {
 					short itemId = s_Rinfo->m_artifacts[j];
@@ -395,8 +396,8 @@ void CMenuPcs::createBonus()
 		}
 
 		int slotIdx = 0;
+		int pc = s_Rinfo->m_partyCount;
 		for (i = 0; i < 0x18; i++) {
-			int pc = s_Rinfo->m_partyCount;
 			if (pc * 2 <= i) {
 				break;
 			}
@@ -2756,10 +2757,12 @@ void CMenuPcs::CalcSelectWait()
 			}
 		}
 		{
+			CMenuPcs::Sprt2* partySprite;
+			CMenuPcs::Sprt2* cursor;
 			int count = m_bonusAnim->header.count;
-			CMenuPcs::Sprt2* cursor = &m_bonusAnim->sprites[count++];
+			cursor = &m_bonusAnim->sprites[count++];
 			cursor->kind = kBonusCursorTexture;
-			CMenuPcs::Sprt2* partySprite = cursor - activePartyCount * 2;
+			partySprite = cursor - activePartyCount * 2;
 			cursor->x = (short)(partySprite->x - 3);
 			cursor->y = (short)(partySprite->y - 8);
 			cursor->w = 0x40;
@@ -2797,9 +2800,8 @@ void CMenuPcs::CalcSelectWait()
 
 	if (this->m_menuWindowInfo->state != 3) {
 		if (this->m_menuWindowInfo->state == 1) {
-			int padSlot = s_Rinfo->m_party[i].m_partySlot;
-			unsigned short down = Pad.GetButtonDown(padSlot);
-			unsigned short repeat = Pad.GetButtonRepeat(padSlot);
+			unsigned short repeat = Pad.GetButtonRepeat(s_Rinfo->m_party[i].m_partySlot);
+			unsigned short down = Pad.GetButtonDown(s_Rinfo->m_party[i].m_partySlot);
 			if ((repeat & 3) != 0) {
 				this->m_bonusState->m_confirmSelection ^= 1;
 				Sound.PlaySe(1, 0x40, 0x7f, 0);
@@ -2840,8 +2842,9 @@ void CMenuPcs::CalcSelectWait()
 			}
 
 			if ((repeat & 0xf) == 0) {
-				int unavailableMask = ((int)(signed char)s_Rinfo->m_selectedArtifactMask | (int)(signed char)s_Rinfo->m_missingArtifactMask)
-				    | s_Rinfo->m_party[i].m_ownedArtifactMask;
+				int unavailableMask = (signed char)s_Rinfo->m_selectedArtifactMask;
+				unavailableMask |= (signed char)s_Rinfo->m_missingArtifactMask;
+				unavailableMask |= s_Rinfo->m_party[i].m_ownedArtifactMask;
 				if ((down & 0x100) != 0) {
 					if (!((unavailableMask & (1 << this->m_bonusState->m_selection)) == 0)) {
 						Sound.PlaySe(4, 0x40, 0x7f, 0);
@@ -2898,8 +2901,7 @@ void CMenuPcs::CalcSelectWait()
 			CMenuPcs::Sprt2* partySprite = cursor - (activePartyCount * 2 - this->m_bonusState->m_currentRank);
 			cursor->x = (short)(partySprite->x - 3);
 			cursor->y = (short)(partySprite->y - 8);
-			int pulseFrame = abs(frame % 20 - 10);
-			cursor->alpha = (float)((double)pulseFrame / 10.0);
+			cursor->alpha = (float)((double)abs(frame % 20 - 10) / 10.0);
 		} else {
 			cursor->alpha = 0.0f;
 		}
@@ -3033,8 +3035,7 @@ void CMenuPcs::CalcSelectCloseAnim()
 	if (this->m_bonusState->m_initialized == 0) {
 		int idx;
 
-		m_bonusAnim->header.count =
-		    (short)(m_bonusAnim->header.count - 1);
+		m_bonusAnim->header.count--;
 
 		{
 			i = 0;
@@ -3053,28 +3054,27 @@ void CMenuPcs::CalcSelectCloseAnim()
 			sprite->startFrame = kFadeFrames;
 			sprite->duration = kFadeFrames;
 		}
-		i = 0;
 		{
 			sprite = &m_bonusAnim->sprites[idx++];
+			sprite->startFrame = 0;
 			sprite->duration = kFadeFrames;
-			sprite->startFrame = i;
 			sprite->flags = 2;
 		}
 		{
 			sprite = &m_bonusAnim->sprites[idx++];
 			sprite->kind = kBonusArtifactFrameTexture;
-			sprite->startFrame = i;
-			sprite->duration = i;
+			sprite->startFrame = 0;
+			sprite->duration = 0;
 			sprite->flags = 2;
 		}
 		{
 			sprite = &m_bonusAnim->sprites[idx++];
 			sprite->kind = -4;
-			sprite->startFrame = i;
+			sprite->startFrame = 0;
 			sprite->duration = kFadeFrames;
 		}
 
-		for (; i < activePartyCount; i++) {
+		for (i = 0; i < activePartyCount; i++) {
 			sprite = &m_bonusAnim->sprites[i + idx];
 			sprite->startFrame = 0;
 			sprite->duration = kFadeFrames;
