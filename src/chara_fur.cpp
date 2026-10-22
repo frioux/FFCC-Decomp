@@ -869,7 +869,8 @@ int CChara::CModel::PickFur(
 								const float invW = 1.0f / incoming.m_clip.w;
 								incoming.m_screen.x = 320.0f * incoming.m_clip.x * invW + 320.0f;
 								incoming.m_screen.y = 224.0f - 224.0f * incoming.m_clip.y * invW;
-								incoming.m_uv = curUV;
+								incoming.m_uv.x = curUV.x;
+								incoming.m_uv.y = curUV.y;
 							}
 							verts[0] = verts[1];
 							verts[1] = verts[2];
