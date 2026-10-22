@@ -179,8 +179,12 @@ inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, fl
 {
     CMapCylinder cylinder;
 
-    cylinder.m_bottom = *cylinderBottom;
-    cylinder.m_axis = *direction;
+    cylinder.m_bottom.x = cylinderBottom->x;
+    cylinder.m_bottom.y = cylinderBottom->y;
+    cylinder.m_bottom.z = cylinderBottom->z;
+    cylinder.m_axis.x = direction->x;
+    cylinder.m_axis.y = direction->y;
+    cylinder.m_axis.z = direction->z;
     cylinder.m_radius = radius;
 
     return g_MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
@@ -316,16 +320,8 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
     PSVECSubtract(&m_worldPosition, &centerPos, &hitMove);
     hitMove.y = 0.0f;
 
-    const float hitRadius = m_capsuleHalfHeight;
-    CMapCylinder hitCylinder;
-    hitCylinder.m_bottom = centerPos;
-    hitCylinder.m_axis.x = hitMove.x;
-    hitCylinder.m_axis.y = 0.0f;
-    hitCylinder.m_axis.z = hitMove.z;
-    hitCylinder.m_radius = hitRadius;
-
-    if (g_MapMng.CheckHitCylinderNear(&hitCylinder, &hitMove, hitMask) != 0) {
-        g_MapMng.m_hitMapObj->CalcHitPosition(&centerPos);
+    if (MapPcs.CheckHitCylinderNear(&centerPos, &hitMove, m_capsuleHalfHeight, hitMask) != 0) {
+        MapPcs.CalcHitPosition(&centerPos);
         centerPos.y -= m_capsuleHalfHeight;
         *outSafePos = centerPos;
         safeDistance = PSVECDistance(&m_worldPosition, &centerPos);
@@ -334,15 +330,9 @@ float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
         hitMove.x = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) * (float)sin((double)other->m_rotBaseY);
         hitMove.y = 0.0f;
         hitMove.z = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) * (float)cos((double)other->m_rotBaseY);
-        const float safeRadius = m_capsuleHalfHeight;
 
-        CMapCylinder safeCylinder;
-        safeCylinder.m_bottom = centerPos;
-        safeCylinder.m_axis = hitMove;
-        safeCylinder.m_radius = safeRadius;
-
-        if (g_MapMng.CheckHitCylinderNear(&safeCylinder, &hitMove, hitMask) != 0) {
-            g_MapMng.m_hitMapObj->CalcHitPosition(&centerPos);
+        if (MapPcs.CheckHitCylinderNear(&centerPos, &hitMove, m_capsuleHalfHeight, hitMask) != 0) {
+            MapPcs.CalcHitPosition(&centerPos);
             safeDistance = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) -
                            PSVECDistance(&m_worldPosition, &centerPos);
         }

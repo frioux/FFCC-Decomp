@@ -222,8 +222,12 @@ inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, fl
 {
 	CMapCylinder cylinder;
 
-	cylinder.m_bottom = *cylinderBottom;
-	cylinder.m_axis = *direction;
+	cylinder.m_bottom.x = cylinderBottom->x;
+	cylinder.m_bottom.y = cylinderBottom->y;
+	cylinder.m_bottom.z = cylinderBottom->z;
+	cylinder.m_axis.x = direction->x;
+	cylinder.m_axis.y = direction->y;
+	cylinder.m_axis.z = direction->z;
 	cylinder.m_radius = radius;
 
 	return g_MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
@@ -3989,8 +3993,12 @@ void CGPartyObj::gpmCol()
 	Vec* trailBase = ghostWork.trailPositions;
 	int i = 0;
 	do {
-		Vec* pos = (i == 0) ? &m_worldPosition
-		                    : &trailBase[i - 1];
+		Vec* pos;
+		if (i == 0) {
+			pos = &m_worldPosition;
+		} else {
+			pos = &trailBase[i - 1];
+		}
 
 		CVector diffVec = CVector(leader->m_worldPosition) - CVector(*pos);
 
