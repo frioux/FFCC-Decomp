@@ -634,13 +634,13 @@ void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
 {
-    CharaBreakDisplayListPair*** perMeshBuffers;
+    u32 dlIndex;
     CharaBreakDisplayListPair** dlEntries;
     CharaBreakMeshData* meshData;
     CharaBreakDisplayListPair*** meshBufferSlot;
     CChara::CModel* model;
     CChara::CMesh* mesh;
-    u32 dlIndex;
+    CharaBreakDisplayListPair*** perMeshBuffers;
     u32 meshIndex;
     CharaBreakWork* work;
     CharaBreakDisplayListPair** dlEntryBase;
@@ -718,12 +718,12 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, _pppCtrlTable* data)
  */
 void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakStep* step, _pppCtrlTable* data)
 {
-    CharaBreakDisplayList* displayList;
+    CharaBreakDisplayListPair** dlEntries;
     CGObject* handle;
     CharaBreakWork* work;
     CChara::CModel* model;
     CChara::CMesh* mesh;
-    CharaBreakDisplayListPair** dlEntries;
+    CharaBreakDisplayList* displayList;
     u32 i;
     int dl;
 
