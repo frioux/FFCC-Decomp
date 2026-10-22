@@ -3258,8 +3258,8 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
     CMaterial* material = 0;
     CChunkFile::CChunk chunk;
     int materialIndex;
-    short bumpIndex;
     unsigned char bumpLightDirect;
+    short bumpIndex;
 
     chunkFile.PushChunk();
     while (chunkFile.GetNextChunk(chunk) != 0) {
@@ -3412,7 +3412,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     while (chunkFile.GetNextChunk(chunk) != 0) {
                         switch (chunk.m_id) {
                         case CHUNK_TSDT: {
-                            unsigned char slot = chunkFile.Get2();
+                            int slot = chunkFile.Get2();
                             chunkFile.Get2();
 
                             if (keyFrameU != 0) {
@@ -3459,7 +3459,7 @@ void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMater
                     }
                     chunkFile.PopChunk();
                 } else {
-                    unsigned int slot = chunkFile.Get2() & 0xFFFF;
+                    int slot = chunkFile.Get2();
                     chunkFile.Get2();
                     material->GetTexScroll(slot)->m_u1 = chunkFile.GetF4();
                     material->GetTexScroll(slot)->m_v1 = chunkFile.GetF4();
