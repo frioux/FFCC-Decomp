@@ -48,8 +48,6 @@ static const MenuGbaLinkPool sMenuGbaLinkStrings = {
 #endif
 };
 
-extern const char sCMenuPcsProcessName[] = "CMenuPcs";
-
 struct MenuFontTlutPalette
 {
     _GXColor shadow;
@@ -61,69 +59,8 @@ STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuInitialized) == 0x85A);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuTextureLoadIndex) == 0x85C);
 STATIC_ASSERT(offsetof(CMenuPcs, m_singleMenuTextureLoadState) == 0x860);
 
-static const char sMenuTexWinKazari[] = "win_kazari";
-extern const char sMenuManagerClassName[] = "CManager";
-extern const char sMenuProcessClassName[] = "CProcess";
-#ifdef VERSION_GCCJGC
-static const char sMenuTexturePathFmt[] = "dvd/menu/%s.tex";
-#else
-static const char sMenuTexturePathFmt[] = "dvd/%smenu/%s.tex";
-#endif
-extern "C" const char s_p_menu_cpp[] = "p_menu.cpp";
-#ifdef VERSION_GCCJGC
-static const char sMenuGc23FontPathFmt[] = "dvd/menu/gc23.fnt";
-#else
-static const char sMenuGc23FontPathFmt[] = "dvd/%smenu/gc23.fnt";
-#endif
-#ifdef VERSION_GCCJGC
-static const char sMenuFontPathFmt[] = "dvd/menu/%s.fnt";
-#else
-static const char sMenuFontPathFmt[] = "dvd/%smenu/%s.fnt";
-#endif
-#ifdef VERSION_GCCJGC
-static const char sMenuGc22FontPathFmt[] = "dvd/menu/gc22.fnt";
-#else
-static const char sMenuGc22FontPathFmt[] = "dvd/%smenu/gc22.fnt";
-#endif
-static const char sMenuCommonName[] = "common";
-static const char sMenuWinName[] = "win";
-static const char sMenuTexKasoru[] = "kasoru";
-static const char sMenuTexPause[] = "pause";
-static const char sMenuTexWin1_0[] = "win1_0";
-static const char sMenuTexWin1_1[] = "win1_1";
-static const char sMenuTexWin1_2[] = "win1_2";
-static const char sMenuTexWin1_3[] = "win1_3";
-static const char sMenuTexWin1_4[] = "win1_4";
-static const char sMenuTexWin1_5[] = "win1_5";
-static const char sMenuTexWin1_6[] = "win1_6";
-static const char sMenuTexWin1_7[] = "win1_7";
-static const char sMenuTexWin1_8[] = "win1_8";
-static const char sMenuTexWin2_0[] = "win2_0";
-static const char sMenuTexWin2_1[] = "win2_1";
-static const char sMenuTexWin2_2[] = "win2_2";
-static const char sMenuTexWin2_3[] = "win2_3";
-static const char sMenuTexWin2_4[] = "win2_4";
-static const char sMenuTexWin2_5[] = "win2_5";
-static const char sMenuTexWin2_6[] = "win2_6";
-static const char sMenuTexWin2_7[] = "win2_7";
-static const char sMenuTexWin2_8[] = "win2_8";
-#ifndef VERSION_GCCJGC
-static const char sMenuTexButton[] = "button";
-#endif
-static const char sMenuRegionShibuya[] = "shibuya";
-static const char sMenuRegionFace[] = "face";
-static const char sMenuTexBattle[] = "battle";
-static const char sMenuTexHeart[] = "heart";
-static const char sMenuTexNavi[] = "navi";
-static const char sMenuTexHp0[] = "hp0";
-static const char sMenuTexHp1[] = "hp1";
-static const char sMenuTexHp2[] = "hp2";
-static const char sMenuTexSuna[] = "suna";
-static const char sMenuTexGba[] = "gba";
-static const char sMenuTexBattle2[] = "battle2";
-
 CProcessCallbackTable CMenuPcs::m_table = {
-    const_cast<char*>(sCMenuPcsProcessName),
+    "CMenuPcs",
     static_cast<CProcessCallback>(&CMenuPcs::create),
     static_cast<CProcessCallback>(&CMenuPcs::destroy),
     {
@@ -289,31 +226,31 @@ int CMenuPcs::GetTable(unsigned long index)
 void CMenuPcs::create()
 {
     char fontPath[0x80];
-    static char* tName[] = { const_cast<char*>(sMenuCommonName), const_cast<char*>(sMenuWinName) };
+    static char* tName[] = { "common", "win" };
     static CMenuPcs::CTmp tTmp[] = {
-        { 0, const_cast<char*>(sMenuTexKasoru) },
-        { 0, const_cast<char*>(sMenuTexPause) },
-        { 1, const_cast<char*>(sMenuTexWin1_0) },
-        { 1, const_cast<char*>(sMenuTexWin1_1) },
-        { 1, const_cast<char*>(sMenuTexWin1_2) },
-        { 1, const_cast<char*>(sMenuTexWin1_3) },
-        { 1, const_cast<char*>(sMenuTexWin1_4) },
-        { 1, const_cast<char*>(sMenuTexWin1_5) },
-        { 1, const_cast<char*>(sMenuTexWin1_6) },
-        { 1, const_cast<char*>(sMenuTexWin1_7) },
-        { 1, const_cast<char*>(sMenuTexWin1_8) },
-        { 1, const_cast<char*>(sMenuTexWin2_0) },
-        { 1, const_cast<char*>(sMenuTexWin2_1) },
-        { 1, const_cast<char*>(sMenuTexWin2_2) },
-        { 1, const_cast<char*>(sMenuTexWin2_3) },
-        { 1, const_cast<char*>(sMenuTexWin2_4) },
-        { 1, const_cast<char*>(sMenuTexWin2_5) },
-        { 1, const_cast<char*>(sMenuTexWin2_6) },
-        { 1, const_cast<char*>(sMenuTexWin2_7) },
-        { 1, const_cast<char*>(sMenuTexWin2_8) },
-        { 1, const_cast<char*>(sMenuTexWinKazari) },
+        { 0, "kasoru" },
+        { 0, "pause" },
+        { 1, "win1_0" },
+        { 1, "win1_1" },
+        { 1, "win1_2" },
+        { 1, "win1_3" },
+        { 1, "win1_4" },
+        { 1, "win1_5" },
+        { 1, "win1_6" },
+        { 1, "win1_7" },
+        { 1, "win1_8" },
+        { 1, "win2_0" },
+        { 1, "win2_1" },
+        { 1, "win2_2" },
+        { 1, "win2_3" },
+        { 1, "win2_4" },
+        { 1, "win2_5" },
+        { 1, "win2_6" },
+        { 1, "win2_7" },
+        { 1, "win2_8" },
+        { 1, "win_kazari" },
 #ifndef VERSION_GCCJGC
-        { 0, const_cast<char*>(sMenuTexButton) }
+        { 0, "button" }
 #endif
     };
 
@@ -326,16 +263,16 @@ void CMenuPcs::create()
         menuHeapSize -= FontMan.GetInternal22Size();
     }
 
-    m_menuStage = Memory.CreateStage(menuHeapSize, const_cast<char*>(sCMenuPcsProcessName), 0);
+    m_menuStage = Memory.CreateStage(menuHeapSize, "CMenuPcs", 0);
     m_mode = -1;
 
     memset(m_textureSets, 0, sizeof(m_textureSets));
     memset(m_textures, 0, sizeof(m_textures));
 
 #ifdef VERSION_GCCJGC
-    loadFont(0, const_cast<char*>(sMenuGc22FontPathFmt), 0, 0);
+    loadFont(0, "dvd/menu/gc22.fnt", 0, 0);
 #else
-    sprintf(fontPath, const_cast<char*>(sMenuGc22FontPathFmt), Game.GetLangString());
+    sprintf(fontPath, "dvd/%smenu/gc22.fnt", Game.GetLangString());
     loadFont(0, fontPath, 0, 0);
 #endif
 
@@ -407,7 +344,7 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
         File.Read(fileHandle);
         File.SyncCompleted(fileHandle);
 
-        m_fonts[slot] = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), MenuFontAllocationLine) CFont;
+        m_fonts[slot] = new (MenuPcs.m_menuStage, "p_menu.cpp", MenuFontAllocationLine) CFont;
         m_fonts[slot]->Create(File.m_readBuffer, stage);
 
         File.Close(fileHandle);
@@ -570,9 +507,9 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
 
     for (int i = 0; i < textureSetCount; i++) {
 #ifdef VERSION_GCCJGC
-        sprintf(texPath, const_cast<char*>(sMenuTexturePathFmt), paths[i]);
+        sprintf(texPath, "dvd/menu/%s.tex", paths[i]);
 #else
-        sprintf(texPath, const_cast<char*>(sMenuTexturePathFmt), Game.GetLangString(), paths[i]);
+        sprintf(texPath, "dvd/%smenu/%s.tex", Game.GetLangString(), paths[i]);
 #endif
 
         CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
@@ -583,7 +520,7 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
             CMemory::CStage* stage = (m_mode == 1) ? g_MapMng.m_stage : GetStage(stageSelect);
 
             m_textureSets[i + textureSetStart] =
-                new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), MenuTextureAllocationLine) CTextureSet;
+                new (MenuPcs.m_menuStage, "p_menu.cpp", MenuTextureAllocationLine) CTextureSet;
 
             m_textureSets[i + textureSetStart]->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
 
@@ -643,7 +580,7 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
     int i;
 
     if (m_mode != static_cast<int>(mode)) {
-        Graphic._WaitDrawDone(const_cast<char*>(s_p_menu_cpp), MenuDrawDoneLine);
+        Graphic._WaitDrawDone("p_menu.cpp", MenuDrawDoneLine);
         currentMode = m_mode;
         switch (currentMode) {
         case -1:
@@ -1272,9 +1209,9 @@ void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
     }
 
 #ifdef VERSION_GCCJGC
-    sprintf(path, const_cast<char*>(sMenuFontPathFmt), fileName);
+    sprintf(path, "dvd/menu/%s.fnt", fileName);
 #else
-    sprintf(path, const_cast<char*>(sMenuFontPathFmt), Game.GetLangString(), fileName);
+    sprintf(path, "dvd/%smenu/%s.fnt", Game.GetLangString(), fileName);
 #endif
     loadFont(2, path, fontNo + 2, -1);
 }
@@ -1344,41 +1281,41 @@ void CMenuPcs::createBattle()
 {
     char fontPath[0x80];
     static char* tName[] = {
-        const_cast<char*>(sMenuRegionShibuya), const_cast<char*>(sMenuRegionFace), 0, 0, 0, 0, 0, 0, 0
+        "shibuya", "face", 0, 0, 0, 0, 0, 0, 0
     };
     static CMenuPcs::CTmp tTmp[] = {
-        { 2, const_cast<char*>(sMenuTexBattle) },
-        { 2, const_cast<char*>(sMenuTexHeart) },
-        { 3, const_cast<char*>(sMenuRegionFace) },
-        { 2, const_cast<char*>(sMenuTexNavi) },
-        { 2, const_cast<char*>(sMenuTexHp0) },
-        { 2, const_cast<char*>(sMenuTexHp1) },
-        { 2, const_cast<char*>(sMenuTexHp2) },
-        { 2, const_cast<char*>(sMenuTexSuna) },
-        { 2, const_cast<char*>(sMenuTexGba) },
-        { 2, const_cast<char*>(sMenuTexBattle2) }
+        { 2, "battle" },
+        { 2, "heart" },
+        { 3, "face" },
+        { 2, "navi" },
+        { 2, "hp0" },
+        { 2, "hp1" },
+        { 2, "hp2" },
+        { 2, "suna" },
+        { 2, "gba" },
+        { 2, "battle2" }
     };
 
     loadTexture(tName, 2, 2, tTmp, MenuBattleTextureStart, 10, 0);
 
     for (int i = 0; i < 12; i++) {
-        CMesMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), MenuMessageAllocationLine) CMesMenu;
+        CMesMenu* menu = new (MenuPcs.m_menuStage, "p_menu.cpp", MenuMessageAllocationLine) CMesMenu;
         m_battleMesMenus[i] = menu;
         m_battleMesMenus[i]->SetIndex(i);
         m_battleMesMenus[i]->Create();
     }
 
     for (int i = 0; i < 4; i++) {
-        CRingMenu* menu = new (MenuPcs.m_menuStage, const_cast<char*>(s_p_menu_cpp), MenuRingAllocationLine) CRingMenu;
+        CRingMenu* menu = new (MenuPcs.m_menuStage, "p_menu.cpp", MenuRingAllocationLine) CRingMenu;
         m_battleRingMenus[i] = menu;
         m_battleRingMenus[i]->SetIndex(i);
         m_battleRingMenus[i]->Create();
     }
 
 #ifdef VERSION_GCCJGC
-    loadFont(0, const_cast<char*>(sMenuGc23FontPathFmt), 1, 1);
+    loadFont(0, "dvd/menu/gc23.fnt", 1, 1);
 #else
-    sprintf(fontPath, const_cast<char*>(sMenuGc23FontPathFmt), Game.GetLangString());
+    sprintf(fontPath, "dvd/%smenu/gc23.fnt", Game.GetLangString());
     loadFont(0, fontPath, 1, 1);
 #endif
 
