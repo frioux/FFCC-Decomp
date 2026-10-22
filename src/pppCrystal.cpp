@@ -64,12 +64,6 @@ union CrystalFloatBits {
     u32 bits;
 };
 
-extern const CrystalTexMtx s_crystalTexMtxBase = {
-    {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
-
-extern const CrystalIndTexMtx s_crystalIndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
-
-
 static inline int CrystalFpClassify(float value)
 {
     CrystalFloatBits bits;
@@ -151,7 +145,8 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTabl
 		step->m_crystal.m_drawEnvColor1, step->m_crystal.m_drawEnvColor0, step->m_crystal.m_blendMode, step->m_crystal.m_drawFlag, 1, 1, step->m_crystal.m_zMode);
 
 	Mtx lightMtx;
-	CrystalTexMtx texMtx = s_crystalTexMtxBase;
+	CrystalTexMtx texMtx = {
+		{{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
 
 	if (step->m_crystal.m_refractionMode == 1) {
 		texW = CRYSTAL_REFRACTION_SIZE;
@@ -162,7 +157,7 @@ void pppRenderCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTabl
 		texH = (float)indirectTex->m_height;
 	}
 
-	CrystalIndTexMtx indMtx = s_crystalIndTexMtxBase;
+	CrystalIndTexMtx indMtx = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
 	indMtx.value[0][0] = ((CRYSTAL_HALF_NEGATIVE * texW) / CRYSTAL_SCREEN_WIDTH) * step->m_stepValue;
 	indMtx.value[1][1] = ((CRYSTAL_HALF_NEGATIVE * texH) / CRYSTAL_SCREEN_HEIGHT) * step->m_stepValue;
 
