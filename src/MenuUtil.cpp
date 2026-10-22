@@ -1164,9 +1164,10 @@ static inline float CalcOptionHelpPos(CMenuPcs* menu, char* text)
 	return 320.0f - width / 2.0f;
 }
 
-static inline void DrawOptionLabel(CFont* font, int x, int y, _GXColor color,
+static inline void DrawOptionLabel(CMenuPcs* menu, int x, int y, _GXColor color,
                                    int tlut, char* text, float scale)
 {
+	CFont* font = menu->GetFont22();
 	font->SetMargin(1.0f);
 	font->SetShadow(1);
 	font->SetScale(scale);
@@ -1314,9 +1315,9 @@ void CMenuPcs::DrawOptionMenu()
 
 #ifdef VERSION_GCCJGC
 		if (i == m_optionIndex) {
-			DrawOptionLabel(m_fonts[0], 94, i * 0x28 + 0x73, color, 0x16, option[i], 1.2f);
+			DrawOptionLabel(this, 94, i * 0x28 + 0x73, color, 0x16, option[i], 1.2f);
 		} else {
-			DrawOptionLabel(m_fonts[0], 96, i * 0x28 + 0x75, color, 6, option[i], 1.0f);
+			DrawOptionLabel(this, 96, i * 0x28 + 0x75, color, 6, option[i], 1.0f);
 		}
 #else
 		if (i == m_optionIndex) {
@@ -1340,7 +1341,7 @@ void CMenuPcs::DrawOptionMenu()
 #endif
 
 #ifdef VERSION_GCCJGC
-	DrawOptionLabel(m_fonts[0], static_cast<int>(CalcOptionHelpPos(this, helpText[m_optionIndex])),
+	DrawOptionLabel(this, static_cast<int>(CalcOptionHelpPos(this, helpText[m_optionIndex])),
 	                391, color, 7, helpText[m_optionIndex], 1.0f);
 #else
 	{
@@ -1411,17 +1412,17 @@ void CMenuPcs::DrawOptionMenu()
 
 #ifdef VERSION_GCCJGC
 		if (m_gameInitMode == 0) {
-			DrawOptionLabel(m_fonts[0], static_cast<int>(leftText->x - 2.0f),
+			DrawOptionLabel(this, static_cast<int>(leftText->x - 2.0f),
 			                static_cast<int>(leftText->y - 2.0f), color, 0x17,
 			                "\202\156\202\155", 1.2f);
-			DrawOptionLabel(m_fonts[0], static_cast<int>(rightText->x),
+			DrawOptionLabel(this, static_cast<int>(rightText->x),
 			                static_cast<int>(rightText->y), color, 6,
 			                "\202\156\202\145\202\145", 1.0f);
 		} else {
-			DrawOptionLabel(m_fonts[0], static_cast<int>(leftText->x),
+			DrawOptionLabel(this, static_cast<int>(leftText->x),
 			                static_cast<int>(leftText->y), color, 6,
 			                "\202\156\202\155", 1.0f);
-			DrawOptionLabel(m_fonts[0], static_cast<int>(rightText->x - 2.0f),
+			DrawOptionLabel(this, static_cast<int>(rightText->x - 2.0f),
 			                static_cast<int>(rightText->y - 2.0f), color, 0x17,
 			                "\202\156\202\145\202\145", 1.2f);
 		}
@@ -1510,17 +1511,17 @@ void CMenuPcs::DrawOptionMenu()
 
 #ifdef VERSION_GCCJGC
 		if (m_stereoMode == 0) {
-			DrawOptionLabel(m_fonts[0], static_cast<int>(leftText->x - 2.0f),
+			DrawOptionLabel(this, static_cast<int>(leftText->x - 2.0f),
 			                static_cast<int>(leftText->y - 2.0f), color, 0x17,
 			                "\203\130\203\145\203\214\203\111", 1.2f);
-			DrawOptionLabel(m_fonts[0], static_cast<int>(rightText->x),
+			DrawOptionLabel(this, static_cast<int>(rightText->x),
 			                static_cast<int>(rightText->y), color, 6,
 			                "\203\202\203\155\203\211\203\213", 1.0f);
 		} else {
-			DrawOptionLabel(m_fonts[0], static_cast<int>(leftText->x),
+			DrawOptionLabel(this, static_cast<int>(leftText->x),
 			                static_cast<int>(leftText->y), color, 6,
 			                "\203\130\203\145\203\214\203\111", 1.0f);
-			DrawOptionLabel(m_fonts[0], static_cast<int>(rightText->x - 2.0f),
+			DrawOptionLabel(this, static_cast<int>(rightText->x - 2.0f),
 			                static_cast<int>(rightText->y - 2.0f), color, 0x17,
 			                "\203\202\203\155\203\211\203\213", 1.2f);
 		}
@@ -1639,10 +1640,10 @@ void CMenuPcs::DrawOptionMenu()
 		}
 
 #ifdef VERSION_GCCJGC
-		DrawOptionLabel(m_fonts[0], static_cast<int>(pos.minLabel.x),
+		DrawOptionLabel(this, static_cast<int>(pos.minLabel.x),
 		                static_cast<int>(pos.minLabel.y), color, 7,
 		                "\202\215\202\211\202\216", 1.0f);
-		DrawOptionLabel(m_fonts[0], static_cast<int>(pos.maxLabel.x),
+		DrawOptionLabel(this, static_cast<int>(pos.maxLabel.x),
 		                static_cast<int>(pos.maxLabel.y), color, 7,
 		                "\202\215\202\201\202\230", 1.0f);
 #else
@@ -1730,10 +1731,10 @@ void CMenuPcs::DrawOptionMenu()
 		}
 
 #ifdef VERSION_GCCJGC
-		DrawOptionLabel(m_fonts[0], static_cast<int>(pos.minLabel.x),
+		DrawOptionLabel(this, static_cast<int>(pos.minLabel.x),
 		                static_cast<int>(pos.minLabel.y), color, 7,
 		                "\202\215\202\211\202\216", 1.0f);
-		DrawOptionLabel(m_fonts[0], static_cast<int>(pos.maxLabel.x),
+		DrawOptionLabel(this, static_cast<int>(pos.maxLabel.x),
 		                static_cast<int>(pos.maxLabel.y), color, 7,
 		                "\202\215\202\201\202\230", 1.0f);
 #else
@@ -1835,7 +1836,7 @@ void CMenuPcs::DrawOptionMenu()
 #ifdef VERSION_GCCJGC
 				const Vec2d* pp4 = &pts[leftXi + 4];
 				int textXi2 = static_cast<int>(pp4->x + static_cast<float>(step1) * specialRowCos);
-				DrawOptionLabel(m_fonts[0], textXi2 + 8,
+				DrawOptionLabel(this, textXi2 + 8,
 				                static_cast<int>(4.0f + (pp4->y + static_cast<float>(i * 0x28))), color, 7,
 				                "\203\211\203\103\203\147\202\156\202\155", 1.0f);
 #elif defined(VERSION_GCCE01)
@@ -1856,7 +1857,7 @@ void CMenuPcs::DrawOptionMenu()
 #endif
 			} else {
 #ifdef VERSION_GCCJGC
-				DrawOptionLabel(m_fonts[0], textXi + 8,
+				DrawOptionLabel(this, textXi + 8,
 				                static_cast<int>(4.0f + (pp3->y + static_cast<float>(i * 0x28))), color, 7,
 				                "\203\211\203\103\203\147\202\156\202\145\202\145", 1.0f);
 #elif defined(VERSION_GCCE01)
