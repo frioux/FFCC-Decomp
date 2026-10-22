@@ -158,10 +158,10 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XStep* s
     float trailStepDelta;
     pppFMATRIX localBase;
     float shapeScaleStep;
-    pppFMATRIX rotMtxA;
-    pppFMATRIX drawMtx;
-    pppFMATRIX rotMtxB;
     pppFMATRIX unitScratch;
+    pppFMATRIX drawMtx;
+    pppFMATRIX rotMtxA;
+    pppFMATRIX rotMtxB ATTRIBUTE_ALIGN(8);
     Vec zeroVecA;
     float nextBaseX;
     Vec initialSeg;
