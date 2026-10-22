@@ -1051,38 +1051,39 @@ CGame::CBossArtifactEntry* CGame::GetBossArtifact(int ratioIndex, int amount)
     static float s_ratio[] = {1.35f, 1.25f, 1.1f, 1.0f};
     static s16 s_top[] = {0, 2, 4};
 
-    int scaledAmount;
-    int artifactRank;
+    int stage;
+    CBossArtifactStage* artifactBase;
+    int top;
+    int value;
+    s16 thresholds[4];
+    int i;
+    int stageIndex;
 
-    int stage =
-        Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
+    stage = Game.m_gameWork.m_bossArtifactStageTable[Game.m_gameWork.m_bossArtifactStageIndex];
     if (2 < stage) {
         stage = 2;
     }
 
-    CBossArtifactStage* artifactBase;
-    int stageBase = s_top[stage];
-    scaledAmount = (int)((float)amount * s_ratio[ratioIndex - 1]);
+    top = s_top[stage];
+    value = (int)((float)amount * s_ratio[ratioIndex - 1]);
 
-    u16 thresholds[4];
     memset(thresholds, 0, sizeof(thresholds));
 
-    int stageIndex = (int)Game.m_gameWork.m_bossArtifactStageIndex;
+    stageIndex = Game.m_gameWork.m_bossArtifactStageIndex;
     artifactBase = Game.m_bossArtifactBase;
-    artifactRank = 3;
-
-    thresholds[1] = artifactBase[stageIndex].m_rankThresholds[1];
-    thresholds[2] = artifactBase[stageIndex].m_rankThresholds[2];
-    thresholds[3] = artifactBase[stageIndex].m_rankThresholds[3];
-
-    if (((scaledAmount < (s16)thresholds[3]) && (artifactRank = 2, scaledAmount < (s16)thresholds[2])) &&
-        (artifactRank = 1, scaledAmount < (s16)thresholds[1])) {
-        artifactRank = 0;
+    for (i = 1; i < 4; i++) {
+        thresholds[i] = artifactBase[stageIndex].m_rankThresholds[i];
     }
 
-    stageBase += rand() % (artifactRank + 1);
+    for (i = 3; i > 0; i--) {
+        if (value >= thresholds[i]) {
+            break;
+        }
+    }
+
+    top += rand() % (i + 1);
     CBossArtifactEntry* entries = artifactBase[stageIndex].m_entries;
-    return &entries[stageBase];
+    return &entries[top];
 }
 
 /*
