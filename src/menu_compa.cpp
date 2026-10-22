@@ -282,10 +282,11 @@ void CMenuPcs::CompaDraw()
 
 		value = Game.GetNPCName(caravanWork->m_evtWordArr[19 + drawIndex]);
 #ifdef VERSION_GCCP01
-		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x90));
+		x = static_cast<float>(compaList->entries[0].x + 0x90);
 #else
-		font->SetPosX(static_cast<float>(compaList->entries[0].x + 0x80));
+		x = static_cast<float>(compaList->entries[0].x + 0x80);
 #endif
+		font->SetPosX(x);
 #ifdef VERSION_GCCJGC
 		font->SetPosY(y);
 #else
