@@ -890,9 +890,9 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxRe
 	int cmpValue;
 	int letterIdx;
 	int excludeFlag;
-	int bit0;
-	int bit2;
 	int bit1;
+	int bit2;
+	int bit0;
 	int foundCount = 0;
 
 	for (int i = 0; i < maxResults; i++) {
