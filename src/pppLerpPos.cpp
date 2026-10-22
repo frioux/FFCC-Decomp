@@ -22,8 +22,6 @@ static inline Vec** GetLerpPosHistory(_pppPObject* object, _pppCtrlTable* ctrl)
     return reinterpret_cast<Vec**>(object->m_workArea + GetLerpPosDataOffsets(ctrl)->m_historyOffset);
 }
 
-static const char s_pppLerpPos_cpp[] = "pppLerpPos.cpp";
-
 /*
  * --INFO--
  * PAL Address: 0x8012b24c
@@ -47,7 +45,7 @@ void pppFrameLerpPos(_pppPObject* object, pppLerpPosStep* step, _pppCtrlTable* c
         if (*historyPtr == 0) {
             *historyPtr = (Vec*)pppMemAlloc(
                 (u32)(u8)step->m_dataValIndex * sizeof(Vec), ppvEnv->m_stagePtr,
-                const_cast<char*>(s_pppLerpPos_cpp),
+                "pppLerpPos.cpp",
                 0x37);
 
             for (i = 0; i < (s32)(u8)step->m_dataValIndex; i++) {

@@ -21,10 +21,6 @@
 #include <string.h>
 #include <PowerPC_EABI_Support/Runtime/New.h>
 
-extern const char s_mapobj_cpp[] = "mapobj.cpp";
-extern const char sMapObjScaleWithoutNameWarn[] = "エラー！！！ ground_a or obj_a ノード のスケールが １ ではない。\n     古いバージョンの ＯＴＭなのでノード名は不明です。";
-extern const char sMapObjScaleWithNameWarn[] = "エラー！！！ ground_a or obj_a ノード %s のスケールが １ ではない。\n";
-extern const char sMapObjTooManyAttributesWarn[] = "node %d はこれ以上アトリビュートを追加できません。\n";
 _GXColor s_mapObjLightColor = {0xFF, 0xFF, 0xFF, 0xFF};
 
 inline void* operator new(unsigned long, void* ptr)
@@ -347,7 +343,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     m_mapData = &mng.m_mapHitArray[meshOrHitIdx];
                 } else {
                     CMapObjAtrMeshName* meshName =
-                        new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x84) CMapObjAtrMeshName();
+                        new (g_MapMng.m_stage, "mapobj.cpp", 0x84) CMapObjAtrMeshName();
                     m_attribute = meshName;
                     char* name = chunkFile.GetString();
                     strncpy(meshName->m_name, name, 0x20);
@@ -392,9 +388,9 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             if (((m_mapDataType == 2) || (m_mapDataType == 3)) &&
                 ((1.0f != m_localScale.x) || (1.0f != m_localScale.y) || (1.0f != m_localScale.z))) {
                 if (m_attribute == 0) {
-                    System.Printf(const_cast<char*>(sMapObjScaleWithoutNameWarn));
+                    System.Printf("エラー！！！ ground_a or obj_a ノード のスケールが １ ではない。\n     古いバージョンの ＯＴＭなのでノード名は不明です。");
                 } else {
-                    System.Printf(const_cast<char*>(sMapObjScaleWithNameWarn),
+                    System.Printf("エラー！！！ ground_a or obj_a ノード %s のスケールが １ ではない。\n",
                                   reinterpret_cast<CMapObjAtrMeshName*>(m_attribute)->m_name);
                 }
                 m_localScale.x = 1.0f;
@@ -407,10 +403,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_PLIT: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
+                System.Printf("node %d はこれ以上アトリビュートを追加できません。\n", objIndex);
             }
             CMapObjAtrPointLight* pointLight =
-                new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0xD4) CMapObjAtrPointLight();
+                new (g_MapMng.m_stage, "mapobj.cpp", 0xD4) CMapObjAtrPointLight();
 
             if (chunk.m_version == 2) {
                 chunkFile.PushChunk();
@@ -483,10 +479,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_SLIT: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
+                System.Printf("node %d はこれ以上アトリビュートを追加できません。\n", objIndex);
             }
             CMapObjAtrSpotLight* spotLight =
-                new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x139) CMapObjAtrSpotLight();
+                new (g_MapMng.m_stage, "mapobj.cpp", 0x139) CMapObjAtrSpotLight();
 
             if (chunk.m_version == 6) {
                 chunkFile.PushChunk();
@@ -613,7 +609,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             break;
         }
         case CHUNK_ANIM: {
-            CMapAnimRun* animRun = new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x21E) CMapAnimRun;
+            CMapAnimRun* animRun = new (g_MapMng.m_stage, "mapobj.cpp", 0x21E) CMapAnimRun;
             animRun->m_mapAnimIndex = static_cast<unsigned short>(chunkFile.Get4());
             animRun->m_startFrame = static_cast<int>(chunkFile.Get4());
             animRun->m_endFrame = static_cast<int>(chunkFile.Get4());
@@ -637,7 +633,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_LSDW: {
             CMapShadow* shadow =
-                new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x241) CMapShadow();
+                new (g_MapMng.m_stage, "mapobj.cpp", 0x241) CMapShadow();
             shadow->m_yFilterMode = 0;
 
             if (chunk.m_version == 4) {
@@ -757,10 +753,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_MIME: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
+                System.Printf("node %d はこれ以上アトリビュートを追加できません。\n", objIndex);
             }
             CMapObjAtrMime* mimeAttr =
-                new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x33B) CMapObjAtrMime();
+                new (g_MapMng.m_stage, "mapobj.cpp", 0x33B) CMapObjAtrMime();
             CMapObjAtrMime* mime = mimeAttr;
 
             chunkFile.PushChunk();
@@ -771,7 +767,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                     mime->m_vertexListCount = static_cast<unsigned char>(mimeChunk.m_arg0);
                     mime->m_vertexLists = reinterpret_cast<float**>(
                         operator new[](static_cast<unsigned long>(mime->m_vertexListCount) << 2,
-                                       g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x348));
+                                       g_MapMng.m_stage, "mapobj.cpp", 0x348));
 
                     chunkFile.PushChunk();
                     CChunkFile::CChunk vtxChunk;
@@ -782,7 +778,7 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                             float* vtx;
                             mime->m_vertexLists[vtxTableIndex++] = vtx = reinterpret_cast<float*>(operator new[](
                                 static_cast<unsigned long>(vtxChunk.m_arg0) * 0xC,
-                                g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x353));
+                                g_MapMng.m_stage, "mapobj.cpp", 0x353));
                             mime->m_vertexCount = static_cast<int>(vtxChunk.m_arg0);
 
                             for (int i = 0; i < mime->m_vertexCount; i++) {
@@ -840,10 +836,10 @@ int CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         }
         case CHUNK_PSTA: {
             if (m_attribute != 0) {
-                System.Printf(const_cast<char*>(sMapObjTooManyAttributesWarn), objIndex);
+                System.Printf("node %d はこれ以上アトリビュートを追加できません。\n", objIndex);
             }
             CMapObjAtrPlaySta* playSta =
-                new (g_MapMng.m_stage, const_cast<char*>(s_mapobj_cpp), 0x39B) CMapObjAtrPlaySta();
+                new (g_MapMng.m_stage, "mapobj.cpp", 0x39B) CMapObjAtrPlaySta();
             playSta->m_playStaNo = chunkFile.Get1();
             m_attribute = playSta;
             break;

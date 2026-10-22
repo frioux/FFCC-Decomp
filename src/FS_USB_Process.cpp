@@ -9,8 +9,6 @@
 
 #include <string.h>
 
-static const char s_FS_USB_Process_cpp[] = "FS_USB_Process.cpp";
-
 namespace {
 
 static inline u8* AnmData(CFunnyShapePcs* self) {
@@ -92,10 +90,10 @@ void CFunnyShapePcs::SetUSBData()
     }
     case 5: {
         OSFS_TEXTURE_ST* tmp = reinterpret_cast<OSFS_TEXTURE_ST*>(
-            new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x55)
+            new (FunnyShapePcs.m_viewerStage, "FS_USB_Process.cpp", 0x55)
                 u8[usb->m_sizeBytes]);
         m_funnyShape.m_textureHeaders[m_funnyShape.m_textureCount] =
-            new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x57)
+            new (FunnyShapePcs.m_viewerStage, "FS_USB_Process.cpp", 0x57)
                 OSFS_TEXTURE_ST;
 
         memcpy(tmp, usb->m_data, usb->m_sizeBytes);
@@ -114,14 +112,14 @@ void CFunnyShapePcs::SetUSBData()
         memcpy(m_funnyShape.m_textureHeaders[m_funnyShape.m_textureCount], tmp, sizeof(OSFS_TEXTURE_ST));
 
         m_funnyShape.m_textureData[m_funnyShape.m_textureCount] =
-            new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x6C)
+            new (FunnyShapePcs.m_viewerStage, "FS_USB_Process.cpp", 0x6C)
                 u8[usb->m_sizeBytes - sizeof(OSFS_TEXTURE_ST)];
         memcpy(m_funnyShape.m_textureData[m_funnyShape.m_textureCount], reinterpret_cast<u8*>(tmp) + sizeof(OSFS_TEXTURE_ST),
                usb->m_sizeBytes - sizeof(OSFS_TEXTURE_ST));
         DCFlushRange(m_funnyShape.m_textureData[m_funnyShape.m_textureCount], usb->m_sizeBytes - sizeof(OSFS_TEXTURE_ST));
 
         m_funnyShape.m_texObjData[m_funnyShape.m_textureCount] =
-            new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x73)
+            new (FunnyShapePcs.m_viewerStage, "FS_USB_Process.cpp", 0x73)
                 GXTexObj;
         GXInitTexObj(m_funnyShape.m_texObjData[m_funnyShape.m_textureCount], m_funnyShape.m_textureData[m_funnyShape.m_textureCount], tmp->width, tmp->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 
@@ -148,7 +146,7 @@ void CFunnyShapePcs::SetUSBData()
         DCStoreRange(&m_funnyShape.m_anm, usb->m_sizeBytes);
         break;
     case 11: {
-        m_funnyShape.m_anm.anmData = new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x9C)
+        m_funnyShape.m_anm.anmData = new (FunnyShapePcs.m_viewerStage, "FS_USB_Process.cpp", 0x9C)
             u8[usb->m_sizeBytes];
 
         memcpy(AnmData(this), usb->m_data, usb->m_sizeBytes);
@@ -240,7 +238,7 @@ void CFunnyShapePcs::SetUSBData()
             m_funnyShape.m_meshData = 0;
         }
 
-        u8* meshData = new (FunnyShapePcs.m_viewerStage, const_cast<char*>(s_FS_USB_Process_cpp), 0x106)
+        u8* meshData = new (FunnyShapePcs.m_viewerStage, "FS_USB_Process.cpp", 0x106)
             u8[usb->m_sizeBytes];
         memcpy(meshData, usb->m_data, usb->m_sizeBytes);
         OSFS_SHAPE_ST* mesh = reinterpret_cast<OSFS_SHAPE_ST*>(meshData);

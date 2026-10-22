@@ -13,8 +13,6 @@ extern f32 gPppDefaultValueBuffer[];
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-static const char s_pppYmTracer_cpp[] = "pppYmTracer.cpp";
-
 STATIC_ASSERT(sizeof(YmTracerDataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(YmTracerDataOffsets, m_workOffset) == 0x0);
 STATIC_ASSERT(offsetof(YmTracerDataOffsets, m_colorOffset) == 0x4);
@@ -203,7 +201,7 @@ void pppFrameYmTracer(pppYmTracer* tracer, pppYmTracerStep* step, pppYmTracerCtr
     if (entriesPtr == 0) {
         work->entries = (TRACE_POLYGON*)pppMemAlloc(
             (u32)step->m_tracer.m_entryCount * sizeof(TRACE_POLYGON), ppvEnv->m_stagePtr,
-            const_cast<char*>(s_pppYmTracer_cpp), 0xEB);
+            "pppYmTracer.cpp", 0xEB);
         entries = work->entries;
         entry = entries;
         for (i = 0; i < (s32)(u32)step->m_tracer.m_entryCount; i++) {

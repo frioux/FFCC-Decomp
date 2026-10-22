@@ -11,7 +11,6 @@
 
 class CMapHitFace;
 
-static const char s_mapmesh_cpp[] = "mapmesh.cpp";
 static const float kMapMeshInitialMinBound = 10000000000.0f;
 static const float kMapMeshInitialMaxBound = -10000000000.0f;
 
@@ -408,7 +407,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
     while (reader.GetNextChunk(chunk)) {
         switch (chunk.m_id) {
         case 0x56455254:
-            m_meshData = new (MapMeshAllocStage(), const_cast<char*>(s_mapmesh_cpp), 0x13A) unsigned char[workSize];
+            m_meshData = new (MapMeshAllocStage(), "mapmesh.cpp", 0x13A) unsigned char[workSize];
 
             cursor = reinterpret_cast<unsigned char*>(m_meshData);
             m_vertexCount = static_cast<unsigned short>(chunk.m_size / 0xC);
@@ -483,7 +482,7 @@ unsigned int CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage
             m_displayListCount = static_cast<unsigned short>(chunk.m_arg0);
             if (usePreallocated != 0) {
                 m_displayListData =
-                    new (MapMeshAllocStage(), const_cast<char*>(s_mapmesh_cpp), 0x1D5) unsigned char[workSize];
+                    new (MapMeshAllocStage(), "mapmesh.cpp", 0x1D5) unsigned char[workSize];
                 cursor = reinterpret_cast<unsigned char*>(m_displayListData);
             } else {
                 cursor = reinterpret_cast<unsigned char*>(Align32(reinterpret_cast<unsigned int>(cursor)));

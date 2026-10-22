@@ -14,8 +14,6 @@
 
 #pragma exceptions on
 
-static const char s_pppYmMiasma_cpp[] = "pppYmMiasma.cpp";
-
 struct PARTICLE_DATA {
     Mtx m_matrix;
     Vec m_velocity;
@@ -189,7 +187,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma, YmMiasmaFrameStep* step, _pppCtr
     if (work->m_particles == 0) {
         work->m_particles = (PARTICLE_DATA*)pppMemAlloc(
             (unsigned long)step->m_particleCount * sizeof(PARTICLE_DATA), ppvEnv->m_stagePtr,
-            const_cast<char*>(s_pppYmMiasma_cpp),
+            "pppYmMiasma.cpp",
             0x18d);
         PARTICLE_DATA* particle = work->m_particles;
         for (i = 0; i < step->m_particleCount; i++) {

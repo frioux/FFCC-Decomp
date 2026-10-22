@@ -14,8 +14,6 @@
 #include <dolphin/os/OSCache.h>
 #include "ffcc/ppp_linkage.h"
 
-static const char s_pppYmChangeTex_cpp[] = "pppYmChangeTex.cpp";
-
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_vertexCount) == 0x14);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_normals) == 0x20);
 STATIC_ASSERT(offsetof(ChangeTexMeshData, m_displayListCount) == 0x4C);
@@ -153,16 +151,16 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 	if ((state->m_meshColorArrays == 0) && (state->m_displayListArrays == 0)) {
 		state->m_meshColorArrays = (GXColor**)pppMemAlloc(
 		    model0->GetRefData()->m_meshCount << 2, ppvEnv->m_stagePtr,
-		    const_cast<char*>(s_pppYmChangeTex_cpp), 0x15D);
+		    "pppYmChangeTex.cpp", 0x15D);
 		state->m_displayListArrays = (ChangeTexDisplayListCopy***)pppMemAlloc(
 		    model0->GetRefData()->m_meshCount << 2, ppvEnv->m_stagePtr,
-		    const_cast<char*>(s_pppYmChangeTex_cpp), 0x160);
+		    "pppYmChangeTex.cpp", 0x160);
 
 		meshColorArrays = state->m_meshColorArrays;
 		for (meshIdx = 0; meshIdx < model0->GetRefData()->m_meshCount; meshIdx++, meshList++) {
 			state->m_displayListArrays[meshIdx] = static_cast<ChangeTexDisplayListCopy**>(
 			    pppMemAlloc(meshList->m_data->m_displayListCount * sizeof(ChangeTexDisplayListCopy*),
-			                ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp), 0x168));
+			                ppvEnv->m_stagePtr, "pppYmChangeTex.cpp", 0x168));
 
 			dlIdx = meshList->m_data->m_displayListCount - 1;
 			dlInfo = meshList->m_data->m_displayLists;
@@ -170,11 +168,11 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 			for (; dlIdx >= 0; dlIdx = dlIdx - 1, dlInfo = dlInfo + 1) {
 				dlPair = static_cast<ChangeTexDisplayListCopy*>(
 				    pppMemAlloc(sizeof(ChangeTexDisplayListCopy), ppvEnv->m_stagePtr,
-				                const_cast<char*>(s_pppYmChangeTex_cpp), 0x172));
+				                "pppYmChangeTex.cpp", 0x172));
 				*dlEntry = dlPair;
 				(*dlEntry)->m_size = dlInfo->m_size;
 				(*dlEntry)->m_data = pppMemAlloc(
-				    dlInfo->m_size, ppvEnv->m_stagePtr, const_cast<char*>(s_pppYmChangeTex_cpp), 0x174);
+				    dlInfo->m_size, ppvEnv->m_stagePtr, "pppYmChangeTex.cpp", 0x174);
 				memcpy((*dlEntry)->m_data, dlInfo->m_data, dlInfo->m_size);
 				Util.ReWriteDisplayList((*dlEntry)->m_data, (unsigned long)dlInfo->m_size, 1);
 				DCFlushRange((*dlEntry)->m_data, (unsigned long)dlInfo->m_size);
@@ -183,7 +181,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 
 			*meshColorArrays = static_cast<GXColor*>(
 			    pppMemAlloc(meshList->m_data->m_vertexCount * sizeof(GXColor), ppvEnv->m_stagePtr,
-			                const_cast<char*>(s_pppYmChangeTex_cpp), 0x17F));
+			                "pppYmChangeTex.cpp", 0x17F));
 			memset(*meshColorArrays, 0xFF, meshList->m_data->m_vertexCount * sizeof(GXColor));
 			meshColorArrays = meshColorArrays + 1;
 		}

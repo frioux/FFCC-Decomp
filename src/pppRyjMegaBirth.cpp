@@ -45,8 +45,6 @@ static void calc_particle(_pppPObject*, VRyjMegaBirth*, PRyjMegaBirth*, VColor*)
 
 static Mtx g_matUnit;
 
-static const char s_pppRyjMegaBirth_cpp[] = "pppRyjMegaBirth.cpp";
-
 STATIC_ASSERT(sizeof(RyjMegaBirthDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(RyjMegaBirthDataOffsets, m_colorOffset) == 0x4);
 STATIC_ASSERT(offsetof(RyjMegaBirthDataOffsets, m_workOffset) == 0x8);
@@ -448,7 +446,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 	{
 		work->m_numParticles = particleData->m_maxParticles;
 		work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc(
-			work->m_numParticles * 0x60, ppvEnv->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x262);
+			work->m_numParticles * 0x60, ppvEnv->m_stagePtr, "pppRyjMegaBirth.cpp", 0x262);
 		if (work->m_particleBlock != NULL)
 		{
 			memset(work->m_particleBlock, 0, work->m_numParticles * 0x60);
@@ -457,7 +455,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 		if ((particleData->m_matrixMode == 1) || (particleData->m_matrixMode == 2))
 		{
 			work->m_worldMatrixBlock = (_PARTICLE_WMAT*)pppMemAlloc(
-				work->m_numParticles * sizeof(_PARTICLE_WMAT), ppvEnv->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x269);
+				work->m_numParticles * sizeof(_PARTICLE_WMAT), ppvEnv->m_stagePtr, "pppRyjMegaBirth.cpp", 0x269);
 			if (work->m_worldMatrixBlock != NULL)
 			{
 				memset(work->m_worldMatrixBlock, 0, work->m_numParticles * sizeof(_PARTICLE_WMAT));
@@ -467,7 +465,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 		if (particleData->m_enableParticleColor != 0)
 		{
 			work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc(
-				work->m_numParticles * sizeof(_PARTICLE_COLOR), ppvEnv->m_stagePtr, const_cast<char*>(s_pppRyjMegaBirth_cpp), 0x271);
+				work->m_numParticles * sizeof(_PARTICLE_COLOR), ppvEnv->m_stagePtr, "pppRyjMegaBirth.cpp", 0x271);
 			if (work->m_colorBlock != NULL)
 			{
 				memset(work->m_colorBlock, 0, work->m_numParticles * sizeof(_PARTICLE_COLOR));

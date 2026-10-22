@@ -20,8 +20,6 @@ unsigned char g_tFont22[] = {
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h"
 #include <dolphin/mtx.h>
 
-static const char s_fontman_cpp[] = "fontman.cpp";
-
 #ifdef VERSION_GCCJGC
 static const unsigned short FontFallbackCharacter = 0x81A1;
 enum { FontGlyphAllocationLine = 0xC7, FontTextureAllocationLine = 0xD7 };
@@ -153,7 +151,7 @@ void CFontMan::Init()
 	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>("CFontMan"), 0);
 	m_stage = stage;
 
-	CFont* font = new (stage, const_cast<char*>(s_fontman_cpp), 0x3D) CFont;
+	CFont* font = new (stage, "fontman.cpp", 0x3D) CFont;
 
 	m_font = font;
 	m_font->Create(0, 0);
@@ -289,7 +287,7 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                     if (m_usesEmbeddedData != 0) {
                         m_glyphData = chunkFile.GetAddress();
                     } else {
-                        m_glyphData = new (stage, const_cast<char*>(s_fontman_cpp), FontGlyphAllocationLine) unsigned char[chunk.m_size];
+                        m_glyphData = new (stage, "fontman.cpp", FontGlyphAllocationLine) unsigned char[chunk.m_size];
                         chunkFile.Get(m_glyphData, chunk.m_size);
                     }
 
@@ -301,7 +299,7 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                     }
                     break;
                 case 'TXTR':
-                    texturePtr = new (FontMan.m_stage, const_cast<char*>(s_fontman_cpp), FontTextureAllocationLine) CTexture;
+                    texturePtr = new (FontMan.m_stage, "fontman.cpp", FontTextureAllocationLine) CTexture;
                     texturePtr->Create(chunkFile, stage, 0, 0, m_usesEmbeddedData != 0);
                     break;
                 }

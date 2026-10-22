@@ -16,8 +16,6 @@ extern f32 gPppDefaultValueBuffer[];
 
 #pragma exceptions on
 
-static const char s_pppYmTracer2_cpp[] = "pppYmTracer2.cpp";
-
 STATIC_ASSERT(sizeof(YmTracer2DataOffsets) == 0x8);
 STATIC_ASSERT(offsetof(YmTracer2DataOffsets, m_workOffset) == 0x0);
 STATIC_ASSERT(offsetof(YmTracer2DataOffsets, m_colorOffset) == 0x4);
@@ -228,7 +226,7 @@ void pppFrameYmTracer2(pppYmTracer2* tracer, pppYmTracer2Step* step, _pppCtrlTab
         work->alphaStep = (u16)step->m_tracer.m_entryAlpha / step->m_tracer.m_entryLife;
         work->entries = (YmTracer2Polygon*)pppMemAlloc(
             (u32)step->m_tracer.m_entryCount * sizeof(YmTracer2Polygon), ppvEnv->m_stagePtr,
-            const_cast<char*>(s_pppYmTracer2_cpp), 0xAD);
+            "pppYmTracer2.cpp", 0xAD);
 
         entry = work->entries;
         for (j = 0; j < (s32)(u32)step->m_tracer.m_entryCount; j++) {

@@ -44,8 +44,6 @@ static void set_matrix(_pppPObject*, pppFMATRIX, pppFMATRIX, PRyjMegaBirthModel*
 static _PARTICLE_WMAT g_matKeep;
 static _PARTICLE_WMAT g_matTmp;
 
-static const char s_pppRyjMegaBirthModel_cpp[] = "pppRyjMegaBirthModel.cpp";
-
 STATIC_ASSERT(sizeof(RyjMegaBirthModelDataOffsets) == 0xC);
 STATIC_ASSERT(offsetof(RyjMegaBirthModelDataOffsets, m_colorOffset) == 0x4);
 STATIC_ASSERT(offsetof(RyjMegaBirthModelDataOffsets, m_workOffset) == 0x8);
@@ -1354,7 +1352,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
         work->m_numParticles = params->m_maxParticles;
         work->m_particleBlock = (_PARTICLE_DATA*)pppMemAlloc(
             work->m_numParticles * sizeof(_PARTICLE_DATA), ppvEnv->m_stagePtr,
-            const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0x8D);
+            "pppRyjMegaBirthModel.cpp", 0x8D);
         if (work->m_particleBlock != NULL) {
             memset(work->m_particleBlock, 0, work->m_numParticles * sizeof(_PARTICLE_DATA));
         }
@@ -1362,7 +1360,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
         if (params->m_enableWorldMatrix != 0) {
             work->m_worldMatrixBlock = (_PARTICLE_WMAT*)pppMemAlloc(
                 work->m_numParticles * sizeof(_PARTICLE_WMAT), ppvEnv->m_stagePtr,
-                const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0x97);
+                "pppRyjMegaBirthModel.cpp", 0x97);
             if (work->m_worldMatrixBlock != NULL) {
                 memset(work->m_worldMatrixBlock, 0, work->m_numParticles * sizeof(_PARTICLE_WMAT));
             }
@@ -1371,7 +1369,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
         if (params->m_enableParticleColor != 0) {
             work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc(
                 work->m_numParticles * sizeof(_PARTICLE_COLOR), ppvEnv->m_stagePtr,
-                const_cast<char*>(s_pppRyjMegaBirthModel_cpp), 0xA2);
+                "pppRyjMegaBirthModel.cpp", 0xA2);
             if (work->m_colorBlock != NULL) {
                 memset(work->m_colorBlock, 0, work->m_numParticles * sizeof(_PARTICLE_COLOR));
             }

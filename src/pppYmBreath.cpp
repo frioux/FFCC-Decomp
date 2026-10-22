@@ -82,8 +82,6 @@ static void BirthParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*, PARTICL
 static void UpdateParticle(VYmBreath*, PYmBreath*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*);
 static void UpdateAllParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*);
 
-static const char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
-
 static inline YmBreathDataOffsets* GetYmBreathDataOffsets(_pppCtrlTable* ctrl)
 {
     return reinterpret_cast<YmBreathDataOffsets*>(ctrl->m_serializedDataOffsets);
@@ -521,7 +519,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _p
         work->m_particleData =
             (PARTICLE_DATA*)pppMemAlloc((unsigned long)(work->m_particleCount * sizeof(PARTICLE_DATA)),
                                         ppvEnv->m_stagePtr,
-                                        const_cast<char*>(s_pppYmBreath_cpp), 0x243);
+                                        "pppYmBreath.cpp", 0x243);
         if (work->m_particleData != NULL) {
             memset(work->m_particleData, 0, (unsigned long)(work->m_particleCount * sizeof(PARTICLE_DATA)));
         }
@@ -529,7 +527,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _p
         work->m_particleWmats =
             (PARTICLE_WMAT*)pppMemAlloc((unsigned long)(work->m_particleCount * sizeof(PARTICLE_WMAT)),
                                         ppvEnv->m_stagePtr,
-                                        const_cast<char*>(s_pppYmBreath_cpp), 0x249);
+                                        "pppYmBreath.cpp", 0x249);
         if (work->m_particleWmats != NULL) {
             memset(work->m_particleWmats, 0, (unsigned long)(work->m_particleCount * sizeof(PARTICLE_WMAT)));
         }
@@ -537,7 +535,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _p
         work->m_particleColors =
             (PARTICLE_COLOR*)pppMemAlloc((unsigned long)(work->m_particleCount * sizeof(PARTICLE_COLOR)),
                                          ppvEnv->m_stagePtr,
-                                         const_cast<char*>(s_pppYmBreath_cpp), 0x24F);
+                                         "pppYmBreath.cpp", 0x24F);
         if (work->m_particleColors != NULL) {
             memset(work->m_particleColors, 0, (unsigned long)(work->m_particleCount * sizeof(PARTICLE_COLOR)));
         }
@@ -545,7 +543,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _p
         work->m_groups =
             (YmBreathParticleGroup*)pppMemAlloc(
                 (unsigned long)((int)params->m_groupCount * sizeof(YmBreathParticleGroup)), ppvEnv->m_stagePtr,
-                const_cast<char*>(s_pppYmBreath_cpp), 0x255);
+                "pppYmBreath.cpp", 0x255);
         if (work->m_groups != NULL) {
             memset(work->m_groups, 0, (unsigned long)((int)params->m_groupCount * sizeof(YmBreathParticleGroup)));
 
@@ -553,12 +551,12 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, _p
             for (i = 0; i < (int)params->m_groupCount; i++) {
                 groupTable->particleIndices = (signed char*)pppMemAlloc(
                     (unsigned long)params->m_slotCount, ppvEnv->m_stagePtr,
-                    const_cast<char*>(s_pppYmBreath_cpp), 0x260);
+                    "pppYmBreath.cpp", 0x260);
                 memset(groupTable->particleIndices, -1, (unsigned long)params->m_slotCount);
 
                 groupTable->particleStates = (signed char*)pppMemAlloc(
                     (unsigned long)params->m_slotCount, ppvEnv->m_stagePtr,
-                    const_cast<char*>(s_pppYmBreath_cpp), 0x263);
+                    "pppYmBreath.cpp", 0x263);
                 memset(groupTable->particleStates, -1, (unsigned long)params->m_slotCount);
                 groupTable->active = 0;
                 groupTable++;

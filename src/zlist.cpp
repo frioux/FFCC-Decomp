@@ -2,8 +2,6 @@
 
 #include "ffcc/p_MaterialEditor.h"
 
-static const char s_zlist_cpp[] = "zlist.cpp";
-
 /*
  * --INFO--
  * PAL Address: 0x8004DFD0
@@ -81,7 +79,7 @@ void* ZLIST::GetDataNext(_ZLISTITEM** it)
  */
 bool ZLIST::AddTail(void* data)
 {
-	_ZLISTITEM* newItem = new (MaterialEditorPcs.m_stage, const_cast<char*>(s_zlist_cpp), 0x107) _ZLISTITEM;
+	_ZLISTITEM* newItem = new (MaterialEditorPcs.m_stage, "zlist.cpp", 0x107) _ZLISTITEM;
 
 	if (newItem == (_ZLISTITEM*)nullptr)
 	{

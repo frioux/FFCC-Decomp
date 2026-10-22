@@ -9,7 +9,6 @@
 #include "ffcc/util.h"
 #include "dolphin/gx.h"
 #include <PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h>
-static const char s_pppRain_cpp[] = "pppRain.cpp";
 
 struct RAIN_DATA {
     Vec position;
@@ -217,7 +216,7 @@ void pppFrameRain(pppRain* rain, PRain* pRain, _pppCtrlTable* data)
         work->drops = (RAIN_DATA*)pppMemAlloc(
             pRain->m_dropCount * sizeof(RAIN_DATA),
             ppvEnv->m_stagePtr,
-            const_cast<char*>(s_pppRain_cpp),
+            "pppRain.cpp",
             0x7f);
         drop = work->drops;
         for (i = 0; i < (int)pRain->m_dropCount; i++) {

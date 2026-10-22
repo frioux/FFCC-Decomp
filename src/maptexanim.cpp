@@ -17,7 +17,6 @@ extern const char s_SetMapTexAnim_MaterialIdNotFound[] = {
     0x6A, 0x83, 0x81, 0x20, 0x69, 0x64, 0x3D, 0x25, 0x64, 0x20, 0x82, 0xAA, 0x82, 0xA0, 0x82, 0xE8,
     0x82, 0xDC, 0x82, 0xB9, 0x82, 0xF1, 0x81, 0x42, 0x0A, 0x00, 0x00, 0x00
 };
-static const char s_maptexanim_cpp[] = "maptexanim.cpp";
 }
 
 namespace {
@@ -206,7 +205,7 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
     while (chunkFile.GetNextChunk(chunk) != 0) {
         switch (chunk.m_id) {
         case 0x54414E4D:
-            ref = new (g_MapMng.m_stage, const_cast<char*>(s_maptexanim_cpp),
+            ref = new (g_MapMng.m_stage, "maptexanim.cpp",
                 0x24) CMapTexAnim;
 
             ref->m_materialIndex = chunkFile.Get2();
@@ -232,7 +231,7 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             chunkFile.Get4();
             chunkFile.Get4();
             unsigned short* frameTable =
-                new (g_MapMng.m_stage, const_cast<char*>(s_maptexanim_cpp), 0x3B)
+                new (g_MapMng.m_stage, "maptexanim.cpp", 0x3B)
                     unsigned short[ref->m_frameCount];
             ref->m_frameTable = frameTable;
 
