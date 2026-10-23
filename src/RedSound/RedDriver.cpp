@@ -1035,30 +1035,8 @@ static inline OSThread& RedDriverMainThread()
     return m_MainThread;
 }
 
-static const char sRedDriverDmaCheckHeaderFmt[] = "%s **** DMA CHECK PROCESS ****\n";
-static const char sRedDriverLogPrefix[] = "\x1B[7;34mSound\x1B[0m:";
-static const char sRedDriverDmaStatusFmt[] = "%s Status = %d, Semaphore = %d, Execute = %d, In Thread = %d\n";
-static const char sRedDriverDmaEntryFmt[] = "%s ID = %d, MMem = %8.8X, AMem = %8.8X, Size = %8.8X, Callback = %8.8X\n";
-static const char sRedDriverMusicHeaderErrorFmt[] = "%s%sMusic-Header was broken !!%s\n";
-static const char sRedDriverSeSepHeaderErrorFmt[] = "%s%sSE-Sep-Header was broken !!%s\n";
-static const char sRedDriverLogWarnColor[] = "\x1B[4;31m";
-static const char sRedDriverLogReset[] = "\x1B[0m";
-
-STATIC_ASSERT(sizeof(sRedDriverDmaCheckHeaderFmt) == REDSOUND_DRIVER_DMA_CHECK_HEADER_FMT_SIZE);
-STATIC_ASSERT(sizeof(sRedDriverLogPrefix) == REDSOUND_DRIVER_LOG_PREFIX_SIZE);
-STATIC_ASSERT(sizeof(sRedDriverDmaStatusFmt) == REDSOUND_DRIVER_DMA_STATUS_FMT_SIZE);
-STATIC_ASSERT(sizeof(sRedDriverDmaEntryFmt) == REDSOUND_DRIVER_DMA_ENTRY_FMT_SIZE);
-STATIC_ASSERT(sizeof(sRedDriverMusicHeaderErrorFmt) == REDSOUND_DRIVER_MUSIC_HEADER_ERROR_FMT_SIZE);
-STATIC_ASSERT(sizeof(sRedDriverSeSepHeaderErrorFmt) == REDSOUND_DRIVER_SE_SEP_HEADER_ERROR_FMT_SIZE);
-STATIC_ASSERT(sizeof(sRedDriverLogWarnColor) == REDSOUND_DRIVER_LOG_WARN_COLOR_SIZE);
-STATIC_ASSERT(sizeof(sRedDriverLogReset) == REDSOUND_DRIVER_LOG_RESET_SIZE);
-STATIC_ASSERT(sizeof(sRedDriverDmaCheckHeaderFmt) + sizeof(sRedDriverLogPrefix) +
-                  sizeof(sRedDriverDmaStatusFmt) + sizeof(sRedDriverDmaEntryFmt) +
-                  sizeof(sRedDriverMusicHeaderErrorFmt) + sizeof(sRedDriverSeSepHeaderErrorFmt) ==
-              REDSOUND_DRIVER_RODATA_SIZE);
 STATIC_ASSERT(REDSOUND_DRIVER_MAP_RODATA_STRING_OFFSET == 0);
 STATIC_ASSERT(REDSOUND_DRIVER_RODATA_SIZE == REDSOUND_DRIVER_MAP_RODATA_STRING_SIZE);
-STATIC_ASSERT(sizeof(sRedDriverLogWarnColor) + sizeof(sRedDriverLogReset) == REDSOUND_DRIVER_SDATA2_SIZE);
 STATIC_ASSERT(REDSOUND_DRIVER_MAP_SDATA2_STRING_OFFSET == 0);
 STATIC_ASSERT(REDSOUND_DRIVER_SDATA2_SIZE == REDSOUND_DRIVER_MAP_SDATA2_STRING_SIZE);
 
@@ -2008,10 +1986,10 @@ static void _DMACheckProcess()
     RedDmaRequest* dmaInfo;
 
     if (RedReportPrintIsEnabled()) {
-        OSReport(sRedDriverDmaCheckHeaderFmt, sRedDriverLogPrefix);
+        OSReport("%s **** DMA CHECK PROCESS ****\n", "\x1B[7;34mSound\x1B[0m:");
         fflush(__files + 1);
 
-        OSReport(sRedDriverDmaStatusFmt, sRedDriverLogPrefix, RedDmaStatusGet(),
+        OSReport("%s Status = %d, Semaphore = %d, Execute = %d, In Thread = %d\n", "\x1B[7;34mSound\x1B[0m:", RedDmaStatusGet(),
                  OSGetSemaphoreCount(RedDmaExecuteSemaphoreGet()), RedDmaExecuteGet(), RedDmaThreadStateGet());
         fflush(__files + 1);
     }
@@ -2019,7 +1997,7 @@ static void _DMACheckProcess()
     dmaInfo = RedDriverMainDmaQueue();
     do {
         if ((RedDmaRequestGetId(dmaInfo) != REDSOUND_DMA_ID_NONE) && (RedReportPrintIsEnabled())) {
-            OSReport(sRedDriverDmaEntryFmt, sRedDriverLogPrefix,
+            OSReport("%s ID = %d, MMem = %8.8X, AMem = %8.8X, Size = %8.8X, Callback = %8.8X\n", "\x1B[7;34mSound\x1B[0m:",
                      RedDmaRequestGetId(dmaInfo), RedDmaRequestGetMainMemory(dmaInfo), RedDmaRequestGetAramMemory(dmaInfo),
                      RedDmaRequestGetSize(dmaInfo), RedDmaRequestGetCallback(dmaInfo));
             fflush(__files + 1);
@@ -2629,7 +2607,7 @@ int CRedDriver::SetMusicData(void* musicData)
             _EntryExecCommand(_SetMusicData, RedExecCommandPointerArg(header), 0, 0, 0, 0, 0, 0);
         }
     } else if (RedReportPrintIsEnabled()) {
-        OSReport(sRedDriverMusicHeaderErrorFmt, sRedDriverLogPrefix, sRedDriverLogWarnColor, sRedDriverLogReset);
+        OSReport("%s%sMusic-Header was broken !!%s\n", "\x1B[7;34mSound\x1B[0m:", "\x1B[4;31m", "\x1B[0m");
         fflush(__files + 1);
     }
     return musicNo;
@@ -3089,8 +3067,8 @@ int CRedDriver::SetSeSepData(void* seSepData)
             _EntryExecCommand(_SetSeSepData, RedExecCommandPointerArg(header), 0, 0, 0, 0, 0, 0);
         }
     } else if (RedReportPrintIsEnabled()) {
-        OSReport(sRedDriverSeSepHeaderErrorFmt, sRedDriverLogPrefix,
-                 sRedDriverLogWarnColor, sRedDriverLogReset);
+        OSReport("%s%sSE-Sep-Header was broken !!%s\n", "\x1B[7;34mSound\x1B[0m:",
+                 "\x1B[4;31m", "\x1B[0m");
         fflush(__files + 1);
     }
     return seNo;
@@ -3298,8 +3276,8 @@ inline int CRedDriver::SePlay(void* seSepData, int autoID, int pan, int volume, 
             seNo = REDSOUND_SESEP_ID_NONE;
         }
     } else if (RedReportPrintIsEnabled()) {
-        OSReport(sRedDriverSeSepHeaderErrorFmt, sRedDriverLogPrefix,
-                 sRedDriverLogWarnColor, sRedDriverLogReset);
+        OSReport("%s%sSE-Sep-Header was broken !!%s\n", "\x1B[7;34mSound\x1B[0m:",
+                 "\x1B[4;31m", "\x1B[0m");
     }
     return autoID;
 }
