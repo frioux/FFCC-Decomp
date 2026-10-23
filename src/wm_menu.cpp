@@ -1435,8 +1435,8 @@ void CMenuPcs::calcWorld()
  */
 inline void CMenuPcs::CalcMainMenu()
 {
-	if (m_wmWorldState->m_mainState <= 4) {
-		const short state = m_wmWorldState->m_mainState;
+	short state = m_wmWorldState->m_mainState;
+	if (state <= 4) {
 		int frameStep;
 		if (state == 0) {
 			frameStep = m_wmWorldState->m_frameCounter - 10;
@@ -1956,7 +1956,7 @@ inline void CMenuPcs::CalcCMakeMenu()
 	if (m_wmWorldState->m_mainState <= 4) {
 		CalcCharaSelect();
 		CalcCharaBase();
-		const short state = m_wmWorldState->m_mainState;
+		short state = m_wmWorldState->m_mainState;
 		int frameStep;
 		if (state == 0) {
 			frameStep = m_wmWorldState->m_frameCounter - 10;
@@ -1966,7 +1966,7 @@ inline void CMenuPcs::CalcCMakeMenu()
 			frameStep = -m_wmWorldState->m_frameCounter;
 		}
 		CalcWMFrame0(frameStep);
-		const short animState = m_wmWorldState->m_mainState;
+		short animState = m_wmWorldState->m_mainState;
 		if (animState > 0 && animState < 4) {
 			CalcChara();
 		}
