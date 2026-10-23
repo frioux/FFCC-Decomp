@@ -1198,6 +1198,8 @@ void CMenuPcs::destroyWorld()
  */
 void CMenuPcs::CalcDiaryMenu()
 {
+	int i;
+
 #ifdef VERSION_GCCP01
 	static bool s_wmMenuLastMountState = false;
 
@@ -1213,7 +1215,7 @@ void CMenuPcs::CalcDiaryMenu()
 
 	WMChgMenu();
 	if (static_cast<char>(m_wmMenuRequest) == 0) {
-		int i = 4;
+		i = 4;
 		do {
 			m_battleMesMenus[i]->Calc();
 			i++;
@@ -1267,7 +1269,7 @@ void CMenuPcs::CalcDiaryMenu()
 		break;
 	}
 
-	int i = 4;
+	i = 4;
 	do {
 		m_battleMesMenus[i]->Calc();
 		i++;
