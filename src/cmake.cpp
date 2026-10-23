@@ -2300,8 +2300,8 @@ void CMenuPcs::CmakeTribeDraw()
     font->DrawInit();
     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a255)).color);
 
-    y = 0x88;
-    for (i = 0; i < 4; i++, y += 0x1C) {
+    for (i = 0; i < 4; i++) {
+        y = 0x88 + i * 0x1C;
         txt = GetTribeStr(i);
         font->SetPosX(264.0f);
 #ifdef VERSION_GCCJGC
@@ -2325,7 +2325,8 @@ void CMenuPcs::CmakeTribeDraw()
         hairBase += 4;
     }
 
-    for (i = 0, y = 0x88; i < 4; i++, y += 0x1C) {
+    for (i = 0; i < 4; i++) {
+        y = 0x88 + i * 0x1C;
         txt = GetHairStr(hairBase + i);
 #ifdef VERSION_GCCJGC
         font->SetPosX(424.0f);
@@ -2772,6 +2773,7 @@ void CMenuPcs::CmakeResultDraw()
 
     labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 
+    const char* value;
 #ifndef VERSION_GCCJGC
     char tribeWithComma[0x10];
 #endif
@@ -2802,7 +2804,6 @@ void CMenuPcs::CmakeResultDraw()
     valueFont->SetTlut(6);
 
     for (int i = 0; i < 4; i++) {
-        const char* value = "";
         if (i == 0) {
             value = s_CmakeInfo.m_name;
         } else if (i == 1) {
@@ -3019,6 +3020,7 @@ void CMenuPcs::CmakeResultDraw1()
 
     labelFont->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)).color);
 
+    const char* value;
 #ifndef VERSION_GCCJGC
     char tribeWithComma[0x10];
 #endif
@@ -3049,21 +3051,20 @@ void CMenuPcs::CmakeResultDraw1()
     valueFont->SetTlut(6);
 
     for (int i = 0; i < 4; i++) {
-        const char* txt = "";
-
         if (i == 0) {
-            txt = s_CmakeInfo.m_name;
+            value = s_CmakeInfo.m_name;
         } else if (i == 1) {
-            txt = GetMenuStr(s_CmakeInfo.m_gender + 0x11);
+            value = GetMenuStr(s_CmakeInfo.m_gender + 0x11);
         } else if (i == 2) {
-            txt = GetTribeStr(s_CmakeInfo.m_tribe);
-#ifndef VERSION_GCCJGC
-            strcpy(tribeWithComma, txt);
+#ifdef VERSION_GCCJGC
+            value = GetTribeStr(s_CmakeInfo.m_tribe);
+#else
+            strcpy(tribeWithComma, GetTribeStr(s_CmakeInfo.m_tribe));
             strcat(tribeWithComma, ",");
-            txt = tribeWithComma;
+            value = tribeWithComma;
 #endif
         } else {
-            txt = GetJobStr(s_CmakeInfo.m_job);
+            value = GetJobStr(s_CmakeInfo.m_job);
         }
 
 #ifdef VERSION_GCCJGC
@@ -3072,14 +3073,14 @@ void CMenuPcs::CmakeResultDraw1()
         float x = 8.0f + labelWidths[i];
 #endif
         float y = static_cast<float>(0x70 + i * 0x28);
-        float valueWidth = static_cast<float>(valueFont->GetWidth(txt));
+        float valueWidth = static_cast<float>(valueFont->GetWidth(value));
         valueFont->SetPosX(x);
 #ifdef VERSION_GCCJGC
         valueFont->SetPosY(y);
 #else
         valueFont->SetPosY(y - 4.0f);
 #endif
-        valueFont->Draw(txt);
+        valueFont->Draw(value);
 
         if (i == 2) {
             int hairIndex = s_CmakeInfo.m_tribe * 8;
