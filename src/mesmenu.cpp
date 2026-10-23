@@ -506,11 +506,6 @@ void CMesMenu::onDraw()
         stateBlend = 0.0f;
     }
 
-    float height;
-    float drawX;
-    float drawY;
-    float width;
-
     if (m_menuIndex < 4) {
         CCaravanWork* scriptFood = Game.m_scriptFoodBase[m_menuIndex];
         if (scriptFood == 0) {
@@ -546,15 +541,16 @@ void CMesMenu::onDraw()
 #endif
 
         if (0.0f < stateBlend) {
-            width = m_windowWidth * stateBlend;
-            height = m_windowHeight * stateBlend;
+            float alphaF;
+            float width = m_windowWidth * stateBlend;
+            float height = m_windowHeight * stateBlend;
             float edgeX;
             if (maskX != 0) {
                 edgeX = -m_windowWidth;
             } else {
                 edgeX = m_windowWidth - width;
             }
-            drawX = baseX + edgeX;
+            float drawX = baseX + edgeX;
 
             float edgeY;
             if (maskY != 0) {
@@ -574,10 +570,10 @@ void CMesMenu::onDraw()
                 edgeY = 40.0f;
 #endif
             }
-            drawY = baseY + edgeY;
+            float drawY = baseY + edgeY;
 
             float stateAlpha = 255.0f * stateBlend;
-            float alphaF = stateAlpha * stageBlend;
+            alphaF = stateAlpha * stageBlend;
             MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).Ref());
             MenuPcs.DrawWindow(drawX, drawY, width, height, static_cast<CMenuPcs::TEX>(2), 32.0f);
 
@@ -609,13 +605,13 @@ void CMesMenu::onDraw()
                     font->SetScale(0.775f);
                     font->SetShadow(1);
                     font->SetMargin(0.0f);
-                    float textWidth = font->GetWidth(Game.m_cFlatDataArr[1].GetTable(2)[m_nameIndex]);
+                    float textWidth = font->GetWidth(Game.GetNPCName(m_nameIndex));
                     font->DrawInit();
                     font->SetTlut(0xF);
                     font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).color);
                     font->SetPosX(iconX + (((m_menuIndex & 1) != 0) ? 62.0f : 82.0f - textWidth));
                     font->SetPosY(iconY + (float)(((m_menuIndex & 2) != 0) ? 8 : 31));
-                    font->Draw(Game.m_cFlatDataArr[1].GetTable(2)[m_nameIndex]);
+                    font->Draw(Game.GetNPCName(m_nameIndex));
                     MenuPcs.DrawInit();
                 }
 
@@ -700,17 +696,17 @@ void CMesMenu::onDraw()
             (float)foodU, (float)foodV, 1.0f, 1.0f,
             0.0f);
     } else {
-        width = m_windowWidth * stateBlend;
-        height = m_windowHeight * stateBlend;
+        float width = m_windowWidth * stateBlend;
+        float height = m_windowHeight * stateBlend;
 #ifndef VERSION_GCCP01
-        drawX = (0.5f * m_windowWidth + (m_baseX)) - 0.5f * width;
+        float drawX = (0.5f * m_windowWidth + (m_baseX)) - 0.5f * width;
 #else
-        drawX = (0.5f * m_windowWidth + (m_baseX + m_offsetX)) - 0.5f * width;
+        float drawX = (0.5f * m_windowWidth + (m_baseX + m_offsetX)) - 0.5f * width;
 #endif
 #ifndef VERSION_GCCP01
-        drawY = (0.5f * m_windowHeight + (m_baseY)) - 0.5f * height;
+        float drawY = (0.5f * m_windowHeight + (m_baseY)) - 0.5f * height;
 #else
-        drawY = (0.5f * m_windowHeight + (m_baseY + m_offsetY)) - 0.5f * height;
+        float drawY = (0.5f * m_windowHeight + (m_baseY + m_offsetY)) - 0.5f * height;
 #endif
 
         if ((m_flags & 1) == 0) {
@@ -754,13 +750,13 @@ void CMesMenu::onDraw()
                         font->SetScale(0.775f);
                         font->SetShadow(1);
                         font->SetMargin(0.0f);
-                        float textWidth = font->GetWidth(Game.m_cFlatDataArr[1].GetTable(2)[m_nameIndex]);
+                        float textWidth = font->GetWidth(Game.GetNPCName(m_nameIndex));
                         font->DrawInit();
                         font->SetTlut(0xF);
                         font->SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaF)).color);
                         font->SetPosX(iconX + ((anchorX != 0) ? 62.0f : 82.0f - textWidth));
                         font->SetPosY(iconY + (float)((anchorY != 0) ? 8 : 31));
-                        font->Draw(Game.m_cFlatDataArr[1].GetTable(2)[m_nameIndex]);
+                        font->Draw(Game.GetNPCName(m_nameIndex));
                         MenuPcs.DrawInit();
                     }
 
