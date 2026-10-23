@@ -4332,7 +4332,6 @@ void CMenuPcs::DrawTitleMenu()
 			         FLOAT_803313dc, FLOAT_803313dc,
 			         FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313dc);
 			AlphaAdd();
-			float secondAlpha = alpha;
 			fX = kTitleSelectionX;
 			fX -= 6.0f;
 			state = m_wmWorldState->m_mainState;
@@ -4344,15 +4343,15 @@ void CMenuPcs::DrawTitleMenu()
 			} else if ((state == 2 && m_wmWorldState->m_delay == 0) ||
 			           (state == 3 && m_wmWorldState->m_state0E == 0)) {
 				int pulse = abs((int)m_wmWorldState->m_titleState % 0x28 - 0x14);
-				secondAlpha = static_cast<float>(-(0.035 * static_cast<double>(pulse) -
-				                                  DOUBLE_80331420));
+				alpha = static_cast<float>(-(0.035 * static_cast<double>(pulse) -
+				                            DOUBLE_80331420));
 			} else {
-				secondAlpha = FLOAT_803313e8;
+				alpha = FLOAT_803313e8;
 			}
 			matColor.r = 0xFF;
 			matColor.g = 0xFF;
 			matColor.b = 0xFF;
-			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * secondAlpha));
+			matColor.a = static_cast<unsigned char>(static_cast<int>(FLOAT_80331458 * alpha));
 			GXSetChanMatColor(GX_COLOR0A0, matColor);
 			MenuPcs.DrawRect(0, fX, fY,
 			         kTitleSelectionWidth, 56.0f,
@@ -9285,13 +9284,11 @@ inline void CMenuPcs::DrawPageMark()
 #else
 	const int kPageMarkTexture = 43;
 #endif
+	float w = 40.0f;
+	float x = 220.0 - w;
+	float y = 369.0f;
 	const int phase = abs(static_cast<int>(System.GetCounter()) % 20 - 10);
 	const float scale = static_cast<float>(0.03 * phase + 0.7);
-	float w = 40.0f;
-	double left = 220.0;
-	left -= w;
-	float x = left;
-	float y = 369.0f;
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 	GXColor color;
 	color.r = 0xFF;
@@ -9302,8 +9299,8 @@ inline void CMenuPcs::DrawPageMark()
 	GXSetChanMatColor(GX_COLOR0A0, color);
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kPageMarkTexture));
 
-	x = static_cast<float>((48.0f - 48.0f * scale) * 0.5 + x);
-	y = static_cast<float>((40.0f - 40.0f * scale) * 0.5 + y);
+	x += (48.0f - 48.0f * scale) * 0.5;
+	y += (40.0f - 40.0f * scale) * 0.5;
 	if ((m_pageMarkFlags & 2) != 0) {
 		MenuPcs.DrawRect(8, x, y, 48.0f, 40.0f, 0.0f, 0.0f, scale, scale, 0.0f);
 	}
