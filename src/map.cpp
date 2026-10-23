@@ -439,21 +439,21 @@ void CMapMng::DestroyMapTexAnimSet()
  */
 void CMapMng::DestroyAnimation()
 {
-    for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapAnimArray().GetSize()); i++) {
+    for (int i = 0; i < GetMapAnimArray().GetSize(); i++) {
         if (GetMapAnimArray()[i] != 0) {
             delete GetMapAnimArray()[i];
         }
     }
     GetMapAnimArray().RemoveAll();
 
-    for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapAnimKeyDtArray().GetSize()); i++) {
+    for (int i = 0; i < GetMapAnimKeyDtArray().GetSize(); i++) {
         if (GetMapAnimKeyDtArray()[i] != 0) {
             delete GetMapAnimKeyDtArray()[i];
         }
     }
     GetMapAnimKeyDtArray().RemoveAll();
 
-    for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapAnimRunArray().GetSize()); i++) {
+    for (int i = 0; i < GetMapAnimRunArray().GetSize(); i++) {
         if (GetMapAnimRunArray()[i] != 0) {
             delete GetMapAnimRunArray()[i];
         }
@@ -472,7 +472,7 @@ void CMapMng::DestroyAnimation()
  */
 void CMapMng::DestroyMapShadow()
 {
-    for (unsigned int i = 0; i < static_cast<unsigned int>(GetMapShadowArray().GetSize()); i++) {
+    for (int i = 0; i < GetMapShadowArray().GetSize(); i++) {
         if (GetMapShadowArray()[i] != 0) {
             delete GetMapShadowArray()[i];
         }
@@ -491,9 +491,8 @@ void CMapMng::DestroyMapShadow()
  */
 void CMapMng::DestroyMapLightHolder()
 {
-    unsigned int j;
     for (int i = 0; i < 2; i++) {
-        for (j = 0; j < static_cast<unsigned int>(GetMapLightHolderArray(i).GetSize()); j++) {
+        for (int j = 0; j < GetMapLightHolderArray(i).GetSize(); j++) {
             if (GetMapLightHolderArray(i)[j] != 0) {
                 delete GetMapLightHolderArray(i)[j];
             }
