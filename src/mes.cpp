@@ -18,20 +18,6 @@ int CMes::m_tempVar[0x10];
 int CMes::m_tempVar[0x14];
 #endif
 
-static const char s_This_TAG_is_not_created_pct02x_801D9E10[] = "This TAG is not created.[%02x]\n";
-static const char s_Not_corresponding_TAG_is_used_pct02x_801D9E30[] = "Not corresponding TAG is used.[%02x]\n";
-#ifdef VERSION_GCCJGC
-static const char s_MessageSpeedTagUsed[] =
-	"\x83\x81\x83\x62\x83\x5A\x81\x5B\x83\x57\x88\xEA\x8F\x75\x95\x5C\x8E\xA6"
-	"\x83\x82\x81\x5B\x83\x68\x82\xC5<speed>\x83\x5E\x83\x4F\x82\xAA\x8E\x67"
-	"\x97\x70\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD\x81\x42\n";
-#else
-static const char s_MessageSpeedTagUsed[] =
-	"\x83\x81\x83\x62\x83\x5A\x81\x5B\x83\x57\x88\xEA\x8F\x75\x95\x8E\xA6"
-	"\x83\x82\x81\x5B\x83\x68\x82\xC5<speed>\x83\x5E\x83\x4F\x82\xAA\x8E\x67"
-	"\x97\x70\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD\x81\x42\n";
-#endif
-
 static inline char GetMesNibbleValue(const char* data)
 {
 	char val = (char)(((unsigned char)data[0] & 0x0F) << 4);
@@ -361,7 +347,7 @@ void CMes::MakeAgbString(char* out, char* src)
             }
             case 0x0C: case 0x0E: case 0x13: case 0x14:
                 if (static_cast<unsigned int>(System.m_execParam) >= 2) {
-                    System.Printf(const_cast<char*>(s_This_TAG_is_not_created_pct02x_801D9E10), tag + 0xA0);
+                    System.Printf("This TAG is not created.[%02x]\n", tag + 0xA0);
                 }
                 break;
             case 2: case 3: case 7: case 0x0A: case 0x0B: case 0x0D:
@@ -371,7 +357,7 @@ void CMes::MakeAgbString(char* out, char* src)
             case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: case 0x28:
             case 0x29: case 0x37:
                 if (static_cast<unsigned int>(System.m_execParam) >= 1) {
-                    System.Printf(const_cast<char*>(s_Not_corresponding_TAG_is_used_pct02x_801D9E30), tag + 0xA0);
+                    System.Printf("Not corresponding TAG is used.[%02x]\n", tag + 0xA0);
                 }
                 break;
             default:
@@ -677,7 +663,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x14:
 			if ((unsigned int)System.m_execParam >= 2U)
 			{
-				System.Printf(const_cast<char*>(s_This_TAG_is_not_created_pct02x_801D9E10), tag + 0xA0);
+				System.Printf("This TAG is not created.[%02x]\n", tag + 0xA0);
 			}
 			break;
 		case 2:
@@ -704,7 +690,7 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
 		case 0x55:
 			if ((unsigned int)System.m_execParam >= 1U)
 			{
-				System.Printf(const_cast<char*>(s_Not_corresponding_TAG_is_used_pct02x_801D9E30), tag + 0xA0);
+				System.Printf("Not corresponding TAG is used.[%02x]\n", tag + 0xA0);
 			}
 			break;
 		default:
@@ -1418,7 +1404,10 @@ void CMes::addString(char** text, int branchMode)
 			{
 				if ((unsigned int)System.m_execParam >= 1U)
 				{
-					System.Printf(const_cast<char*>(s_MessageSpeedTagUsed));
+					System.Printf(
+						"\x83\x81\x83\x62\x83\x5A\x81\x5B\x83\x57\x88\xEA\x8F\x75\x95\x8E\xA6"
+						"\x83\x82\x81\x5B\x83\x68\x82\xC5<speed>\x83\x5E\x83\x4F\x82\xAA\x8E\x67"
+						"\x97\x70\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD\x81\x42\n");
 				}
 			}
 			else if (value == 0x7F)
