@@ -9084,10 +9084,8 @@ void CMenuPcs::CalcMcObj()
 	for (i = 0; i < 4; i++, panelState++, viewSlot++) {
 		panelState->m_viewportX = static_cast<short>(panelStateFloat);
 
-		const int y = static_cast<int>(
-		    static_cast<float>(48.0 + (88.0 * static_cast<double>(i) + 24.0)) -
-		    112.0f);
-		panelState->m_viewportY = static_cast<short>(y);
+		float y = static_cast<float>(48.0 + (88.0 * static_cast<double>(i) + 24.0));
+		panelState->m_viewportY = static_cast<short>(y - 112.0f);
 		panelState->m_viewportWidth = 0x140;
 		panelState->m_viewportHeight = 0xE0;
 		panelState->m_cameraPosition.x = FLOAT_803313dc;
