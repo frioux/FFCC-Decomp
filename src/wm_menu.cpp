@@ -7640,14 +7640,13 @@ void CMenuPcs::WMChgMenu()
 	}
 	case 3: {
 			float initialRotY = -0.2617993950843811f;
-			int slot = 0;
 			WmWorldObjInfo* worldObj = &m_wm.m_worldObjData[32];
+			int slot = 0;
 			do {
 				const int handleIdx = slot + 0x20;
 				m_wm.m_charaModelData[slot].m_modelChanged = 1;
 				worldObj->m_transform.m_rotation.y = initialRotY;
-				WmCharaSelectEntry* const selectData = &m_wm.m_charaSelectData[slot];
-				selectData->m_displaySlot = selectData->m_currentSlot;
+				m_wm.m_charaSelectData[slot].m_displaySlot = m_wm.m_charaSelectData[slot].m_currentSlot;
 #ifndef VERSION_GCCJGC
 				if (m_wm.m_handles[handleIdx]->IsModelLoaded(1))
 #endif
