@@ -8032,6 +8032,7 @@ void CMenuPcs::CalcMainMenuSub()
 	const int kRotateFrames = 17;
 #endif
 	int i;
+	WmWorldObjInfo* panel;
 	int n;
 	const unsigned short btn = Pad.GetButtonDown(0);
 
@@ -8149,12 +8150,12 @@ void CMenuPcs::CalcMainMenuSub()
 
 		rotZSel = 0.01745329238474369f * selectedRotZ;
 		rotYSel = 0.01745329238474369f * selectedRotY;
-		for (i = 0; i < 5; i++) {
+		panel = worldObj;
+		for (i = 0; i < 5; i++, panel++) {
 			if (!(((m_wmWorldState->m_mainState > 0) && (m_wmWorldState->m_mainState < 4)) || i == 1)) {
 				continue;
 			}
 
-			WmWorldObjInfo* const panel = &worldObj[i];
 			panel->m_active = 1;
 			float modelScale = FLOAT_803315d4;
 			if (i == 0) {
@@ -8248,12 +8249,9 @@ void CMenuPcs::CalcMainMenuSub()
 			if (m_wmWorldState->m_nextMenuMode != -1 && i == 1 &&
 			    m_wmWorldState->m_cardChannel == 1 && m_wmWorldState->m_mainState != 2) {
 				double u = static_cast<double>(n) / 20.0;
-				float m10 = modelMtx[1][3];
-				float m20 = modelMtx[2][3];
-				float m00 = modelMtx[0][3];
-				modelMtx[0][3] = m00 + static_cast<float>(static_cast<float>(-m00 * u) * u);
-				modelMtx[1][3] = m10 + static_cast<float>(static_cast<float>(-0.2 - m10 * u) * u);
-				modelMtx[2][3] = m20 + static_cast<float>(static_cast<float>(51.5 - m20) * u);
+				modelMtx[0][3] += static_cast<float>(static_cast<float>(-modelMtx[0][3] * u) * u);
+				modelMtx[1][3] += static_cast<float>(static_cast<float>(-0.2 - modelMtx[1][3] * u) * u);
+				modelMtx[2][3] += static_cast<float>(static_cast<float>(51.5 - modelMtx[2][3]) * u);
 			}
 
 			if (m_wmWorldState->m_nextMenuMode != -1 && m_wmWorldState->m_cardChannel == i &&
