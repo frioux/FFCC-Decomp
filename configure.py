@@ -527,7 +527,7 @@ config.libs = [
                 extra_cflags=["-RTTI on", "-str reuse,readonly", "-inline auto,deferred"],
             ),
             Object(NonMatching, "chara_fur.cpp", extra_cflags=["-str reuse,nopool,readonly", "-inline auto,deferred"]),
-            Object(MatchingFor("GCCP01", "GCCE01"), "chara.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "chara.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(NonMatching, "charaobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "chunkfile.cpp", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "cmake.cpp", extra_cflags=["-str reuse,readonly", "-inline noauto,deferred"]),
