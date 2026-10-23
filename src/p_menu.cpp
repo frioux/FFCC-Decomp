@@ -1123,23 +1123,30 @@ inline void CMenuPcs::DrawBar(float x, float y, float width, CMenuPcs::TEX texBa
  */
 void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs::TEX texBase, float corner)
 {
-    float vOff;
-    float cornerH;
+	float cornerH;
+	float uOff;
+	int tex;
+	float cornerW;
+	float midW;
+	float twoCorner;
+	float vOff;
+	float midH;
+
 	if (width <= 0.0f || height <= 0.0f) {
 		return;
 	}
 
-	const float twoCorner = corner * 2.0f;
-	float midW = (width - twoCorner < 0.0f) ? 0.0f : width - twoCorner;
-	float midH = (height - twoCorner < 0.0f) ? 0.0f : height - twoCorner;
-	float uOff = (twoCorner - width < 0.0f) ? 0.0f : twoCorner - width;
+	twoCorner = corner * 2.0f;
+	midW = (width - twoCorner < 0.0f) ? 0.0f : width - twoCorner;
+	midH = (height - twoCorner < 0.0f) ? 0.0f : height - twoCorner;
+	uOff = (twoCorner - width < 0.0f) ? 0.0f : twoCorner - width;
 	uOff *= 0.5f;
 	vOff = (twoCorner - height < 0.0f) ? 0.0f : twoCorner - height;
 	vOff *= 0.5f;
-	const int tex = static_cast<int>(texBase);
+	tex = static_cast<int>(texBase);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(tex));
-	const float cornerW = corner - uOff;
+	cornerW = corner - uOff;
 	cornerH = corner - vOff;
 	DrawRect(0, x, y, cornerW, cornerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 
