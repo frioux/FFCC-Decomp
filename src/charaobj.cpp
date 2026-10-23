@@ -1671,17 +1671,16 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
  */
 void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, int, Vec* hitPos)
 {
-	l_pHitCross = hitPos;
-	l_idxAttackCol = attackColIndex;
-
-	int staType;
-	int damageAmount;
 	int counterType;
-	int counterItem;
-	int counterSe;
+	int damageAmount;
+	CGCharaObj* sourceChara = static_cast<CGCharaObj*>(sourceObj);
+	int staType;
 	int resistType;
 	int allowEffect;
 	int effectResult;
+
+	l_pHitCross = hitPos;
+	l_idxAttackCol = attackColIndex;
 
 	if ((static_cast<unsigned short>(GetCID()) & 0x6D) == 0x6D && m_scriptHandle->m_statusTimers[5] != 0) {
 		System.Printf("生き返り後の無敵期間でダメージOFF中\n");
@@ -1842,8 +1841,8 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 					basePower = 0;
 				}
 				if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && itemId == 0x206) {
-					int castCurrent = static_cast<CGCharaObj*>(sourceObj)->m_unk68C;
-					int castEnd = static_cast<CGCharaObj*>(sourceObj)->m_comboFramePrev;
+					int castCurrent = sourceChara->m_unk68C;
+					int castEnd = sourceChara->m_comboFramePrev;
 					if (castCurrent * 3 <= castEnd) {
 						basePower <<= 2;
 					} else if (castCurrent * 2 <= castEnd) {
@@ -1875,13 +1874,13 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 				    (Game.m_gameWork.m_chaliceElement & 4U) == 0 &&
 				    sourceObj->m_scriptHandle->m_elementResistances[3] == 0) {
 					unsigned int srcEntryKind =
-						CharaObjItemRow(static_cast<CGCharaObj*>(sourceObj)->m_itemId)->m_status & 0xFF;
+						CharaObjItemRow(sourceChara->m_itemId)->m_status & 0xFF;
 					if (sourceObj->m_lastStateId == 6 && srcEntryKind <= 1) {
 						break;
 					}
-					reinterpret_cast<CGCharaObj*>(sourceObj)->setSta(4, kCounterDamageStatusFrames);
+					sourceChara->setSta(4, kCounterDamageStatusFrames);
 					sourceObj->changeStat(10, 0, 0);
-					reinterpret_cast<CGCharaObj*>(sourceObj)->addHp(-1, 0);
+					sourceChara->addHp(-1, 0);
 				}
 				break;
 			}
@@ -1981,7 +1980,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			case 10: {
 				float recoilRate = (static_cast<float>(Game.m_battleParams[0x13 + resistType]) * 0.01f) + 1.0e-07f;
 				int raw = static_cast<int>(static_cast<float>(static_cast<unsigned int>(sourceObj->m_scriptHandle->m_hp)) * recoilRate);
-				damageAmount = (raw < 1) ? 1 : raw;
+				damageAmount = 1;
+				if (raw >= 1) {
+					damageAmount = raw;
+				}
 				System.Printf("MON->PC GRAダメージ %d\n", damageAmount);
 				break;
 			}
@@ -2064,10 +2066,10 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 		    staType != 0x1C) {
 			damageAmount = (damageAmount >= 1) ? 1 : damageAmount;
 		}
-		if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x2D) == 0x2D && static_cast<CGCharaObj*>(sourceObj)->m_comboItemState >= 0 &&
-		    static_cast<CGCharaObj*>(sourceObj)->m_comboLinkCount != 0) {
-			System.Printf("魔法剣でダメージを%d倍\n", static_cast<CGCharaObj*>(sourceObj)->m_comboLinkCount);
-			damageAmount *= static_cast<CGCharaObj*>(sourceObj)->m_comboLinkCount;
+		if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x2D) == 0x2D && sourceChara->m_comboItemState >= 0 &&
+		    sourceChara->m_comboLinkCount != 0) {
+			System.Printf("魔法剣でダメージを%d倍\n", sourceChara->m_comboLinkCount);
+			damageAmount *= sourceChara->m_comboLinkCount;
 		}
 
 		if (damageAmount != 0) {
@@ -2079,16 +2081,16 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 			}
 			SCharaItemRow* bonusRows = reinterpret_cast<SCharaItemRow*>(Game.m_itemTable);
 			if ((bonusRows[itemId].m_flags32 & 1) != 0 ||
-			    ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && static_cast<CGCharaObj*>(sourceObj)->m_comboItemState >= 0)) {
+			    ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D && sourceChara->m_comboItemState >= 0)) {
 				bonus(0x15, itemId, sourceObj);
 				sourceObj->bonus(0x11, itemId, this);
 				if (isDead != 0) {
 					sourceObj->bonus(0xC, itemId, this);
 				}
-				for (int i = 0; i < static_cast<CGCharaObj*>(sourceObj)->m_comboLinkCount; i++) {
-					static_cast<CGCharaObj*>(sourceObj)->m_comboLinks[i]->bonus(0x11, itemId, this);
+				for (int i = 0; i < sourceChara->m_comboLinkCount; i++) {
+					sourceChara->m_comboLinks[i]->bonus(0x11, itemId, this);
 					if (isDead != 0) {
-						static_cast<CGCharaObj*>(sourceObj)->m_comboLinks[i]->bonus(0xC, itemId, this);
+						sourceChara->m_comboLinks[i]->bonus(0xC, itemId, this);
 					}
 				}
 			} else {
@@ -2120,7 +2122,9 @@ void CGCharaObj::onDamage(CGPrgObj* sourceObj, int itemId, int attackColIndex, i
 
 		if ((static_cast<unsigned short>(sourceObj->GetCID()) & 0x6D) == 0x6D &&
 		    m_scriptHandle->m_hp != 0) {
-			int counterState = static_cast<CGCharaObj*>(sourceObj)->m_comboItemState;
+			int counterItem;
+			int counterSe;
+			int counterState = sourceChara->m_comboItemState;
 			if (counterState >= 0) {
 				switch (counterState) {
 				case 0:
