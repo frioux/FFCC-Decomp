@@ -419,6 +419,13 @@ redsound_inline_off_units = {
     "RedStream",
     *parse_unit_env_set("FFCC_REDSOUND_INLINE_OFF_UNITS"),
 }
+# These units have no strings owned by stripped functions, so retail's separate
+# anonymous string literals are reproduced without pooling.
+redsound_unpooled_str_units = {
+    "RedDriver",
+    "RedMemory",
+    "RedStream",
+}
 redsound_inline_deferred_units = parse_unit_env_set(
     "FFCC_REDSOUND_INLINE_DEFERRED_UNITS"
 )
@@ -444,6 +451,8 @@ def redsound_unit_cflags(unit_name: str, *, cpp_exceptions: bool = False) -> Lis
         flags = replace_flag_prefix(flags, "-inline ", "-inline off")
     elif unit_name in redsound_inline_deferred_units:
         flags = replace_flag_prefix(flags, "-inline ", "-inline deferred")
+    if unit_name in redsound_unpooled_str_units:
+        flags = replace_flag_prefix(flags, "-str ", "-str reuse,readonly")
     flags = [*flags, *redsound_extra_flags]
     return flags
 
@@ -513,7 +522,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "baseobj.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,pool,readonly"]),
             Object(NonMatching, "bonus_menu.cpp", extra_cflags=["-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "cflat_data.cpp", extra_cflags=["-str reuse,readonly"]),
-            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "cflat_r2class.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "cflat_r2class.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(
                 NonMatching,
                 "cflat_r2system.cpp",
@@ -549,7 +558,7 @@ config.libs = [
             Object(MatchingFor("GCCP01", "GCCE01"), "joybus.cpp", extra_cflags=["-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "KeLns.cpp"),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "LocationTitle2.cpp"),
-            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "main.cpp"),
+            Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "main.cpp", extra_cflags=["-str reuse,readonly"]),
             Object(NonMatching, "manager.cpp"),
             Object(NonMatching, "map.cpp", extra_cflags=["-RTTI on", "-sdata 8", "-str reuse,readonly", "-inline auto,deferred"]),
             Object(MatchingFor("GCCP01", "GCCE01", "GCCJGC"), "mapanim.cpp", extra_cflags=["-RTTI on", "-str reuse,readonly"]),

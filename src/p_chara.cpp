@@ -33,10 +33,6 @@ inline int CSystem::GetErrorLevel()
     return m_execParam;
 }
 
-static const char s_CCharaPcs_GAME_801D9128[] = "CCharaPcs(GAME)";
-static const char s_CCharaPcs_VIEWER_801D9138[] = "CCharaPcs(VIEWER)";
-static const char s_CCharaPcs_PART_801D914C[] = "CCharaPcs(PART)";
-
 inline void* operator new(unsigned long, void* ptr)
 {
     return ptr;
@@ -2600,7 +2596,7 @@ CCharaPcs::CLoadPdt::~CLoadPdt()
 #pragma pool_data off
 CProcessCallbackTable CCharaPcs::m_table[3] = {
     {
-        const_cast<char*>(s_CCharaPcs_GAME_801D9128),
+        "CCharaPcs(GAME)",
         static_cast<CProcessCallback>(&CCharaPcs::create),
         static_cast<CProcessCallback>(&CCharaPcs::destroy),
         {
@@ -2613,7 +2609,7 @@ CProcessCallbackTable CCharaPcs::m_table[3] = {
         },
     },
     {
-        const_cast<char*>(s_CCharaPcs_VIEWER_801D9138),
+        "CCharaPcs(VIEWER)",
         static_cast<CProcessCallback>(&CCharaPcs::createViewer),
         static_cast<CProcessCallback>(&CCharaPcs::destroyViewer),
         {
@@ -2623,7 +2619,7 @@ CProcessCallbackTable CCharaPcs::m_table[3] = {
         },
     },
     {
-        const_cast<char*>(s_CCharaPcs_PART_801D914C),
+        "CCharaPcs(PART)",
         static_cast<CProcessCallback>(&CCharaPcs::create),
         static_cast<CProcessCallback>(&CCharaPcs::destroy),
         {

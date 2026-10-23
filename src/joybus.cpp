@@ -24,7 +24,7 @@ JoyBus Joybus;
 
 static int s_ThreadRtn = 0;
 
-extern const unsigned short JoyBusCrcTable[256] =
+static const unsigned short s_CrcTbl[256] =
 {
     0x0000, 0x1021, 0x2042, 0x3063,
     0x4084, 0x50A5, 0x60C6, 0x70E7,
@@ -211,7 +211,7 @@ unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
 {
     while (--len >= 0) {
         int value = *crc;
-        *crc = static_cast<unsigned short>((value << 8) ^ JoyBusCrcTable[static_cast<unsigned char>(value >> 8) ^ *data++]);
+        *crc = static_cast<unsigned short>((value << 8) ^ s_CrcTbl[static_cast<unsigned char>(value >> 8) ^ *data++]);
     }
 
     return static_cast<unsigned short>(~static_cast<unsigned short>(*crc));
@@ -4584,7 +4584,7 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
     cursor = data;
     remaining = length;
     while (--remaining >= 0) {
-        crc = (((crc & 0xFFFF) << 8) ^ JoyBusCrcTable[((crc >> 8) & 0xFF) ^ *cursor++]) & 0xFFFF;
+        crc = (((crc & 0xFFFF) << 8) ^ s_CrcTbl[((crc >> 8) & 0xFF) ^ *cursor++]) & 0xFFFF;
     }
 
     unsigned short checksum = static_cast<unsigned short>(~static_cast<unsigned short>(crc));
