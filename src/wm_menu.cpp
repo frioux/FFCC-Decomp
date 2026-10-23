@@ -7126,6 +7126,12 @@ void CMenuPcs::CalcCharaSelect()
  */
 void CMenuPcs::DrawCharaName()
 {
+	int i;
+	int j;
+	unsigned int pendingMask;
+	unsigned int activeMask;
+	unsigned int confirmedMask;
+	CFont* font;
 #ifdef VERSION_GCCJGC
 	static const char* STR_TBL[] = {"\x82\xC8\x82\xB5", "\x83\x4C\x83\x83\x83\x89\x83\x81\x83\x43\x83\x4E\x92\x86"};
 #else
@@ -7136,7 +7142,7 @@ void CMenuPcs::DrawCharaName()
 	static const char* STR_TBL_sp[] = {"Vac\355o", "Creando..."};
 #endif
 
-	CFont* const font = GetFont22();
+	font = GetFont22();
 	WmCharaSelectEntry* const selectEntries = m_wm.m_charaSelectData;
 	unsigned char nameBuf[0x20];
 
@@ -7170,13 +7176,11 @@ void CMenuPcs::DrawCharaName()
 	} else {
 		fade = static_cast<float>(-(DOUBLE_803314E8 * static_cast<double>(m_wmWorldState->m_frameCounter) - DOUBLE_80331420));
 	}
-	int i;
-	int j;
-	unsigned int confirmedMask = 0;
-	unsigned int activeMask = 0;
-	unsigned int pendingMask = 0;
+	confirmedMask = 0;
+	activeMask = 0;
+	pendingMask = 0;
 	const WmCharaSelectEntry* entry = selectEntries;
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++, entry++) {
 		if (entry->m_connected != 0) {
 			const unsigned int bit = 1u << entry->m_currentSlot;
 			activeMask |= bit;
@@ -7187,7 +7191,6 @@ void CMenuPcs::DrawCharaName()
 				pendingMask |= bit;
 			}
 		}
-		entry++;
 	}
 
 	font->SetMargin(FLOAT_803313e8);
