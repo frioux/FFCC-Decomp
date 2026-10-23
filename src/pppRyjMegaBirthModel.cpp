@@ -349,9 +349,6 @@ static inline void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBi
  */
 void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* params, _pppCtrlTable* ctrlTable)
 {
-    int baseGreen;
-    int baseBlue;
-    int baseAlpha;
     RyjMegaBirthModelDataOffsets* offsets = GetRyjMegaBirthModelDataOffsets(ctrlTable);
     VRyjMegaBirthModel* work =
         (VRyjMegaBirthModel*)(obj->m_workArea + offsets->m_workOffset);
@@ -379,15 +376,15 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* params, _ppp
     init_matrix(obj, emitterMatrix, params, work);
 
     int baseRed = baseColor->m_color.rgba[0];
-    baseGreen = baseColor->m_color.rgba[1];
-    baseBlue = baseColor->m_color.rgba[2];
-    baseAlpha = baseColor->m_color.rgba[3];
+    int baseGreen = baseColor->m_color.rgba[1];
+    int baseBlue = baseColor->m_color.rgba[2];
+    int baseAlpha = baseColor->m_color.rgba[3];
 
     for (int i = 0; i < numParticles; i++) {
         if (particle->m_life != 0) {
 
         pppFMATRIX drawMatrix;
-        pppCVECTOR drawColor;
+        VColor drawColor ATTRIBUTE_ALIGN(8);
         pppCVECTOR ambColor;
 
         pppUnitMatrix(scratchMatrix);
@@ -435,12 +432,12 @@ void pppRyjDrawMegaBirthModel(_pppPObject* obj, PRyjMegaBirthModel* params, _ppp
         pppCopyMatrix(*(pppFMATRIX*)&g_matTmp, obj->m_localMatrix);
         pppMulMatrix(obj->m_localMatrix, obj->m_localMatrix, *(pppFMATRIX*)&g_matKeep);
 
-        drawColor.rgba[0] = (u8)red;
-        drawColor.rgba[1] = (u8)green;
-        drawColor.rgba[2] = (u8)blue;
-        drawColor.rgba[3] = (u8)alpha;
+        drawColor.m_color.rgba[0] = (u8)red;
+        drawColor.m_color.rgba[1] = (u8)green;
+        drawColor.m_color.rgba[2] = (u8)blue;
+        drawColor.m_color.rgba[3] = (u8)alpha;
 
-        pppSetDrawEnv(&drawColor, &obj->m_drawMatrix,
+        pppSetDrawEnv(&drawColor.m_color, &obj->m_drawMatrix,
                       params->m_useEnvDepth != 0 ? params->m_drawDepth : 0.0f,
                       params->m_lightTarget, params->m_fogIndex, params->m_blendMode, params->m_cullMode,
                       params->m_zEnable, 1, 0);
