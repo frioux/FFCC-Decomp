@@ -665,8 +665,8 @@ void CRingMenu::onDraw()
 					    && (static_cast<signed char>(
 					            static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 30) & 0xC0000000) >> 31)
 					        == 0)) {
-						const float dimAlpha = showScale * (128.0f * fade * transitionScale);
 						fullAlpha = showScale * (255.0f * fade * transitionScale);
+						const float dimAlpha = showScale * (128.0f * fade * transitionScale);
 						const float barY = 20.0f + textY;
 
 						for (int i = 0; i < caravanWork->GetNumCmdList(); i++) {

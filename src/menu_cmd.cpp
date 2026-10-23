@@ -685,9 +685,9 @@ void CMenuPcs::CmdDraw()
 	float h;
 	s32 itemCount;
 	s32 idx;
+	s32 sel;
 	s32 row;
 	s32 choice;
-	s32 sel;
 	s16 mode;
 	s32 hasItemHelp = false;
 	s32 helpId;
