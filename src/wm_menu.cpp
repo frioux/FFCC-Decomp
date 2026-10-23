@@ -2395,9 +2395,10 @@ void CMenuPcs::CalcLoadMenu()
 				}
 				for (int charaIdx = 0; charaIdx < kWmMenuPlayerCount; charaIdx++) {
 					int tribe;
-					WmCharaModelInfo* modelInfo = &m_wm.m_charaModelData[charaIdx];
 					int variant;
 					int gender;
+					CCaravanWork* caravan;
+					WmCharaModelInfo* modelInfo = &m_wm.m_charaModelData[charaIdx];
 					if (m_wmWorldState->m_menuMode == 8 && m_cmakeWork != 0) {
 						Mc::CharaDat& character = m_cmakeWork->m_characters[charaIdx];
 						if (character.m_exists != 0) {
@@ -2410,17 +2411,19 @@ void CMenuPcs::CalcLoadMenu()
 							variant = -1;
 							gender = -1;
 						}
-					} else if (Game.m_caravanWorkArr[charaIdx].m_shopState != 0) {
-						CCaravanWork& work = Game.m_caravanWorkArr[charaIdx];
-						tribe = work.m_tribeId;
-						gender = work.m_genderFlag;
-						variant = work.m_appearanceVariant;
-						modelInfo->m_modelNo = GetModelNo(tribe, variant, gender);
 					} else {
-						modelInfo->m_modelNo = -1;
-						tribe = -1;
-						variant = -1;
-						gender = -1;
+						caravan = &Game.m_caravanWorkArr[charaIdx];
+						if (Game.m_caravanWorkArr[charaIdx].m_shopState != 0) {
+							tribe = caravan->m_tribeId;
+							gender = caravan->m_genderFlag;
+							variant = caravan->m_appearanceVariant;
+							modelInfo->m_modelNo = GetModelNo(tribe, variant, gender);
+						} else {
+							modelInfo->m_modelNo = -1;
+							tribe = -1;
+							variant = -1;
+							gender = -1;
+						}
 					}
 					ChgModel(charaIdx, tribe, variant, gender);
 				}
