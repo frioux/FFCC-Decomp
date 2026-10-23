@@ -252,6 +252,7 @@ void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTable
 	CMapMesh* mapMesh;
 	int textureIndex;
 
+	u32 xFine;
 	if (ppvUserStopPartF != 0) {
 		return;
 	}
@@ -317,7 +318,7 @@ void pppFrameCrystal(pppCrystal* pppCrystal, pppCrystalStep* step, _pppCtrlTable
 				}
 #endif
 
-				u32 xFine = x & 3;
+				xFine = x & 3;
 				if (magnitude > maxMagnitude) {
 					magnitude = maxMagnitude;
 				}

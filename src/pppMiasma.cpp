@@ -346,8 +346,8 @@ void pppRenderMiasma(pppMiasma* pppMiasma, pppMiasmaRenderStep* step, _pppCtrlTa
         yPos = (float)slice * height;
         yOffset = (int)yPos;
 
-        Graphic.GetBackBufferRect2(graphicPtr->m_scratchTextureBuffer, &backSceneTex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR,
-                                   GX_TF_RGBA8, 0);
+        graphicPtr->GetBackBufferRect2(graphicPtr->m_scratchTextureBuffer, &backSceneTex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR,
+                                       GX_TF_RGBA8, 0);
         GXSetScissor(0, (u32)yPos, scissorWidth, scissorHeight);
 
         if (isCameraInside) {

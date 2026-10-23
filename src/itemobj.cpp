@@ -1130,7 +1130,9 @@ void CGItemObj::ItemJump(int state, float jump)
 			move.y = -2000.0f;
 			unsigned int mapMask = object->m_bgHitMask;
 			CMapCylinder cylinder;
-			cylinder.m_bottom = bottom;
+			cylinder.m_bottom.x = bottom.x;
+			cylinder.m_bottom.y = bottom.y;
+			cylinder.m_bottom.z = bottom.z;
 			cylinder.m_axis.x = 0.0f;
 			cylinder.m_axis.y = -2000.0f;
 			cylinder.m_axis.z = 0.0f;

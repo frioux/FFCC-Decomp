@@ -653,13 +653,12 @@ static void CalcReflectionVector2(
             }
             CVector reflected(vtxReflection->x, vtxReflection->y, vtxReflection->z);
 
+            uv.y = 0.5f;
+            uv.x = 0.5f;
             vtxColor = &color[posIndex];
             vtxColor->r = 0x80;
             vtxColor->g = 0x80;
             vtxColor->b = 0x80;
-
-            uv.y = 0.5f;
-            uv.x = 0.5f;
             vtxColor->a = 0xFF;
 
             switch (axis) {

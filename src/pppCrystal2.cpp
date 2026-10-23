@@ -55,12 +55,6 @@ union Crystal2FloatBits {
     u32 bits;
 };
 
-static const Crystal2IndTexMtx s_crystal2IndTexMtxBase = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
-
-static const Crystal2TexMtx s_crystal2TexMtxBase = {
-    {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
-
-
 static inline int Crystal2FpClassify(float value)
 {
     Crystal2FloatBits bits;
@@ -112,13 +106,11 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrl
     CTexture* sourceTex;
     _GXTexObj backTexObj;
     int textureIndex;
-    Crystal2IndTexMtx indTexMtx;
     Mtx normalMtx;
     Mtx cameraMtx;
     Mtx tmpMtx;
     Mtx drawMtx;
     Mtx lightMtx;
-    Crystal2TexMtx texMtx;
 
     if (dataValIndex != 0xFFFF) {
         sourceTex = 0;
@@ -143,10 +135,11 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrl
             step->m_crystal.m_zMode);
         GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 
-        indTexMtx = s_crystal2IndTexMtxBase;
+        Crystal2IndTexMtx indTexMtx = {{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
         indTexMtx.value[0][0] = -0.5f * step->m_stepValue;
         indTexMtx.value[1][1] = indTexMtx.value[0][0];
-        texMtx = s_crystal2TexMtxBase;
+        Crystal2TexMtx texMtx = {
+            {{0.5f, 0.0f, 0.0f, 0.5f}, {0.0f, -0.5f, 0.0f, 0.5f}, {0.0f, 0.0f, 0.0f, 1.0f}}};
 
         PSMTXIdentity(drawMtx);
         PSMTXConcat(ppvMng->m_matrix.value, pppCrystal2->m_localMatrix.value, cameraMtx);
@@ -226,6 +219,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlT
     float xCoord;
     float ySq;
 
+    u32 xFine;
     if (ppvUserStopPartF != 0) {
         return;
     }
@@ -270,7 +264,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2Step* step, _pppCtrlT
                 }
 #endif
 
-                u32 xFine = x & 3;
+                xFine = x & 3;
                 if (magnitude > 1.0f) {
                     magnitude = 1.0f;
                 }

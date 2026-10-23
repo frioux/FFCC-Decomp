@@ -4225,6 +4225,8 @@ void GbaQueue::ClrChgRadarMode(int channel)
  */
 int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 {
+	int statusCount;
+	short scouterValue;
 	struct ScouterEntry
 	{
 		unsigned char m_baseDataIndex;
@@ -4254,7 +4256,7 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 					work = -1;
 					localScouterInfo[i].m_dropItemCode = __lhbrx(&work, 0);
 				} else {
-					const short scouterValue = m_enemies[i].m_dropItemCodes[0];
+					scouterValue = m_enemies[i].m_dropItemCodes[0];
 					if (scouterValue <= 0) {
 						localScouterInfo[i].m_dropItemCode = 0;
 					} else if ((scouterValue & 0xC000) == 0x4000) {
@@ -4286,7 +4288,7 @@ int GbaQueue::GetScouterInfo(int channel, unsigned char* outData)
 								localScouterInfo[i].m_traits[0] = 4;
 							}
 						} else {
-							int statusCount = 0;
+							statusCount = 0;
 
 							if (form0 == 0) {
 								localScouterInfo[i].m_traits[0] = 5;

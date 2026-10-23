@@ -43,8 +43,12 @@ inline int CMapPcs::CheckHitCylinderNear(Vec* cylinderBottom, Vec* direction, fl
 {
 	CMapCylinder cylinder;
 
-	cylinder.m_bottom = *cylinderBottom;
-	cylinder.m_axis = *direction;
+	cylinder.m_bottom.x = cylinderBottom->x;
+	cylinder.m_bottom.y = cylinderBottom->y;
+	cylinder.m_bottom.z = cylinderBottom->z;
+	cylinder.m_axis.x = direction->x;
+	cylinder.m_axis.y = direction->y;
+	cylinder.m_axis.z = direction->z;
 	cylinder.m_radius = radius;
 
 	return g_MapMng.CheckHitCylinderNear(&cylinder, direction, hitMask);
@@ -1773,6 +1777,7 @@ void CGMonObj::checkCol(int flags, float rotY, float distance, float* hitScale, 
  */
 void CGMonObj::mlHide()
 {
+	int action;
 	if (m_unk6BE != 0) {
 		return;
 	}
@@ -1787,7 +1792,7 @@ void CGMonObj::mlHide()
 	}
 
 	if (partyIndex >= 0) {
-		int action = m_actionBranch;
+		action = m_actionBranch;
 		unsigned short noticeFlags = m_scriptHandle->m_romWork[0x7F];
 		int monClass = m_scriptHandle->m_baseDataIndex;
 

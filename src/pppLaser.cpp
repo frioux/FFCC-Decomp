@@ -319,7 +319,7 @@ extern "C" void pppRenderLaser(pppLaser *laser, pppLaserStep *step, _pppCtrlTabl
     s32 dataValIndex = step->m_dataValIndex;
     u32 count;
     s32 i;
-    s32 alphaStep;
+    short alphaStep;
     char alphaMax;
     float negHalfWidth;
     float length;

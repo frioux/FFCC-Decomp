@@ -397,8 +397,12 @@ static inline int CheckLineCylinder(const Vec& lineStart, const Vec& lineDirecti
     Vec rayDirection = cyl.m_axis;
 
     CMapCylinder edgeCylinder;
-    edgeCylinder.m_bottom = lineStart;
-    edgeCylinder.m_axis = lineDirection;
+    edgeCylinder.m_bottom.x = lineStart.x;
+    edgeCylinder.m_bottom.y = lineStart.y;
+    edgeCylinder.m_bottom.z = lineStart.z;
+    edgeCylinder.m_axis.x = lineDirection.x;
+    edgeCylinder.m_axis.y = lineDirection.y;
+    edgeCylinder.m_axis.z = lineDirection.z;
     edgeCylinder.m_radius = cyl.m_radius;
 
     return FindIntersection(rayStart, rayDirection, edgeCylinder, outT);

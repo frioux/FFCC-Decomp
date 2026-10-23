@@ -944,6 +944,7 @@ enum {
 void CMenuPcs::DrawSingleStat(float alpha)
 {
     CFont* font;
+    float y;
 #ifdef VERSION_GCCP01
     int languageId = Game.m_gameWork.m_languageId;
 #endif
@@ -1059,7 +1060,7 @@ void CMenuPcs::DrawSingleStat(float alpha)
     float statY0 = 184.0f;
     float statYStep = 36.0f;
     float statPosX0 = 592.0f;
-    float y = statY0;
+    y = statY0;
     for (int i = 0; i < 4; i++) {
         font->SetPosX(440.0f);
 #ifdef VERSION_GCCJGC
@@ -1866,6 +1867,8 @@ void CMenuPcs::DrawSingWin(short mode)
 {
     int i;
 
+    float topScale;
+    double innerW;
     if (mode >= 0 && m_menuWindowInfo->state != mode) {
         m_menuWindowInfo->state = mode;
     }
@@ -1882,7 +1885,7 @@ void CMenuPcs::DrawSingWin(short mode)
     if (m_menuWindowInfo->state != 1) {
         float leftScale = (left - m_menuWindowInfo->x - 32.0f) / SINGWIN_OPEN_FRAMES;
         leftScale *= m_menuWindowInfo->frame;
-        float topScale = (top - m_menuWindowInfo->y - 32.0f) / SINGWIN_OPEN_FRAMES;
+        topScale = (top - m_menuWindowInfo->y - 32.0f) / SINGWIN_OPEN_FRAMES;
         topScale *= m_menuWindowInfo->frame;
         width = static_cast<float>(2.0 * static_cast<double>(32.0f + leftScale));
         left = (left - 32.0f) - leftScale;
@@ -1937,7 +1940,7 @@ void CMenuPcs::DrawSingWin(short mode)
 
     MenuPcs.SetTexture(SingMenuTex(0x41));
     float innerX = 32.0f + x0;
-    double innerW = static_cast<double>(w) - 64.0;
+    innerW = static_cast<double>(w) - 64.0;
     float yy = y0;
     float innerWf = static_cast<float>(innerW);
     for (i = 0; i < 2; i++) {
@@ -2562,6 +2565,7 @@ void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
 {
     int tex;
+    int barX;
     _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_AND);
     MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
@@ -2599,7 +2603,7 @@ void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
     }
 
     MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(tex));
-    int barX = x + 0x10;
+    barX = x + 0x10;
     int barY = y + 8;
     MenuPcs.DrawRect(0, static_cast<float>(barX), static_cast<float>(barY),
                                     4.0f, 8.0f, 0.0f, 0.0f,

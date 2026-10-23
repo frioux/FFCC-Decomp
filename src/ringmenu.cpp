@@ -367,6 +367,7 @@ static void drawCommand(int state, CFont* font, float posX, float posY, CCaravan
  */
 void CRingMenu::onDraw()
 {
+	float fullAlpha;
 	if (!((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1))) {
 		return;
 	}
@@ -431,6 +432,15 @@ void CRingMenu::onDraw()
 	for (int group = 2; group >= 0; group--) {
 		float posY;
 		float posX;
+		float buttonAlpha;
+		float textX0;
+		float textY0;
+		float drawX;
+		float drawY;
+		float textY1;
+		float textY2;
+		float textX2;
+		float textX1;
 
 		if (group == 2) {
 			posX = 16.0f + (((m_menuIndex & 1) != 0) ? posAltX : posLeft);
@@ -440,7 +450,7 @@ void CRingMenu::onDraw()
 			posY = 96.0f + (((m_menuIndex & 2) != 0) ? posMainY : posLeft);
 		}
 
-		float buttonAlpha = static_cast<float>(m_buttonTimers[group][2]) / 8.0f;
+		buttonAlpha = static_cast<float>(m_buttonTimers[group][2]) / 8.0f;
 		if (m_battleCommands[group][0] >= 0) {
 			buttonAlpha = 1.0f - buttonAlpha;
 		}
@@ -462,8 +472,6 @@ void CRingMenu::onDraw()
 #else
 		const float labelWidth = 144.0f;
 #endif
-		float drawX;
-		float drawY;
 		switch (group) {
 		case 0: {
 			const float wobble = static_cast<float>(sin(static_cast<double>(1.5707963705062866f * buttonAlpha)));
@@ -533,8 +541,7 @@ void CRingMenu::onDraw()
 					}
 				}
 
-				labelAlpha = (fabs(static_cast<double>(m_spinAccumulator)) < 0.009999999776482582)
-				                 ? 100.0 * fabs(static_cast<double>(m_spinAccumulator)) : 1.0;
+				labelAlpha = (__fabs(m_spinAccumulator) < 0.01f) ? 100.0 * __fabs(m_spinAccumulator) : 1.0;
 
 				int prev1 = (Game.m_gameWork.IsMogStage())
 				                ? (cmdIndex + 4) % 5
@@ -559,19 +566,19 @@ void CRingMenu::onDraw()
 			}
 		}
 
-		const float textX2 = 64.0f + drawX;
+		textX2 = 64.0f + drawX;
 #ifdef VERSION_GCCJGC
-		const float textX0 = textX2;
-		const float textY0 = 5.0f + drawY;
-		const float textX1 = 56.0f + drawX;
-		const float textY1 = 3.0f + drawY;
+		textX0 = textX2;
+		textY0 = 5.0f + drawY;
+		textX1 = 56.0f + drawX;
+		textY1 = 3.0f + drawY;
 #else
-		const float textX0 = textX2 + 20.0f;
-		const float textY0 = (5.0f + drawY) - 4.0f;
-		const float textX1 = (56.0f + drawX) + 20.0f;
-		const float textY1 = (3.0f + drawY) - 4.0f;
+		textX0 = textX2 + 20.0f;
+		textY0 = (5.0f + drawY) - 4.0f;
+		textX1 = (56.0f + drawX) + 20.0f;
+		textY1 = (3.0f + drawY) - 4.0f;
 #endif
-		const float textY2 = 6.0f + drawY;
+		textY2 = 6.0f + drawY;
 		CFont* font = MenuPcs.GetFont23();
 		for (int button = 1; button >= 0; button--) {
 			const int buttonValue = m_battleCommands[group][button];
@@ -664,8 +671,8 @@ void CRingMenu::onDraw()
 					    && (static_cast<signed char>(
 					            static_cast<int>((static_cast<unsigned int>(CFlatGameFlags()) << 30) & 0xC0000000) >> 31)
 					        == 0)) {
+						fullAlpha = showScale * (255.0f * fade * transitionScale);
 						const float dimAlpha = showScale * (128.0f * fade * transitionScale);
-						const float fullAlpha = showScale * (255.0f * fade * transitionScale);
 						const float barY = 20.0f + textY;
 
 						for (int i = 0; i < caravanWork->GetNumCmdList(); i++) {
@@ -716,15 +723,22 @@ void CRingMenu::onDraw()
  */
 void CRingMenu::drawGBA()
 {
+	float gbaAnim;
 	float sinA;
 	float sinB;
-	float gbaAnim;
 	float angle;
-	float posX;
+	float alphaBase;
 	float showScale;
-	float cycle;
+	float posX;
 	float posY;
 	float sizePulse;
+	float gbaAnimRaw;
+	float cycleRaw;
+	float cycle;
+	float invSize;
+	float orbitX;
+	float orbitY;
+	float alphaLit;
 
 	if (!((Game.m_gameWork.m_menuStageMode == 0) || (m_menuIndex < 1))) {
 		return;
@@ -745,7 +759,7 @@ void CRingMenu::drawGBA()
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_BATTLE));
 
-	float gbaAnimRaw = static_cast<float>(
+	gbaAnimRaw = static_cast<float>(
 	    sin(static_cast<double>((1.5707963705062866f * static_cast<float>(m_gbaAnimCounter)) / 12.0f)));
 	gbaAnim = gbaAnimRaw;
 	if (m_gbaConnectedFlag == 1) {
@@ -767,8 +781,8 @@ void CRingMenu::drawGBA()
 	MenuPcs.SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 
 	sizePulse = 0.25f * (1.0f - gbaAnim) + 1.0f;
-	float cycleRaw = static_cast<float>(fmod(static_cast<double>(0.05f * static_cast<float>(m_commonFrameCounter)),
-	                                         2.0));
+	cycleRaw = static_cast<float>(fmod(static_cast<double>(0.05f * static_cast<float>(m_commonFrameCounter)),
+	                                   2.0));
 	if (cycleRaw > 1.0f) {
 		cycle = 2.0f - cycleRaw;
 	} else {
@@ -781,17 +795,17 @@ void CRingMenu::drawGBA()
 
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(RING_TEX_GBA));
 
-	const float alphaBase = 255.0f * gbaAnim;
+	alphaBase = 255.0f * gbaAnim;
 	MenuPcs.SetColor(CColor(0, 0, 0, static_cast<unsigned char>(0.5f * alphaBase * showScale)));
 
-	const float invSize = 1.0f - sizePulse;
-	const float orbitX = 5.0f * (sizePulse * sinB);
-	const float orbitY = 10.0f * (sizePulse * sinA);
+	invSize = 1.0f - sizePulse;
+	orbitX = 5.0f * (sizePulse * sinB);
+	orbitY = 10.0f * (sizePulse * sinA);
 	MenuPcs.DrawRect(3, 8.0f + (posX + orbitX), 8.0f + (posY - orbitY), 80.0f, 48.0f,
 	                                 0.0f, static_cast<float>(m_menuIndex * 0x30), 0.75f * (1.0f + invSize),
 	                                 0.75f * (sizePulse + invSize), 0.2f * (2.0f * (cycle - 0.5f)));
 
-	const float alphaLit = alphaBase * showScale;
+	alphaLit = alphaBase * showScale;
 	MenuPcs.SetColor(CColor(0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaLit)));
 	MenuPcs.DrawRect(3, posX + orbitX, posY - orbitY, 80.0f, 48.0f, 0.0f, static_cast<float>(m_menuIndex * 0x30),
 	                                 0.75f * sizePulse, 0.75f * sizePulse, 0.2f * (2.0f * (cycle - 0.5f)));

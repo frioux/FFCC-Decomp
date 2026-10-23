@@ -773,9 +773,9 @@ static void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, 
                     break;
                 case 5:
                     cameraPos.y -= 1.0f;
+                    cameraUp.x = 0.0f;
                     cameraUp.y = 0.0f;
                     cameraUp.z = 1.0f;
-                    cameraUp.x = 0.0f;
                     break;
                 }
             }

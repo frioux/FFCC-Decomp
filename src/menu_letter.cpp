@@ -1786,6 +1786,8 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	float y1;
 	float innerX;
 
+	double decoX1;
+	float barY1;
 	if (openRatio <= 0.0f) {
 		return;
 	}
@@ -1894,7 +1896,7 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	MenuPcs.SetTexture(static_cast<CMenuPcs::TEX>(kLetterTexBase + 0x13));
 	double decoY0 = y0 - 8.0;
 	float decoX = xw - 16.0f;
-	double decoX1 = 8.0 + decoX;
+	decoX1 = 8.0 + decoX;
 	double decoY1 = 8.0 + (yh - 24.0f);
 	for (i = 0; i < 4; ++i) {
 		flip = 0;
@@ -1920,7 +1922,7 @@ void CMenuPcs::LetterLstBaseDraw(float openRatio)
 	float barX = x0 - 8.0f;
 	float barX1 = 8.0f + decoX;
 	float barY0 = static_cast<float>((24.0 + y0) - 8.0);
-	float barY1 = barY0 + static_cast<float>(h - 32.0);
+	barY1 = barY0 + static_cast<float>(h - 32.0);
 	for (i = 0; i < 2; ++i) {
 		if (i != 0) {
 			barX = barX1;
