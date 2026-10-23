@@ -6110,7 +6110,9 @@ void CMenuPcs::CalcWMFrame0(int param)
 	int value;
 
 	m_wm.m_frameInfo->m_sprites[0].m_x = 0x10;
-	m_wm.m_frameInfo->m_sprites[1].m_x = 640.0f - (m_wm.m_frameInfo->m_sprites[0].m_width + m_wm.m_frameInfo->m_sprites[0].m_x);
+	float rightX = m_wm.m_frameInfo->m_sprites[0].m_width + m_wm.m_frameInfo->m_sprites[0].m_x;
+	rightX = 640.0f - rightX;
+	m_wm.m_frameInfo->m_sprites[1].m_x = rightX;
 
 	if (param < 0) {
 		float offset = static_cast<float>(static_cast<int>(m_wm.m_frameInfo->m_sprites[0].m_width) +
