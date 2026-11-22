@@ -28,6 +28,7 @@ public:
     void SetWrapMode(GXTexWrapMode wrapMode) { m_wrapMode = wrapMode; }
     void* GetRefBuffer() { return m_imageData; }
     void SetFormat(unsigned long format) { m_format = format; }
+    void Set(_GXTexMapID texMapId);
 
     void InitTexObj();
     void Create(CChunkFile&, CMemory::CStage*, CAmemCacheSet*, int, int);
@@ -141,5 +142,19 @@ private:
 };
 
 extern CTextureMan TextureMan;
+
+/*
+ * --INFO--
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
+ * EN Address: 0x8004EEB4
+ * EN Size: 52b
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+inline void CTexture::Set(_GXTexMapID texMapId)
+{
+    TextureMan.SetTexture(texMapId, this);
+}
 
 #endif // _FFCC_PPP_TEXTUREMAN_H_

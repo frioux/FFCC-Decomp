@@ -142,8 +142,7 @@ void CMenuPcs::Init()
     one = 0.0f;
     m_gameInitMode = 0;
     m_stereoMode = 0;
-    m_bgmVolume = 6;
-    m_seVolume = 6;
+    m_seVolume = m_bgmVolume = 6;
     m_leftHintTimer = 0;
     m_rightHintTimer = 0;
     m_optionMenuState = 0;
@@ -282,9 +281,8 @@ void CMenuPcs::destroy()
 
     freeTexture(0, 2, 0, MenuCommonTextureCount);
 
-    CFont* font = m_fonts[0];
-    if (font != nullptr) {
-        font->Release();
+    if (m_fonts[0] != 0) {
+        m_fonts[0]->Release();
         m_fonts[0] = 0;
     }
 
@@ -469,10 +467,7 @@ inline CMemory::CStage* CMenuPcs::GetStage(int stageSelect)
         return g_MapMng.m_stage;
     }
     if ((Game.m_gameWork.m_menuStageMode != 0) && (stageSelect != 0)) {
-        if (stageSelect == 1) {
-            return m_stageF0;
-        }
-        return m_stageF4;
+        return (stageSelect == 1) ? m_stageF0 : m_stageF4;
     }
     return m_menuStage;
 }
@@ -535,17 +530,15 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
 void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int textureStart, int textureCount)
 {
     for (int i = 0; i < textureCount; i++) {
-        CTexture* texture = m_textures[i + textureStart];
-        if (texture != nullptr) {
-            texture->Release();
+        if (m_textures[i + textureStart] != 0) {
+            m_textures[i + textureStart]->Release();
             m_textures[i + textureStart] = 0;
         }
     }
 
     for (int i = 0; i < textureSetCount; i++) {
-        CTextureSet* textureSet = m_textureSets[i + textureSetStart];
-        if (textureSet != nullptr) {
-            textureSet->Release();
+        if (m_textureSets[i + textureSetStart] != 0) {
+            m_textureSets[i + textureSetStart]->Release();
             m_textureSets[i + textureSetStart] = 0;
         }
     }
@@ -621,6 +614,7 @@ void CMenuPcs::calc()
     switch (m_mode) {
         case 0:
             calcBattle();
+            calcVillageMenu();
             break;
         case 1:
             CalcDiaryMenu();
@@ -693,14 +687,8 @@ void CMenuPcs::DrawInit()
     _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetCullMode(GX_CULL_NONE);
     GXSetNumTexGens(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
+    SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
 }
 
 /*
@@ -836,8 +824,8 @@ void CMenuPcs::onScriptChanging(char* script)
  */
 void CMenuPcs::onMapChanging(int mapNo, int)
 {
-    if (((mapNo == 0x21) && (Game.m_currentMapId != 0x21)) ||
-        ((mapNo != 0x21) && (Game.m_currentMapId == 0x21))) {
+    if (((mapNo == 0x21) && !Game.IsWorldMap()) ||
+        ((mapNo != 0x21) && Game.IsWorldMap())) {
         changeMode(static_cast<CMenuPcs::MENUMODE>(-1));
     }
 }
@@ -853,7 +841,7 @@ void CMenuPcs::onMapChanging(int mapNo, int)
  */
 void CMenuPcs::onMapChanged(int, int, int)
 {
-    changeMode(static_cast<CMenuPcs::MENUMODE>((Game.m_currentMapId == 0x21) ? 1 : 0));
+    changeMode(static_cast<CMenuPcs::MENUMODE>(Game.IsWorldMap() ? 1 : 0));
 }
 
 /*
@@ -877,14 +865,14 @@ void CMenuPcs::SetTexture(CMenuPcs::TEX tex)
         u32 height;
 
         texture = m_textures[(int)tex];
-        TextureMan.SetTexture(GX_TEXMAP0, texture);
+        texture->Set(GX_TEXMAP0);
 
         width = texture->GetWidth();
         height = texture->GetHeight();
         PSMTXScale(texMtx, 1.0f / (f32)width, 1.0f / (f32)height, 1.0f);
         GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
         GXSetNumTexGens(1);
-        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+        GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
     }
 
     TextureMan.SetTextureTev(texture);
@@ -1188,7 +1176,7 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
  */
 void CMenuPcs::SetColor(CColor& color)
 {
-    GXSetChanMatColor(GX_COLOR0A0, color.color);
+    GXSetChanMatColor(GX_COLOR0A0, color);
 }
 
 /*
@@ -1203,10 +1191,9 @@ void CMenuPcs::SetColor(CColor& color)
 void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
 {
     char path[0x108];
-    CFont* font = m_fonts[fontNo + 2];
 
-    if (font != 0) {
-        font->Release();
+    if (m_fonts[fontNo + 2] != 0) {
+        m_fonts[fontNo + 2]->Release();
         m_fonts[fontNo + 2] = 0;
     }
 
@@ -1260,7 +1247,7 @@ void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
  */
 void CMenuPcs::drawPause()
 {
-    if (((CFlat.m_eventFlags & 0x10) == 0) || (System.m_scenegraphStepMode != 2)) {
+    if (((CFlat.m_eventFlags & 0x10) == 0) || (System.GetSpeed() != 2)) {
         return;
     }
 
@@ -1399,12 +1386,8 @@ inline void CMenuPcs::calcBattle()
     limit = current + limit;
     m_battleHud.m_gaugeValue = (limit < value) ? value : ((++current < limit) ? current : limit);
 
-    u32 counter = m_battleHud.m_fadeCounter - 1;
-    m_battleHud.m_fadeCounter = counter & ~((int)counter >> 31);
-    counter = m_battleHud.m_gaugeCounter - 1;
-    m_battleHud.m_gaugeCounter = counter & ~((int)counter >> 31);
-
-    calcVillageMenu();
+    m_battleHud.m_fadeCounter = (m_battleHud.m_fadeCounter - 1 < 0) ? 0 : m_battleHud.m_fadeCounter - 1;
+    m_battleHud.m_gaugeCounter = (m_battleHud.m_gaugeCounter - 1 < 0) ? 0 : m_battleHud.m_gaugeCounter - 1;
 }
 
 /*
@@ -1498,9 +1481,7 @@ void CMenuPcs::drawBattle()
  */
 void CMenuPcs::ChgPlayModeFromScript(bool isScriptMode)
 {
-    const int mode = m_mode;
-
-    if ((mode != 2) && (mode != 1)) {
+    if ((m_mode != 2) && (m_mode != 1)) {
         destroySingleMenu();
     }
 
