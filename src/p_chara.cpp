@@ -518,7 +518,7 @@ void CCharaPcs::onScriptChanging(char*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCharaPcs::calc()
+inline void CCharaPcs::calc()
 {
     CHandle* handle = m_handleList->m_next;
 
@@ -553,7 +553,7 @@ void CCharaPcs::calcAfter()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::ReleaseAllAnimBank()
+inline void CCharaPcs::ReleaseAllAnimBank()
 {
     for (int i = m_loadAnims.GetSize() - 1; i >= 0; i--) {
         m_loadAnims[i]->m_anim->ReleaseBank();
@@ -565,7 +565,7 @@ void CCharaPcs::ReleaseAllAnimBank()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::ReleaseUnusedAnimBank()
+inline void CCharaPcs::ReleaseUnusedAnimBank()
 {
     CLoadAnim* loadAnim;
     CChara::CAnim* anim;
@@ -922,7 +922,7 @@ int CCharaPcs::releaseUnuseLoadModel(int releaseMask)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::releaseUnuseLoadAnim(CCharaPcs::CLoadAnim* target, int releaseMask)
+inline void CCharaPcs::releaseUnuseLoadAnim(CCharaPcs::CLoadAnim* target, int releaseMask)
 {
     for (int i = m_loadAnims.GetSize() - 1; i >= 0; i--) {
         CLoadAnim* loadAnim = m_loadAnims[static_cast<unsigned long>(i)];
@@ -1043,7 +1043,7 @@ void CCharaPcs::DumpLoad()
  * Address:	TODO
  * Size:	TODO
  */
-CCharaPcs::CLoadModel* CCharaPcs::searchModel(int keyTag, int keyId)
+inline CCharaPcs::CLoadModel* CCharaPcs::searchModel(int keyTag, int keyId)
 {
     for (unsigned int i = 0; i < static_cast<unsigned int>(m_loadModels.GetSize()); i++) {
         CLoadModel* loadModel = m_loadModels[i];
@@ -1059,7 +1059,7 @@ CCharaPcs::CLoadModel* CCharaPcs::searchModel(int keyTag, int keyId)
  * Address:	TODO
  * Size:	TODO
  */
-CCharaPcs::CLoadTexture* CCharaPcs::searchTexture(int keyTag, int keyId, int variantTag)
+inline CCharaPcs::CLoadTexture* CCharaPcs::searchTexture(int keyTag, int keyId, int variantTag)
 {
     for (unsigned int i = 0; i < static_cast<unsigned int>(m_loadTextures.GetSize()); i++) {
         CLoadTexture* loadTexture = m_loadTextures[i];
@@ -1076,7 +1076,7 @@ CCharaPcs::CLoadTexture* CCharaPcs::searchTexture(int keyTag, int keyId, int var
  * Address:	TODO
  * Size:	TODO
  */
-CCharaPcs::CLoadAnim* CCharaPcs::searchAnim(int keyTag, int keyId, char* name)
+inline CCharaPcs::CLoadAnim* CCharaPcs::searchAnim(int keyTag, int keyId, char* name)
 {
     for (unsigned int i = 0; i < static_cast<unsigned int>(m_loadAnims.GetSize()); i++) {
         CLoadAnim* loadAnim = m_loadAnims[i];
@@ -1093,7 +1093,7 @@ CCharaPcs::CLoadAnim* CCharaPcs::searchAnim(int keyTag, int keyId, char* name)
  * Address:	TODO
  * Size:	TODO
  */
-CCharaPcs::CLoadPdt* CCharaPcs::searchPdt(int keyTag, int keyId, int variantTag)
+inline CCharaPcs::CLoadPdt* CCharaPcs::searchPdt(int keyTag, int keyId, int variantTag)
 {
     for (unsigned int i = 0; i < static_cast<unsigned int>(m_loadPdts.GetSize()); i++) {
         CLoadPdt* loadPdt = m_loadPdts[i];
@@ -1362,7 +1362,7 @@ inline int CCharaPcs::isCached(int mergeFileId, int)
  * Address:	TODO
  * Size:	TODO
  */
-CCharaPcs::CLoadModel* CCharaPcs::loadModel(void* data, int keyTag, int keyId, int mergeFileId, int mergeFlags,
+inline CCharaPcs::CLoadModel* CCharaPcs::loadModel(void* data, int keyTag, int keyId, int mergeFileId, int mergeFlags,
                                             int streamToAmem, int size)
 {
     CLoadModel* loadModel = new (CharaPcs.m_stage, "p_chara.cpp", 0x5E8) CLoadModel;
@@ -1393,7 +1393,7 @@ CCharaPcs::CLoadModel* CCharaPcs::loadModel(void* data, int keyTag, int keyId, i
  * Address:	TODO
  * Size:	TODO
  */
-CCharaPcs::CLoadTexture* CCharaPcs::loadTexture(void* data, int keyTag, int keyId, int variantTag, int mergeFileId,
+inline CCharaPcs::CLoadTexture* CCharaPcs::loadTexture(void* data, int keyTag, int keyId, int variantTag, int mergeFileId,
                                                 int mergeFlags, int streamToAmem, int size)
 {
     CLoadTexture* loadTexture = new (CharaPcs.m_stage, "p_chara.cpp", 0x609) CLoadTexture;
@@ -1423,7 +1423,7 @@ CCharaPcs::CLoadTexture* CCharaPcs::loadTexture(void* data, int keyTag, int keyI
  * Address:	TODO
  * Size:	TODO
  */
-CCharaPcs::CLoadAnim* CCharaPcs::loadAnimBuffer(void* data, char* name, int keyTag, int keyId, int mergeFileId,
+inline CCharaPcs::CLoadAnim* CCharaPcs::loadAnimBuffer(void* data, char* name, int keyTag, int keyId, int mergeFileId,
                                                 int mergeFlags)
 {
     CChara::CAnim* anim = new (CharaPcs.m_stage, "p_chara.cpp", 0x62A) CChara::CAnim;
@@ -1697,7 +1697,7 @@ void CCharaPcs::CHandle::Add()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCharaPcs::CHandle::Remove()
+inline void CCharaPcs::CHandle::Remove()
 {
     if (m_next != 0 && m_previous != 0) {
         m_previous->m_next = m_next;
@@ -2015,7 +2015,7 @@ int CCharaPcs::LoadAnim(int charaKind, int charaNo, char* animName, int, int mer
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CHandle::FreeModel()
+inline void CCharaPcs::CHandle::FreeModel()
 {
     Graphic._WaitDrawDone("p_chara.cpp", 0x8C9);
     PartMng.pppDeleteCHandle(this);
@@ -2118,7 +2118,7 @@ int CCharaPcs::CHandle::SetAnim(int animIndex, int startFrame, int endFrame, int
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CHandle::Calc()
+inline void CCharaPcs::CHandle::Calc()
 {
     m_shadowTexturePtr = 0;
     loadModelASyncFrame();
